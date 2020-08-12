@@ -180,7 +180,6 @@ int main(void) {
 					*bp = 0;
 					reRenderWorld();
 				}
-				reRenderWorld();
 			} else if (lMousePress && glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) != GLFW_PRESS) {
 				//lMousePress = false;
 			}
