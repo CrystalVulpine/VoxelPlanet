@@ -1,5 +1,5 @@
-#ifndef BLOCKS_H_
-#define BLOCKS_H_
+#ifndef BLOCKS_HPP_
+#define BLOCKS_HPP_
 
 #define blockGrass 0x00bf00ff
 #define blockDirt 0x662000ff

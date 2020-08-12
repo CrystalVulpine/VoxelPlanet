@@ -6,7 +6,6 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include <glm/gtc/matrix_transform.hpp>
-#include "shaders.h"
 #include "World.hpp"
 #include "Blocks.hpp"
 #include "VoxelPlanet.hpp"
@@ -15,6 +14,29 @@ GLuint vertexbuffer;
 GLuint colorbuffer;
 
 unsigned int vertexIndex = 0;
+
+GLuint loadShaders(GLchar const * vertexShaderCode, GLchar const * fragmentShaderCode) {
+	GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
+	GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+
+	glShaderSource(vertexShader, 1, &vertexShaderCode, NULL);
+	glCompileShader(vertexShader);
+
+	glShaderSource(fragmentShader, 1, &fragmentShaderCode, NULL);
+	glCompileShader(fragmentShader);
+
+	GLuint program = glCreateProgram();
+	glAttachShader(program, vertexShader);
+	glAttachShader(program, fragmentShader);
+	glLinkProgram(program);
+
+	glDetachShader(program, vertexShader);
+	glDetachShader(program, fragmentShader);
+	glDeleteShader(vertexShader);
+	glDeleteShader(fragmentShader);
+
+	return program;
+}
 
 void renderBlock(int x, int y, int z, unsigned int block) {
 	double vertices[6 * 2 * 3 * 3];

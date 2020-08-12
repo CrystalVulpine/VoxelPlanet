@@ -4,7 +4,6 @@
 #include <GLFW/glfw3.h>
 #include <chrono>
 #include <glm/gtc/matrix_transform.hpp>
-#include "shaders.h"
 #include "World.hpp"
 #include "Blocks.hpp"
 #include "Rendering.hpp"
@@ -130,6 +129,9 @@ int main(void) {
 				}
 			} else {
 				glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+
+				// if this is not done the game will count the pause time as elapsed
+				lastTick = std::chrono::system_clock::now().time_since_epoch().count() / 1000000;
 			}
 			esc_pressed = true;
 		} else if (esc_pressed && glfwGetKey(window, GLFW_KEY_ESCAPE) != GLFW_PRESS) {
@@ -202,6 +204,7 @@ int main(void) {
 			rotationYaw += ((float)mouseX - ((float)windowWidth / 2.0)) / 180.0F;
 			rotationPitch += ((float)mouseY - ((float)windowHeight / 2.0)) / 180.0F;
 
+			// this prevents the camera from rotating too far upwards or downwards
 			if (rotationPitch > 3.14159265359F / 2.0F) {
 				rotationPitch = 3.14159265359F / 2.0F;
 			} else if (rotationPitch < -3.14159265359F / 2.0F) {

@@ -1,5 +1,5 @@
-#ifndef WORLD_H_
-#define WORLD_H_
+#ifndef WORLD_HPP_
+#define WORLD_HPP_
 
 #define WORLD_WIDTH 64
 #define WORLD_HEIGHT 64
