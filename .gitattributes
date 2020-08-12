@@ -1,0 +1,7 @@
+*.cpp text
+*.c text
+*.hpp text
+*.h text
+*.glsl text
+*.txt text
+
