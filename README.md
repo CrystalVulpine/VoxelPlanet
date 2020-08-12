@@ -2,7 +2,7 @@ VoxelPlanet is a sandbox made out of colored cubes. It is made using basic shade
 
 Currently, its functions are still very limited. For example, you can't set your own cube colors, and you can only place and destroy cubes at the position of your camera.
 
-##Controls:
+## Controls:
 
 * Move: WASD
 * Up: Space Bar
@@ -12,33 +12,33 @@ Currently, its functions are still very limited. For example, you can't set your
 * Select color of the selected cube: Middle Click
 * Pause/Unpause: Esc
 
-##Screenshots:
+## Screenshots:
 
 ![](https://i.imgur.com/CsTJFOc.png)
 
-##Checklist:
+## Checklist:
 
-[ ] Ray tracing for cube selection. As of now, the current cube is always the one the camera is inside of.
+- [ ] Ray tracing for cube selection. As of now, the current cube is always the one the camera is inside of.
 
-[ ] Add a GUI and the ability to select the color of the cube you're placing. For now you can middle click an existing one to select its color.
+- [ ] Add a GUI and the ability to select the color of the cube you're placing. For now you can middle click an existing one to select its color.
 
-[ ] Add settings and controls
+- [ ] Add settings and controls
 
-[ ] Improve rendering, allowing a larger world size and more details.
+- [ ] Improve rendering, allowing a larger world size and more details.
 
-[ ] Add the ability to save your world, possibly multiple
+- [ ] Add the ability to save your world, possibly multiple
 
-[ ] Add the ability to change your environment (like sky color, terrain generation)
+- [ ] Add the ability to change your environment (like sky color, terrain generation)
 
-[ ] Implement physics
+- [ ] Implement physics
 
-[ ] Infinite worlds (maybe)
+- [ ] Infinite worlds (maybe)
 
-##Local Development:
+## Local Development:
 
 VoxelPlanet is designed to be mostly platform independent, and should be compilable on most OSes provided that it works with the compiler (it is mainly built using gcc). However, the eclipse project may require some changes if you use it.
 
-###Required Libraries:
+### Required Libraries:
 
 * OpenGL
 * GLEW
