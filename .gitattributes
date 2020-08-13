@@ -5,3 +5,5 @@
 *.glsl text
 *.txt text
 
+/src/**.h linguist-language=C++
+
