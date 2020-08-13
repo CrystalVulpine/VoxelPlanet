@@ -155,14 +155,17 @@ int main(void) {
 
 		// this lets you type in new cube colors
 		if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS) {
+			colorInputIndex = 0;
 			changeRed = true;
 			changeGreen = false;
 			changeBlue = false;
 		} else if (glfwGetKey(window, GLFW_KEY_G) == GLFW_PRESS) {
+			colorInputIndex = 0;
 			changeRed = false;
 			changeGreen = true;
 			changeBlue = false;
 		} else if (glfwGetKey(window, GLFW_KEY_B) == GLFW_PRESS) {
+			colorInputIndex = 0;
 			changeRed = false;
 			changeGreen = false;
 			changeBlue = true;
