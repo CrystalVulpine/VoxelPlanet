@@ -11,6 +11,10 @@ Currently, its functions are still very limited. For example, you can't set your
 * Place cube: Right Click
 * Select color of the cube you're pointing at: Middle Click
 * Pause/Unpause: Esc
+* R: set red as the color being edited
+* G: set red as the color being edited
+* B: set red as the color being edited
+* Numbers from 000-255: sets the color being edited
 
 ## Screenshots:
 
@@ -20,7 +24,7 @@ Currently, its functions are still very limited. For example, you can't set your
 
 - [X] Ray tracing for cube selection. Before this was implemented, the current cube was always the one the camera is inside of.
 
-- [ ] Add a GUI and the ability to select the color of the cube you're placing. For now you can middle click an existing one to select its color.
+- [ ] Add a GUI and the ability to select the color of the cube you're placing. For now you can use the RGB keys and input numbers to set the color (see controls section above).
 
 - [ ] Add settings and controls
 
