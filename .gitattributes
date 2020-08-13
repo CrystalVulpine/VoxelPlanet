@@ -7,4 +7,5 @@
 
 /src/*.h linguist-language=C++
 /src/*.cpp linguist-language=C++
+/src/*.hpp linguist-language=C++
 

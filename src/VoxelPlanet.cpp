@@ -175,6 +175,17 @@ int main(void) {
 			xPos += forward * std::sin(rotationYaw) + sideways * std::cos(-rotationYaw);
 			zPos -= forward * std::cos(rotationYaw) + sideways * std::sin(-rotationYaw);
 
+			if (xPos < 0.0) {
+				xPos = 0.0;
+			} else if (xPos > WORLD_WIDTH) {
+				xPos = WORLD_WIDTH;
+			}
+			if (zPos < 0.0) {
+				zPos = 0.0;
+			} else if (zPos > WORLD_WIDTH) {
+				zPos = WORLD_WIDTH;
+			}
+
 			glfwGetCursorPos(window, &mouseX, &mouseY);
 
 			rotationYaw += ((float)mouseX - ((float)windowWidth / 2.0)) / 180.0F;
