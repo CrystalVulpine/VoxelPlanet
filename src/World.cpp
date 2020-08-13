@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "World.hpp"
-#include "Blocks.hpp"
+#include "global.h"
 
 World::World() {
 	blocks = (unsigned int*) malloc(WORLD_WIDTH * WORLD_WIDTH * WORLD_HEIGHT * sizeof(unsigned int)); // yes I know, malloc in C++ is non-conventional. But it gets the job done.

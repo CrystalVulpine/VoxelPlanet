@@ -1,5 +1,5 @@
-#ifndef RENDERING_HPP_
-#define RENDERING_HPP_
+#ifndef RENDERING_H_
+#define RENDERING_H_
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -7,8 +7,7 @@
 #include <GLFW/glfw3.h>
 #include <glm/gtc/matrix_transform.hpp>
 #include "World.hpp"
-#include "Blocks.hpp"
-#include "VoxelPlanet.hpp"
+#include "global.h"
 
 GLuint vertexbuffer;
 GLuint colorbuffer;

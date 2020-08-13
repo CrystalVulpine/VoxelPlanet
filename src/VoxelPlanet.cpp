@@ -5,9 +5,8 @@
 #include <chrono>
 #include <glm/gtc/matrix_transform.hpp>
 #include "World.hpp"
-#include "Blocks.hpp"
-#include "Rendering.hpp"
-#include "VoxelPlanet.hpp"
+#include "rendering.h"
+#include "global.h"
 
 GLFWwindow* window;
 int windowWidth = 1024;
