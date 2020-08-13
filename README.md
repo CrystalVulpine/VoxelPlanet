@@ -18,7 +18,7 @@ Currently, its functions are still very limited. For example, you can't set your
 
 ## Checklist:
 
-- [ ] Ray tracing for cube selection. As of now, the current cube is always the one the camera is inside of.
+- [X] Ray tracing for cube selection. As of now, the current cube is always the one the camera is inside of.
 
 - [ ] Add a GUI and the ability to select the color of the cube you're placing. For now you can middle click an existing one to select its color.
 

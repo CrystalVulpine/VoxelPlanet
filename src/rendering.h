@@ -11,6 +11,7 @@
 
 GLuint vertexbuffer;
 GLuint colorbuffer;
+GLuint linebuffer;
 
 unsigned int vertexIndex = 0;
 
@@ -183,6 +184,39 @@ void renderWorld() {
 void reRenderWorld() {
 	vertexIndex = 0;
 	renderWorld();
+}
+
+void renderSelectBlock(double sx, double sy, double sz) {
+	double lines[] = {
+			sx - 0.001, sy + 1.001, sz - 0.001,
+			sx + 1.001, sy + 1.001, sz - 0.001,
+			sx + 1.001, sy + 1.001, sz - 0.001,
+			sx + 1.001, sy + 1.001, sz + 1.001,
+			sx + 1.001, sy + 1.001, sz + 1.001,
+			sx - 0.001, sy + 1.001, sz + 1.001,
+			sx - 0.001, sy + 1.001, sz + 1.001,
+			sx - 0.001, sy + 1.001, sz - 0.001,
+
+			sx - 0.001, sy - 0.001, sz - 0.001,
+			sx + 1.001, sy - 0.001, sz - 0.001,
+			sx + 1.001, sy - 0.001, sz - 0.001,
+			sx + 1.001, sy - 0.001, sz + 1.001,
+			sx + 1.001, sy - 0.001, sz + 1.001,
+			sx - 0.001, sy - 0.001, sz + 1.001,
+			sx - 0.001, sy - 0.001, sz + 1.001,
+			sx - 0.001, sy - 0.001, sz - 0.001,
+
+			sx - 0.001, sy - 0.001, sz - 0.001,
+			sx - 0.001, sy + 1.001, sz - 0.001,
+			sx + 1.001, sy - 0.001, sz - 0.001,
+			sx + 1.001, sy + 1.001, sz - 0.001,
+			sx - 0.001, sy - 0.001, sz + 1.001,
+			sx - 0.001, sy + 1.001, sz + 1.001,
+			sx + 1.001, sy - 0.001, sz + 1.001,
+			sx + 1.001, sy + 1.001, sz + 1.001,
+	};
+	glBindBuffer(GL_ARRAY_BUFFER, linebuffer);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(lines), lines);
 }
 
 

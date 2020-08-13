@@ -6,4 +6,5 @@
 *.txt text
 
 /src/*.h linguist-language=C++
+/src/*.cpp linguist-language=C++
 

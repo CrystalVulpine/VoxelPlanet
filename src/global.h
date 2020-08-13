@@ -10,5 +10,8 @@
 
 extern World mainWorld;
 
+typedef long Clock;
+Clock currentTimeMs();
+
 
 #endif

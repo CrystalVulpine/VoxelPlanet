@@ -23,7 +23,7 @@ float zPos = (float)WORLD_WIDTH / 2.0F;
 float rotationYaw = 0.0F;
 float rotationPitch = 0.0F;
 
-bool debugMode = false; // don't let GLFW capture the pointer in case the application suspends.
+bool debugMode = true; // don't let GLFW capture the pointer in case the application suspends.
 
 int main(void) {
 	if (!glfwInit()) {
@@ -58,11 +58,13 @@ int main(void) {
 
 	gameRunning = true;
 
-	mainWorld = World();
-
 	GLuint vao;
 	glGenVertexArrays(1, &vao);
 	glBindVertexArray(vao);
+
+	GLuint guiVao;
+	glGenVertexArrays(1, &guiVao);
+	glBindVertexArray(guiVao);
 
 	const GLchar *vertexShader = R"(
 	#version 330 core
@@ -91,11 +93,14 @@ int main(void) {
 
 	glGenBuffers(1, &vertexbuffer);
 	glGenBuffers(1, &colorbuffer);
+	glGenBuffers(1, &linebuffer);
 
 	glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
 	glBufferData(GL_ARRAY_BUFFER, ((WORLD_WIDTH * WORLD_WIDTH * WORLD_HEIGHT) * 6 * 2 * 3 * 3) * sizeof(double), NULL, GL_STATIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, colorbuffer);
 	glBufferData(GL_ARRAY_BUFFER, ((WORLD_WIDTH * WORLD_WIDTH * WORLD_HEIGHT) * 6 * 2 * 3 * 3) * sizeof(float), NULL, GL_STATIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, linebuffer);
+	glBufferData(GL_ARRAY_BUFFER, 100 * sizeof(double), NULL, GL_STATIC_DRAW);
 
 	GLuint matrix = glGetUniformLocation(program, "MVP");
 
@@ -110,14 +115,15 @@ int main(void) {
 	bool esc_pressed = false;
 	bool gamePaused = false;
 
-	bool lMousePress = false;
-	bool rMousePress = false;
 	bool mMousePress = false;
 
 	unsigned int selectedBlock = blockStone;
 
-	long now;
-	long lastTick = std::chrono::system_clock::now().time_since_epoch().count() / 1000000;
+	Clock now;
+	Clock lastTick = currentTimeMs();
+
+	Clock clickClock = currentTimeMs();
+
 	while (glfwWindowShouldClose(window) == 0 && gameRunning) {
 		if (!esc_pressed && glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
 			gamePaused = !gamePaused;
@@ -130,7 +136,7 @@ int main(void) {
 				glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 
 				// if this is not done the game will count the pause time as elapsed
-				lastTick = std::chrono::system_clock::now().time_since_epoch().count() / 1000000;
+				lastTick = currentTimeMs();
 			}
 			esc_pressed = true;
 		} else if (esc_pressed && glfwGetKey(window, GLFW_KEY_ESCAPE) != GLFW_PRESS) {
@@ -140,7 +146,9 @@ int main(void) {
 		glfwGetWindowSize(window, &windowWidth, &windowHeight);
 
 		// we want to control the speed of things like moving the camera
-		now = std::chrono::system_clock::now().time_since_epoch().count() / 1000000;
+		now = currentTimeMs();
+		bool noBlockSelected = false;
+
 		if (!gamePaused) {
 			float forward = 0.0F;
 			float sideways = 0.0F;
@@ -162,37 +170,6 @@ int main(void) {
 			if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) {
 				yPos -= (float)(now - lastTick) / 100.0;
 			}
-			if (!rMousePress && glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS) {
-				// the mouse press checks are commented out for now to allow mass placing of cubes; they'll be useful for when ray selection is implemented.
-				//rMousePress = true;
-
-				unsigned int * __restrict__ bp = mainWorld.getBlockPointer((int)std::floor(xPos), (int)std::floor(yPos), (int)std::floor(zPos));
-				if (bp != NULL && *bp == 0) {
-					*bp = selectedBlock;
-					reRenderWorld();
-				}
-			} else if (rMousePress && glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) != GLFW_PRESS) {
-				rMousePress = false;
-			}
-			if (!lMousePress && glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) {
-				//lMousePress = true;
-				unsigned int * __restrict__ bp = mainWorld.getBlockPointer((int)std::floor(xPos), (int)std::floor(yPos), (int)std::floor(zPos));
-				if (bp != NULL && *bp > 0) {
-					*bp = 0;
-					reRenderWorld();
-				}
-			} else if (lMousePress && glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) != GLFW_PRESS) {
-				//lMousePress = false;
-			}
-			if (!mMousePress && glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_MIDDLE) == GLFW_PRESS) {
-				mMousePress = true;
-				unsigned int b = mainWorld.getBlock((int)std::floor(xPos), (int)std::floor(yPos), (int)std::floor(zPos));
-				if (b > 0) {
-					selectedBlock = b;
-				}
-			} else if (mMousePress && glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_MIDDLE) != GLFW_PRESS) {
-				mMousePress = false;
-			}
 			forward *= (float)(now - lastTick) / 100.0;
 			sideways *= (float)(now - lastTick) / 100.0;
 			xPos += forward * std::sin(rotationYaw) + sideways * std::cos(-rotationYaw);
@@ -212,7 +189,80 @@ int main(void) {
 
 			glfwSetCursorPos(window, (double)windowWidth / 2.0, (double)windowHeight / 2.0);
 
-			lastTick = std::chrono::system_clock::now().time_since_epoch().count() / 1000000;
+			lastTick = currentTimeMs();
+
+			// here's where we trace a ray from the camera to a cube in the world
+			glm::vec3 start(xPos, yPos, zPos);
+			glm::vec3 pos = start;
+			glm::vec3 lastPos = start;
+			int bl = 0;
+			while (bl == 0) {
+				lastPos = pos;
+			    pos.x -= glm::cos(rotationYaw + 1.5708) * 0.05;
+			    pos.z -= glm::sin(rotationYaw + 1.5708) * 0.05;
+			    pos.y -= glm::tan(rotationPitch) * 0.05;
+			    bl = mainWorld.getBlock(pos.x, pos.y, pos.z);
+			    if (glm::distance(start, pos) > 6.0) {
+			    	noBlockSelected = true;
+			    	break;
+			    }
+			}
+
+			// this prevents the edge case of placing a cube on a corner
+		    int posDiff = 0;
+		    if (std::floor(pos.x) != std::floor(lastPos.x)) {
+		    	posDiff += 1;
+		    }
+		    if (std::floor(pos.y) != std::floor(lastPos.y)) {
+		    	posDiff += 1;
+		    }
+		    if (std::floor(pos.z) != std::floor(lastPos.z)) {
+		    	posDiff += 1;
+		    }
+		    if (posDiff > 1) {
+		    	noBlockSelected = true;
+		    }
+
+			if (!noBlockSelected) {
+				double sx = std::floor(pos.x);
+				double sy = std::floor(pos.y);
+				double sz = std::floor(pos.z);
+
+				renderSelectBlock(sx, sy, sz);
+
+				int x = (int)sx;
+				int y = (int)sy;
+				int z = (int)sz;
+
+				if (currentTimeMs() - clickClock > 200 && glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS) {
+					clickClock = currentTimeMs();
+
+					unsigned int * __restrict__ bp = mainWorld.getBlockPointer((int)std::floor(lastPos.x), (int)std::floor(lastPos.y), (int)std::floor(lastPos.z));
+					if (bp != NULL && *bp == 0) {
+						*bp = selectedBlock;
+						reRenderWorld();
+					}
+				}
+				if (currentTimeMs() - clickClock > 200 && glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) {
+					clickClock = currentTimeMs();
+
+					unsigned int * __restrict__ blockPointer = mainWorld.getBlockPointer(x, y, z);
+					if (blockPointer != NULL && *blockPointer > 0) {
+						*blockPointer = 0;
+						reRenderWorld();
+					}
+				}
+
+				if (!mMousePress && glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_MIDDLE) == GLFW_PRESS) {
+					mMousePress = true;
+					unsigned int b = mainWorld.getBlock(x, y, z);
+					if (b > 0) {
+						selectedBlock = b;
+					}
+				} else if (mMousePress && glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_MIDDLE) != GLFW_PRESS) {
+					mMousePress = false;
+				}
+			}
 		}
 
 		glm::mat4 model = glm::mat4(1.0f);
@@ -236,6 +286,11 @@ int main(void) {
 		glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
 		glVertexAttribPointer(0, 3, GL_DOUBLE, GL_FALSE, 0, NULL);
 		glDrawArrays(GL_TRIANGLES, 0, vertexIndex / 3);
+		if (!noBlockSelected) {
+			glBindBuffer(GL_ARRAY_BUFFER, linebuffer);
+			glVertexAttribPointer(0, 3, GL_DOUBLE, GL_FALSE, 0, NULL);
+			glDrawArrays(GL_LINES, 0, 40);
+		}
 		glDisableVertexAttribArray(0);
 
 		glEnableVertexAttribArray(1);
@@ -248,6 +303,8 @@ int main(void) {
 
 	glDeleteBuffers(1, &vertexbuffer);
 	glDeleteVertexArrays(1, &vao);
+	glDeleteBuffers(1, &linebuffer);
+	glDeleteVertexArrays(1, &guiVao);
 	glDeleteProgram(program);
 
 	glfwTerminate();
