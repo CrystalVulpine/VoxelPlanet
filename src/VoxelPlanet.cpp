@@ -62,21 +62,15 @@ int main(void) {
 	glGenVertexArrays(1, &vao);
 	glBindVertexArray(vao);
 
-	GLuint guiVao;
-	glGenVertexArrays(1, &guiVao);
-	glBindVertexArray(guiVao);
-
 	const GLchar *vertexShader = R"(
 	#version 330 core
 	layout(location = 0) in vec3 vertexPosition_modelspace;
     layout(location = 1) in vec3 vertexColor;
     out vec3 fragmentColor;
   
-    // Values that stay constant for the whole mesh.
     uniform mat4 MVP;
   
-    void main(){
-        // Output position of the vertex, in clip space : MVP * position
+    void main() {
         gl_Position =  MVP * vec4(vertexPosition_modelspace,1);
         fragmentColor = vertexColor;
     })";
@@ -124,6 +118,22 @@ int main(void) {
 
 	Clock clickClock = currentTimeMs();
 
+	double square[] = {
+			-0.2, -0.2, 0.0,
+			-0.2, 0.2, 0.0,
+			0.2, 0.2, 0.0,
+			-0.2, -0.2, 0.0,
+			0.2, 0.2, 0.0,
+			0.2, -0.2, 0.0
+	};
+
+	bool changeRed = false;
+	bool changeGreen = false;
+	bool changeBlue = false;
+	bool numKeysPressed[10] = { false };
+	unsigned char colorInput[3] = { 0 };
+	unsigned int colorInputIndex = 0;
+
 	while (glfwWindowShouldClose(window) == 0 && gameRunning) {
 		if (!esc_pressed && glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
 			gamePaused = !gamePaused;
@@ -141,6 +151,46 @@ int main(void) {
 			esc_pressed = true;
 		} else if (esc_pressed && glfwGetKey(window, GLFW_KEY_ESCAPE) != GLFW_PRESS) {
 			esc_pressed = false;
+		}
+
+		// this lets you type in new cube colors
+		if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS) {
+			changeRed = true;
+			changeGreen = false;
+			changeBlue = false;
+		} else if (glfwGetKey(window, GLFW_KEY_G) == GLFW_PRESS) {
+			changeRed = false;
+			changeGreen = true;
+			changeBlue = false;
+		} else if (glfwGetKey(window, GLFW_KEY_B) == GLFW_PRESS) {
+			changeRed = false;
+			changeGreen = false;
+			changeBlue = true;
+		}
+		for (unsigned int i = 0; i < 10; ++i) {
+			if (!numKeysPressed[i] && glfwGetKey(window, i + GLFW_KEY_0) == GLFW_PRESS) {
+				numKeysPressed[i] = true;
+				colorInput[colorInputIndex] = i;
+				++colorInputIndex;
+				if (colorInputIndex >= 3) {
+					if (changeRed) {
+						unsigned char red = colorInput[0] * 100 + colorInput[1] * 10 + colorInput[2];
+						*(((unsigned char*)&selectedBlock) + 3) = red;
+						changeRed = false;
+					} else if (changeGreen) {
+						unsigned char red = colorInput[0] * 100 + colorInput[1] * 10 + colorInput[2];
+						*(((unsigned char*)&selectedBlock) + 2) = red;
+						changeGreen = false;
+					} else if (changeBlue) {
+						unsigned char red = colorInput[0] * 100 + colorInput[1] * 10 + colorInput[2];
+						*(((unsigned char*)&selectedBlock) + 1) = red;
+						changeBlue = false;
+					}
+					colorInputIndex = 0;
+				}
+			} else if (numKeysPressed[i] && glfwGetKey(window, i + GLFW_KEY_0) != GLFW_PRESS) {
+				numKeysPressed[i] = false;
+			}
 		}
 
 		glfwGetWindowSize(window, &windowWidth, &windowHeight);
@@ -293,20 +343,52 @@ int main(void) {
 		glm::mat4 mvp = projection * view;
 		glUniformMatrix4fv(matrix, 1, GL_FALSE, &mvp[0][0]);
 
+		glEnableVertexAttribArray(1);
 		glEnableVertexAttribArray(0);
 		glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
 		glVertexAttribPointer(0, 3, GL_DOUBLE, GL_FALSE, 0, NULL);
 		glDrawArrays(GL_TRIANGLES, 0, vertexIndex / 3);
+
+		glBindBuffer(GL_ARRAY_BUFFER, colorbuffer);
+		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, NULL);
+
+		glDisableVertexAttribArray(1);
+
 		if (!noBlockSelected) {
 			glBindBuffer(GL_ARRAY_BUFFER, linebuffer);
 			glVertexAttribPointer(0, 3, GL_DOUBLE, GL_FALSE, 0, NULL);
-			glDrawArrays(GL_LINES, 0, 40);
+			glDrawArrays(GL_LINES, 0, 24);
 		}
-		glDisableVertexAttribArray(0);
 
 		glEnableVertexAttribArray(1);
+
+		glDisable(GL_DEPTH_TEST);
+		glDisable(GL_CULL_FACE);
+
+		mvp = glm::ortho<float>(((float)windowWidth / (float)windowHeight) * 0.95f, ((float)windowWidth / (float)windowHeight) * 0.0f, 1.0f, 0.0f, -1.0f, 1.0f);
+		glUniformMatrix4fv(matrix, 1, GL_FALSE, &mvp[0][0]);
+
+		glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
+		glBufferSubData(GL_ARRAY_BUFFER, vertexIndex * sizeof(double), sizeof(square), square);
+		glVertexAttribPointer(0, 3, GL_DOUBLE, GL_FALSE, 0, NULL);
+		glDrawArrays(GL_TRIANGLES, vertexIndex / 3, 6);
+
+		float red = (float)(selectedBlock >> 24) / 255.0F;
+		float green = (float)((selectedBlock >> 16) & 255) / 255.0F;
+		float blue = (float)((selectedBlock >> 8) & 255) / 255.0F;
+		float squareColor[] = {
+				red, green, blue,
+				red, green, blue,
+				red, green, blue,
+				red, green, blue,
+				red, green, blue,
+				red, green, blue,
+		};
 		glBindBuffer(GL_ARRAY_BUFFER, colorbuffer);
-		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, NULL);
+		glBufferSubData(GL_ARRAY_BUFFER, vertexIndex * sizeof(float), sizeof(squareColor), squareColor);
+
+		glDisableVertexAttribArray(0);
+		glDisableVertexAttribArray(1);
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
@@ -315,8 +397,6 @@ int main(void) {
 	glDeleteBuffers(1, &vertexbuffer);
 	glDeleteVertexArrays(1, &vao);
 	glDeleteBuffers(1, &linebuffer);
-	glDeleteVertexArrays(1, &guiVao);
-	glDeleteProgram(program);
 
 	glfwTerminate();
 

@@ -34,6 +34,8 @@ Currently, its functions are still very limited. For example, you can't set your
 
 - [ ] Infinite worlds (maybe), or the ability to set the size of the world as you would an image.
 
+- [ ] Sounds and music
+
 ## Local Development:
 
 VoxelPlanet is designed to be mostly platform independent, and should be compilable on most OSes provided that it works with the compiler (it is mainly built using gcc). However, the eclipse project may require some changes if you use it.
