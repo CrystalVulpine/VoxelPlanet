@@ -12,8 +12,8 @@ Currently, its functions are still very limited. For example, you can't set your
 * Select color of the cube you're pointing at: Middle Click
 * Pause/Unpause: Esc
 * R: set red as the color being edited
-* G: set red as the color being edited
-* B: set red as the color being edited
+* G: set green as the color being edited
+* B: set blue as the color being edited
 * Numbers from 000-255: sets the color being edited
 
 ## Screenshots:
