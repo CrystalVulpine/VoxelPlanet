@@ -30,7 +30,7 @@ Currently, its functions are still very limited.
 
 - [ ] Improve rendering, allowing a larger world size and more details.
 
-- [ ] Add the ability to save your world, possibly multiple
+- [x] Add the ability to save your world, possibly multiple
 
 - [ ] Add the ability to change your environment (like sky color, terrain generation)
 

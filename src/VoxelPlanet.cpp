@@ -181,12 +181,12 @@ int main(void) {
 						*(((unsigned char*)&selectedBlock) + 3) = red;
 						changeRed = false;
 					} else if (changeGreen) {
-						unsigned char red = colorInput[0] * 100 + colorInput[1] * 10 + colorInput[2];
-						*(((unsigned char*)&selectedBlock) + 2) = red;
+						unsigned char green = colorInput[0] * 100 + colorInput[1] * 10 + colorInput[2];
+						*(((unsigned char*)&selectedBlock) + 2) = green;
 						changeGreen = false;
 					} else if (changeBlue) {
-						unsigned char red = colorInput[0] * 100 + colorInput[1] * 10 + colorInput[2];
-						*(((unsigned char*)&selectedBlock) + 1) = red;
+						unsigned char blue = colorInput[0] * 100 + colorInput[1] * 10 + colorInput[2];
+						*(((unsigned char*)&selectedBlock) + 1) = blue;
 						changeBlue = false;
 					}
 					colorInputIndex = 0;
@@ -402,6 +402,8 @@ int main(void) {
 	glDeleteBuffers(1, &linebuffer);
 
 	glfwTerminate();
+
+	mainWorld.saveWorld();
 
 	return 0;
 }
