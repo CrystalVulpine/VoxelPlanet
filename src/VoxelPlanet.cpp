@@ -107,7 +107,9 @@ int main(void) {
 	glfwGetCursorPos(window, &mouseX, &mouseY);
 
 	bool esc_pressed = false;
+	bool f1_pressed = false;
 	bool gamePaused = false;
+	bool hideGUI = false;
 
 	bool mMousePress = false;
 
@@ -118,13 +120,59 @@ int main(void) {
 
 	Clock clickClock = currentTimeMs();
 
-	double square[] = {
-			-0.2, -0.2, 0.0,
-			-0.2, 0.2, 0.0,
-			0.2, 0.2, 0.0,
-			-0.2, -0.2, 0.0,
-			0.2, 0.2, 0.0,
-			0.2, -0.2, 0.0
+	double blockGUI[] = {
+			-0.1, -0.1, 0.1,
+			-0.1, 0.1, 0.1,
+			0.1, 0.1, 0.1,
+			-0.1, -0.1, 0.1,
+			0.1, 0.1, 0.1,
+			0.1, -0.1, 0.1,
+
+			-0.1, -0.1, 0.1,
+			-0.1, 0.1, 0.1,
+			-0.1, 0.1, -0.1,
+			-0.1, -0.1, 0.1,
+			-0.1, 0.1, -0.1,
+			-0.1, -0.1, -0.1,
+
+			0.1, 0.1, 0.1,
+			0.1, 0.1, -0.1,
+			-0.1, 0.1, -0.1,
+			-0.1, 0.1, -0.1,
+			-0.1, 0.1, 0.1,
+			0.1, 0.1, 0.1,
+	};
+
+	double crosshairs[] = {
+			-0.005, 0.05, 0.0,
+			0.005, 0.05, 0.0,
+			0.005, -0.05, 0.0,
+			0.005, -0.05, 0.0,
+			-0.005, -0.05, 0.0,
+			-0.005, 0.05, 0.0,
+
+			0.05, -0.005, 0.0,
+			0.05, 0.005, 0.0,
+			-0.05, 0.005, 0.0,
+			-0.05, 0.005, 0.0,
+			-0.05, -0.005, 0.0,
+			0.05, -0.005, 0.0,
+	};
+
+	double crosshairColor[] = {
+			1.0, 1.0, 1.0,
+			1.0, 1.0, 1.0,
+			1.0, 1.0, 1.0,
+			1.0, 1.0, 1.0,
+			1.0, 1.0, 1.0,
+			1.0, 1.0, 1.0,
+
+			1.0, 1.0, 1.0,
+			1.0, 1.0, 1.0,
+			1.0, 1.0, 1.0,
+			1.0, 1.0, 1.0,
+			1.0, 1.0, 1.0,
+			1.0, 1.0, 1.0,
 	};
 
 	bool changeRed = false;
@@ -151,6 +199,13 @@ int main(void) {
 			esc_pressed = true;
 		} else if (esc_pressed && glfwGetKey(window, GLFW_KEY_ESCAPE) != GLFW_PRESS) {
 			esc_pressed = false;
+		}
+
+		if (!f1_pressed && glfwGetKey(window, GLFW_KEY_F1) == GLFW_PRESS) {
+			f1_pressed = true;
+			hideGUI = !hideGUI;
+		} else if (f1_pressed && glfwGetKey(window, GLFW_KEY_F1) != GLFW_PRESS) {
+			f1_pressed = false;
 		}
 
 		// this lets you type in new cube colors
@@ -200,7 +255,7 @@ int main(void) {
 
 		// we want to control the speed of things like moving the camera
 		now = currentTimeMs();
-		bool noBlockSelected = false;
+		bool noBlockSelected = gamePaused;
 
 		if (!gamePaused) {
 			float forward = 0.0F;
@@ -355,51 +410,86 @@ int main(void) {
 		glBindBuffer(GL_ARRAY_BUFFER, colorbuffer);
 		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, NULL);
 
-		glDisableVertexAttribArray(1);
+		if (!hideGUI) {
 
-		if (!noBlockSelected) {
-			glBindBuffer(GL_ARRAY_BUFFER, linebuffer);
+			glDisableVertexAttribArray(1);
+
+			if (!noBlockSelected) {
+				glLineWidth(1.0f);
+				glBindBuffer(GL_ARRAY_BUFFER, linebuffer);
+				glVertexAttribPointer(0, 3, GL_DOUBLE, GL_FALSE, 0, NULL);
+				glDrawArrays(GL_LINES, 0, 24);
+			}
+
+			glEnableVertexAttribArray(1);
+
+			glDisable(GL_CULL_FACE);
+
+			model = glm::mat4(1.0f);
+			mvp = glm::ortho<float>(-((float)windowWidth / (float)windowHeight), (float)windowWidth / (float)windowHeight, -1.0f, 1.0f, -1.0f, 1.0f) * glm::rotate(model, 0.5f, glm::vec3(1.0, 0.0, 0.0)) * glm::translate(model, glm::vec3(((double)windowWidth / (double)windowHeight) - 0.2, 0.9, 0.0)) * glm::rotate(model, 0.785398f, glm::vec3(0.0, 1.0, 0.0));
+			glUniformMatrix4fv(matrix, 1, GL_FALSE, &mvp[0][0]);
+
+			const int blockGUIVertexCount = 18;
+
+			glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
+			glBufferSubData(GL_ARRAY_BUFFER, vertexIndex * sizeof(double), sizeof(blockGUI), blockGUI);
 			glVertexAttribPointer(0, 3, GL_DOUBLE, GL_FALSE, 0, NULL);
-			glDrawArrays(GL_LINES, 0, 24);
+			glDrawArrays(GL_TRIANGLES, vertexIndex / 3, blockGUIVertexCount);
+
+			float red = (float)(selectedBlock >> 24) / 255.0F;
+			float green = (float)((selectedBlock >> 16) & 255) / 255.0F;
+			float blue = (float)((selectedBlock >> 8) & 255) / 255.0F;
+			float blockGUIColor[] = {
+					red * 0.8f, green * 0.8f, blue * 0.8f,
+					red * 0.8f, green * 0.8f, blue * 0.8f,
+					red * 0.8f, green * 0.8f, blue * 0.8f,
+					red * 0.8f, green * 0.8f, blue * 0.8f,
+					red * 0.8f, green * 0.8f, blue * 0.8f,
+					red * 0.8f, green * 0.8f, blue * 0.8f,
+
+					red * 0.6f, green * 0.6f, blue * 0.6f,
+					red * 0.6f, green * 0.6f, blue * 0.6f,
+					red * 0.6f, green * 0.6f, blue * 0.6f,
+					red * 0.6f, green * 0.6f, blue * 0.6f,
+					red * 0.6f, green * 0.6f, blue * 0.6f,
+					red * 0.6f, green * 0.6f, blue * 0.6f,
+
+					red, green, blue,
+					red, green, blue,
+					red, green, blue,
+					red, green, blue,
+					red, green, blue,
+					red, green, blue,
+			};
+			glBindBuffer(GL_ARRAY_BUFFER, colorbuffer);
+			glBufferSubData(GL_ARRAY_BUFFER, vertexIndex * sizeof(float), sizeof(blockGUIColor), blockGUIColor);
+
+			model = glm::mat4(1.0f);
+			mvp = glm::ortho<float>(-((float)windowWidth / (float)windowHeight), (float)windowWidth / (float)windowHeight, -1.0f, 1.0f, -1.0f, 1.0f);
+			glUniformMatrix4fv(matrix, 1, GL_FALSE, &mvp[0][0]);
+
+			glDisable(GL_DEPTH_TEST);
+			glEnable(GL_BLEND);
+			glBlendFunc(GL_ONE_MINUS_DST_COLOR, GL_ZERO);
+			glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
+			glBufferSubData(GL_ARRAY_BUFFER, vertexIndex * sizeof(double) + sizeof(blockGUI), sizeof(crosshairs), crosshairs);
+			glVertexAttribPointer(0, 3, GL_DOUBLE, GL_FALSE, 0, NULL);
+			glDrawArrays(GL_TRIANGLES, vertexIndex / 3 + blockGUIVertexCount, 12);
+			glBindBuffer(GL_ARRAY_BUFFER, colorbuffer);
+			glBufferSubData(GL_ARRAY_BUFFER, vertexIndex * sizeof(float) + sizeof(blockGUIColor), sizeof(crosshairColor), crosshairColor);
+			glDisable(GL_BLEND);
 		}
 
-		glEnableVertexAttribArray(1);
-
-		glDisable(GL_DEPTH_TEST);
-		glDisable(GL_CULL_FACE);
-
-		mvp = glm::ortho<float>(((float)windowWidth / (float)windowHeight) * 0.95f, ((float)windowWidth / (float)windowHeight) * 0.0f, 1.0f, 0.0f, -1.0f, 1.0f);
-		glUniformMatrix4fv(matrix, 1, GL_FALSE, &mvp[0][0]);
-
-		glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
-		glBufferSubData(GL_ARRAY_BUFFER, vertexIndex * sizeof(double), sizeof(square), square);
-		glVertexAttribPointer(0, 3, GL_DOUBLE, GL_FALSE, 0, NULL);
-		glDrawArrays(GL_TRIANGLES, vertexIndex / 3, 6);
-
-		float red = (float)(selectedBlock >> 24) / 255.0F;
-		float green = (float)((selectedBlock >> 16) & 255) / 255.0F;
-		float blue = (float)((selectedBlock >> 8) & 255) / 255.0F;
-		float squareColor[] = {
-				red, green, blue,
-				red, green, blue,
-				red, green, blue,
-				red, green, blue,
-				red, green, blue,
-				red, green, blue,
-		};
-		glBindBuffer(GL_ARRAY_BUFFER, colorbuffer);
-		glBufferSubData(GL_ARRAY_BUFFER, vertexIndex * sizeof(float), sizeof(squareColor), squareColor);
-
-		glDisableVertexAttribArray(0);
 		glDisableVertexAttribArray(1);
+		glDisableVertexAttribArray(0);
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 	}
 
 	glDeleteBuffers(1, &vertexbuffer);
-	glDeleteVertexArrays(1, &vao);
 	glDeleteBuffers(1, &linebuffer);
+	glDeleteVertexArrays(1, &vao);
 
 	glfwTerminate();
 

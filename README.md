@@ -1,4 +1,4 @@
-VoxelPlanet is a sandbox made out of colored cubes. It is made using basic shaders, however requires OpenGL 3.1. The intent is to provide an open world for people to create things; it's more like a 3D paint than Minecraft.
+VoxelPlanet is a sandbox made out of colored cubes. It is made using basic shaders, however requires OpenGL 3.3. The intent is to provide an open world for people to create things; it's more like a 3D paint than Minecraft.
 
 Currently, its functions are still very limited.
 
@@ -15,6 +15,7 @@ Currently, its functions are still very limited.
 * G: set green as the color being edited
 * B: set blue as the color being edited
 * Numbers from 000-255: sets the color being edited
+* F1: Hide GUI
 
 ## Screenshots:
 
@@ -24,7 +25,7 @@ Currently, its functions are still very limited.
 
 - [X] Ray tracing for cube selection. Before this was implemented, the current cube was always the one the camera is inside of.
 
-- [ ] Add a GUI and the ability to select the color of the cube you're placing. For now you can use the RGB keys and input numbers to set the color (see controls section above).
+- [x] Add a GUI and the ability to select the color of the cube you're placing. (Only partially finished).
 
 - [ ] Add settings and controls
 
