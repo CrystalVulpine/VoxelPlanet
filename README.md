@@ -17,6 +17,12 @@ Currently, its functions are still very limited.
 * Numbers from 000-255: sets the color being edited
 * F1: Hide GUI
 
+## Command Line Arguments:
+* `--debug` launches VoxelPlanet in debug mode. Currently, the only difference is that in debug mode, VoxelPlanet will not capture your pointer in case the application crashes or freezes.
+* `--antialiasing` plus an integer sets the multisampling/antialiasing level for the program. For example, `--antialiasing 0` would set the value to 0 (thus disabling it). The default value is 4.
+* `--brightness` plus a decimal between 0.0 and 1.0 allows you to specify the brightness of the world, so you can simulate a nighttime or evening/morning effect. The default value is 1.0.
+* `--skycolor` followed by 3 integers each between 0 and 255 allows you to set the color of the sky. It goes in the RGB order: the first integer specifies the amount of red color, followed by green, then blue. The default values are 128 128 255.
+
 ## Screenshots:
 
 ![](https://i.imgur.com/CsTJFOc.png)

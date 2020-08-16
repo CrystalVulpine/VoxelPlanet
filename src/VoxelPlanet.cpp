@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <cstring>
 #include "global.h"
 #include "rendering.hpp"
 #include "World.hpp"
@@ -8,21 +9,41 @@ bool gameRunning = false;
 World mainWorld;
 
 // don't let GLFW capture the pointer in case the application suspends.
-bool debugMode = true;
+bool debugMode = false;
 
-unsigned int heldBlock = 0x7f7f7fff;
+unsigned int heldBlock = 0x808080ff;
 bool isBlockSelected = false;
 bool gamePaused = false;
 bool hideGUI = false;
 
-int main(void) {
+int main(unsigned int argc, char *argv[]) {
+	for (unsigned int i = 0; i < argc; ++i) {
+		if (strcmp(argv[i], "--debug") == 0) {
+			debugMode = true;
+		} else if (strcmp(argv[i], "--antialiasing") == 0) {
+			if (argc > i + 1) {
+				antialiasing_level = atoi(argv[i + 1]);
+			}
+		} else if (strcmp(argv[i], "--brightness") == 0) {
+			if (argc > i + 1) {
+				brightness = atof(argv[i + 1]);
+			}
+		} else if (strcmp(argv[i], "--skycolor") == 0) {
+			if (argc > i + 3) {
+				skyColorRed = atoi(argv[i + 1]) / 255.0f;
+				skyColorGreen = atoi(argv[i + 2]) / 255.0f;
+				skyColorBlue = atoi(argv[i + 3]) / 255.0f;
+			}
+		}
+	}
+
 	int glErrorCode = setupOpenGL();
 	if (glErrorCode != 0) {
 		return glErrorCode;
 	}
 
 	gameRunning = true;
-	camera.setBounds(0.0f, (float)WORLD_WIDTH / 2.0f, 0.0f, (float)WORLD_WIDTH / 2.0f);
+	camera.setBounds(0.0f, (float)WORLD_WIDTH, 0.0f, (float)WORLD_WIDTH);
 
 	double mouseX;
 	double mouseY;

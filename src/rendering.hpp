@@ -20,6 +20,10 @@ GLFWwindow* window;
 int windowWidth = 1024;
 int windowHeight = 768;
 unsigned char antialiasing_level = 4;
+float brightness = 1.0f;
+float skyColorRed = 0.5f;
+float skyColorGreen = 0.5f;
+float skyColorBlue = 1.0f;
 
 Camera camera((float)WORLD_WIDTH / 2.0f, 17.6f, (float)WORLD_WIDTH / 2.0f, 0.0f, 0.0f);
 
@@ -222,9 +226,9 @@ void renderBlock(int x, int y, int z, unsigned int block) {
 	float blue = (float)((block >> 8) & 255) / 255.0F;
 
 	for (unsigned int i = 0; i < sizeof(colors) / sizeof(colors[0]); i += 3) {
-		colors[i + 0] *= red;
-		colors[i + 1] *= green;
-		colors[i + 2] *= blue;
+		colors[i + 0] *= red * brightness;
+		colors[i + 1] *= green * brightness;
+		colors[i + 2] *= blue * brightness;
 	}
 
 	glBindBuffer(GL_ARRAY_BUFFER, colorbuffer);
@@ -356,7 +360,7 @@ int setupOpenGL() {
 
 	matrix = glGetUniformLocation(program, "MVP");
 
-	glClearColor(0.5f, 0.5f, 1.0f, 0.0f);
+	glClearColor(skyColorRed, skyColorGreen, skyColorBlue, 0.0f);
 
 	renderWorld();
 

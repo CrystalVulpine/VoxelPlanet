@@ -21,7 +21,7 @@ World::World() {
 				const unsigned int temp1 = temp + x * WORLD_HEIGHT;
 				blocks[temp1 + 0] = 0x333333ff;
 				for (unsigned int y = 1; y < 11; ++y) {
-					blocks[temp1 + y] = 0x7f7f7fff;
+					blocks[temp1 + y] = 0x808080ff;
 				}
 				for (unsigned int y = 11; y < 15; ++y) {
 					blocks[temp1 + y] = 0x662000ff;
