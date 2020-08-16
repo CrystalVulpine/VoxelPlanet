@@ -1,4 +1,6 @@
-VoxelPlanet is a sandbox made out of colored cubes. It is made using basic shaders, however requires OpenGL 3.3. The intent is to provide an open world for people to create things; it's more like a 3D paint than Minecraft.
+# VoxelPlanet
+
+VoxelPlanet is a sandbox made out of colored cubes. It is made using basic shaders, however requires OpenGL 3.3. The intent is to provide an open world to create things, much in the same way you would draw a picture out of pixels, but in a 3-dimensional space.
 
 ![GitHub language count](https://img.shields.io/github/languages/count/CrystalVulpine/VoxelPlanet) ![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/CrystalVulpine/VoxelPlanet)
 
