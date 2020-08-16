@@ -22,6 +22,7 @@ int main(void) {
 	}
 
 	gameRunning = true;
+	camera.setBounds(0.0f, (float)WORLD_WIDTH / 2.0f, 0.0f, (float)WORLD_WIDTH / 2.0f);
 
 	double mouseX;
 	double mouseY;
