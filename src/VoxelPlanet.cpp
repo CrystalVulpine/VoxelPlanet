@@ -21,6 +21,9 @@ bool gamePaused = false;
 bool hideGUI = false;
 
 int main(unsigned int argc, char *argv[]) {
+	unsigned int worldLength = 64;
+	unsigned int worldWidth = 64;
+	unsigned int worldHeight = 64;
 	for (unsigned int i = 0; i < argc; ++i) {
 		if (strcmp(argv[i], "--debug") == 0) {
 			debugMode = true;
@@ -34,12 +37,19 @@ int main(unsigned int argc, char *argv[]) {
 			}
 		} else if (strcmp(argv[i], "--skycolor") == 0) {
 			if (argc > i + 3) {
-				skyColorRed = atoi(argv[i + 1]) / 255.0f;
-				skyColorGreen = atoi(argv[i + 2]) / 255.0f;
-				skyColorBlue = atoi(argv[i + 3]) / 255.0f;
+				skyColorRed = (float)atoi(argv[i + 1]) / 255.0f;
+				skyColorGreen = (float)atoi(argv[i + 2]) / 255.0f;
+				skyColorBlue = (float)atoi(argv[i + 3]) / 255.0f;
+			}
+		} else if (strcmp(argv[i], "--worldsize") == 0) {
+			if (argc > i + 3) {
+				worldLength = atoi(argv[i + 1]);
+				worldWidth = atoi(argv[i + 2]);
+				worldHeight = atoi(argv[i + 3]);
 			}
 		}
 	}
+	mainWorld.startWorld(worldLength, worldWidth, worldHeight);
 
 	int glErrorCode = setupOpenGL();
 	if (glErrorCode != 0) {
@@ -47,7 +57,7 @@ int main(unsigned int argc, char *argv[]) {
 	}
 
 	gameRunning = true;
-	camera.setBounds(0.0f, (float)WORLD_WIDTH, 0.0f, (float)WORLD_WIDTH);
+	camera.setBounds(0.0f, (float)worldLength, 0.0f, (float)worldWidth);
 
 	double mouseX;
 	double mouseY;

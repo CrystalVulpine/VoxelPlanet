@@ -7,22 +7,30 @@
 #include "global.h"
 
 World::World() {
-	// yes I know, malloc in C++ is non-conventional. But it gets the job done.
-	cubes = (unsigned int*) malloc(WORLD_WIDTH * WORLD_WIDTH * WORLD_HEIGHT * sizeof(unsigned int));
 
+}
+
+void World::startWorld(unsigned int length, unsigned int width, unsigned int height) {
 	// generate a new world if one doesn't exist, otherwise load the save file
 	struct stat st;
 	if (stat("world/cubes.dat", &st) != 0) {
 
+		worldLength = length;
+		worldWidth = width;
+		worldHeight = height;
+
+		// yes I know, malloc in C++ is non-conventional. But it gets the job done.
+		cubes = (unsigned int*) malloc(worldLength * worldWidth * worldHeight * sizeof(unsigned int));
+
 		// very simple flat terrain generator for now
-		for (unsigned int z = 0; z < WORLD_WIDTH; ++z) {
+		for (unsigned int z = 0; z < worldWidth; ++z) {
 
 			 // store this index number in a temp variable so it doesn't have to be recomputed
-			const unsigned int temp = z * WORLD_WIDTH * WORLD_HEIGHT;
+			const unsigned int temp = z * worldLength * worldHeight;
 
-			for (unsigned int x = 0; x < WORLD_WIDTH; ++x) {
+			for (unsigned int x = 0; x < worldLength; ++x) {
 
-				const unsigned int temp1 = temp + x * WORLD_HEIGHT;
+				const unsigned int temp1 = temp + x * worldHeight;
 
 				cubes[temp1 + 0] = 0x333333ff;
 				for (unsigned int y = 1; y < 11; ++y) {
@@ -32,14 +40,36 @@ World::World() {
 					cubes[temp1 + y] = 0x662000ff;
 				}
 				cubes[temp1 + 15] = 0x00bf00ff;
-				for (unsigned int y = 16; y < WORLD_HEIGHT; ++y) {
+				for (unsigned int y = 16; y < worldHeight; ++y) {
 					cubes[temp1 + y] = 0;
 				}
 			}
 		}
 	} else {
+
+		if (stat("world/level.dat", &st) != 0) {
+			printf("Could not load level information. You must move the current world so that a new one can be created.\n");
+			exit(1);
+		}
+
+		std::ifstream level("world/level.dat", std::ios::binary | std::ios::ate);
+		std::streamsize size = level.tellg();
+
+		if (size < 6) {
+			printf("Could not load world size. You must move the current world so that a new one can be created.\n");
+			exit(1);
+		}
+
+		level.seekg(0, std::ios::beg);
+		unsigned char info[6];
+		level.read((char*)info, size);
+		worldLength = (unsigned short)info[0] << 8 | (unsigned short)info[1];
+		worldWidth = (unsigned short)info[2] << 8 | (unsigned short)info[3];
+		worldHeight = (unsigned short)info[4] << 8 | (unsigned short)info[5];
+		cubes = (unsigned int*) malloc(worldLength * worldWidth * worldHeight * sizeof(unsigned int));
+
 		std::ifstream save("world/cubes.dat", std::ios::binary | std::ios::ate);
-		std::streamsize size = save.tellg();
+		size = save.tellg();
 		save.seekg(0, std::ios::beg);
 		unsigned char* __restrict__ data = (unsigned char*)malloc(size);
 		save.read((char*)data, size);
@@ -59,24 +89,24 @@ World::World() {
 }
 
 void World::setCube(const int x, const int y, const int z, const unsigned int cube) {
-	if (x >= WORLD_WIDTH || x < 0 || z >= WORLD_WIDTH || z < 0 || y >= WORLD_HEIGHT || y < 0) {
+	if (x >= worldLength || x < 0 || z >= worldWidth || z < 0 || y >= worldHeight || y < 0) {
 		return;
 	}
-	cubes[((z * WORLD_WIDTH * WORLD_HEIGHT) + x * WORLD_HEIGHT) + y] = cube;
+	cubes[((z * worldLength * worldHeight) + x * worldHeight) + y] = cube;
 }
 
 unsigned int World::getCube(const int x, const int y, const int z) {
-	if (x >= WORLD_WIDTH || x < 0 || z >= WORLD_WIDTH || z < 0 || y >= WORLD_HEIGHT || y < 0) {
+	if (x >= worldLength || x < 0 || z >= worldWidth || z < 0 || y >= worldHeight || y < 0) {
 		return 0;
 	}
-	return cubes[((z * WORLD_WIDTH * WORLD_HEIGHT) + x * WORLD_HEIGHT) + y];
+	return cubes[((z * worldLength * worldHeight) + x * worldHeight) + y];
 }
 
 unsigned int* World::getCubePointer(const int x, const int y, const int z) {
-	if (x >= WORLD_WIDTH || x < 0 || z >= WORLD_WIDTH || z < 0 || y >= WORLD_HEIGHT || y < 0) {
+	if (x >= worldLength || x < 0 || z >= worldWidth || z < 0 || y >= worldHeight || y < 0) {
 		return NULL;
 	}
-	return &cubes[((z * WORLD_WIDTH * WORLD_HEIGHT) + x * WORLD_HEIGHT) + y];
+	return &cubes[((z * worldLength * worldHeight) + x * worldHeight) + y];
 }
 
 void World::saveWorld() {
@@ -88,12 +118,22 @@ void World::saveWorld() {
 		}
 	}
 
+	std::ofstream level("world/level.dat");
+	unsigned char worldSizeInfo[6];
+	worldSizeInfo[0] = (worldLength >> 8) & 0xff;
+	worldSizeInfo[1] = worldLength & 0xff;
+	worldSizeInfo[2] = (worldWidth >> 8) & 0xff;
+	worldSizeInfo[3] = worldWidth & 0xff;
+	worldSizeInfo[4] = (worldHeight >> 8) & 0xff;
+	worldSizeInfo[5] = worldHeight & 0xff;
+	level.write((char*)worldSizeInfo, 6);
+
 	std::ofstream save("world/cubes.dat");
 
 	// one byte for cube color count, 4 for block/cube id
-	unsigned char * __restrict__ data = (unsigned char*)malloc(WORLD_WIDTH * WORLD_WIDTH * WORLD_HEIGHT * 5);
+	unsigned char * __restrict__ data = (unsigned char*)malloc(worldLength * worldWidth * worldHeight * 5);
 	unsigned int index = 0;
-	for (unsigned int i = 0; i < WORLD_WIDTH * WORLD_WIDTH * WORLD_HEIGHT;) {
+	for (unsigned int i = 0; i < worldLength * worldWidth * worldHeight;) {
 
 		// this does some (very basic) compression; not particularly effective
 		unsigned int prevCube = cubes[i];
@@ -101,7 +141,7 @@ void World::saveWorld() {
 		unsigned char count = 0;
 		while (prevCube == cube) {
 			++count;
-			if (count >= 255 || i + count >= WORLD_WIDTH * WORLD_WIDTH * WORLD_HEIGHT) {
+			if (count >= 255 || i + count >= worldLength * worldWidth * worldHeight) {
 				break;
 			}
 			cube = cubes[i + count];

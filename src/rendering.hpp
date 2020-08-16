@@ -25,7 +25,7 @@ float skyColorRed = 0.5f;
 float skyColorGreen = 0.5f;
 float skyColorBlue = 1.0f;
 
-Camera camera((float)WORLD_WIDTH / 2.0f, 17.6f, (float)WORLD_WIDTH / 2.0f, 0.0f, 0.0f);
+Camera camera;
 
 double usingCubeVertices[] = {
 		-0.1, -0.1, 0.1,
@@ -116,12 +116,12 @@ void renderCube(int x, int y, int z, unsigned int cube) {
 
 	// attempts to speed through the surrounding cube check by going through memory as contiguously as possible. cubePointer is the cube's memory location.
 	unsigned int* __restrict__ cubePointer = mainWorld.getCubePointer(x, y, z);
-	bool renderFrontFace = z <= 0 || cubePointer[-(WORLD_WIDTH * WORLD_HEIGHT)] == 0;
-	bool renderLeftFace = x <= 0 || cubePointer[-WORLD_HEIGHT] == 0;
+	bool renderFrontFace = z <= 0 || cubePointer[-(mainWorld.worldLength * mainWorld.worldHeight)] == 0;
+	bool renderLeftFace = x <= 0 || cubePointer[-mainWorld.worldHeight] == 0;
 	bool renderBottomFace = y <= 0 || cubePointer[-1] == 0;
-	bool renderTopFace = y >= WORLD_HEIGHT - 1 || cubePointer[1] == 0;
-	bool renderRightFace = x >= WORLD_WIDTH - 1 || cubePointer[WORLD_HEIGHT] == 0;
-	bool renderBackFace = z >= WORLD_WIDTH - 1 || cubePointer[WORLD_WIDTH * WORLD_HEIGHT] == 0;
+	bool renderTopFace = y >= mainWorld.worldHeight - 1 || cubePointer[1] == 0;
+	bool renderRightFace = x >= mainWorld.worldLength - 1 || cubePointer[mainWorld.worldHeight] == 0;
+	bool renderBackFace = z >= mainWorld.worldWidth - 1 || cubePointer[mainWorld.worldLength * mainWorld.worldHeight] == 0;
 
 	if (renderTopFace) {
 		vertices[vertexCount + 0] = (double)x + 1.0; vertices[vertexCount + 1] = (double)y + 1.0; vertices[vertexCount + 2] = (double)z + 1.0;
@@ -238,11 +238,11 @@ void renderCube(int x, int y, int z, unsigned int cube) {
 }
 
 void renderWorld() {
-	for (unsigned int z = 0; z < WORLD_WIDTH; ++z) {
-		const unsigned int temp = z * WORLD_WIDTH * WORLD_HEIGHT; // stores this index number so it doesn't have to be recomputed every time a cube is set
-		for (unsigned int x = 0; x < WORLD_WIDTH; ++x) {
-			const unsigned int temp1 = temp + (x * WORLD_HEIGHT);
-			for (unsigned int y = 0; y < WORLD_HEIGHT; ++y) {
+	for (unsigned int z = 0; z < mainWorld.worldWidth; ++z) {
+		const unsigned int temp = z * mainWorld.worldLength * mainWorld.worldHeight; // stores this index number so it doesn't have to be recomputed every time a cube is set
+		for (unsigned int x = 0; x < mainWorld.worldLength; ++x) {
+			const unsigned int temp1 = temp + (x * mainWorld.worldHeight);
+			for (unsigned int y = 0; y < mainWorld.worldHeight; ++y) {
 				const unsigned int cube = mainWorld.cubes[temp1 + y];
 				if (cube) {
 					renderCube(x, y, z, cube);
@@ -352,13 +352,15 @@ int setupOpenGL() {
 	glGenBuffers(1, &linebuffer);
 
 	glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
-	glBufferData(GL_ARRAY_BUFFER, ((WORLD_WIDTH * WORLD_WIDTH * WORLD_HEIGHT) * 6 * 2 * 3 * 3) * sizeof(double), NULL, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, ((mainWorld.worldLength * mainWorld.worldWidth * mainWorld.worldHeight) * 6 * 2 * 3 * 3) * sizeof(double), NULL, GL_STATIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, colorbuffer);
-	glBufferData(GL_ARRAY_BUFFER, ((WORLD_WIDTH * WORLD_WIDTH * WORLD_HEIGHT) * 6 * 2 * 3 * 3) * sizeof(float), NULL, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, ((mainWorld.worldLength * mainWorld.worldWidth * mainWorld.worldHeight) * 6 * 2 * 3 * 3) * sizeof(float), NULL, GL_STATIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, linebuffer);
 	glBufferData(GL_ARRAY_BUFFER, 100 * sizeof(double), NULL, GL_STATIC_DRAW);
 
 	matrix = glGetUniformLocation(program, "MVP");
+
+	camera.initCamera((float)mainWorld.worldLength / 2.0f, 17.6f, (float)mainWorld.worldWidth / 2.0f, 0.0f, 0.0f);
 
 	glClearColor(skyColorRed, skyColorGreen, skyColorBlue, 0.0f);
 

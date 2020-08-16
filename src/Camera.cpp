@@ -2,6 +2,10 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include "Camera.hpp"
 
+Camera::Camera() {
+
+}
+
 void Camera::move(float forward, float vertical, float sideways) {
 	xPos += forward * glm::sin(rotationYaw) + sideways * glm::cos(-rotationYaw);
 	zPos -= forward * glm::cos(rotationYaw) + sideways * glm::sin(-rotationYaw);
@@ -45,7 +49,7 @@ glm::mat4 Camera::getMatrix(float windowSizeRatio) {
 	return model * projection * view;
 }
 
-Camera::Camera(float x, float y, float z, float yaw, float pitch) {
+void Camera::initCamera(float x, float y, float z, float yaw, float pitch) {
 	xPos = x;
 	yPos = y;
 	zPos = z;

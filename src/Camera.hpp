@@ -27,7 +27,9 @@ public:
 	glm::mat4 getMatrix(float windowSizeRatio);
 
 	/** Specify the position and rotation to start the camera at **/
-	Camera(float x, float y, float z, float rotationYaw, float rotationPitch);
+	void initCamera(float x, float y, float z, float rotationYaw, float rotationPitch);
+
+	Camera();
 };
 
 #endif
