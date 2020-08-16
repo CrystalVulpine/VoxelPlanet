@@ -13,12 +13,17 @@ World::World() {
 	// generate a new world if one doesn't exist, otherwise load the save file
 	struct stat st;
 	if (stat("world/cubes.dat", &st) != 0) {
+
 		// very simple flat terrain generator for now
 		for (unsigned int z = 0; z < WORLD_WIDTH; ++z) {
+
 			 // store this index number in a temp variable so it doesn't have to be recomputed
 			const unsigned int temp = z * WORLD_WIDTH * WORLD_HEIGHT;
+
 			for (unsigned int x = 0; x < WORLD_WIDTH; ++x) {
+
 				const unsigned int temp1 = temp + x * WORLD_HEIGHT;
+
 				cubes[temp1 + 0] = 0x333333ff;
 				for (unsigned int y = 1; y < 11; ++y) {
 					cubes[temp1 + y] = 0x808080ff;
@@ -82,12 +87,14 @@ void World::saveWorld() {
 			return;
 		}
 	}
+
 	std::ofstream save("world/cubes.dat");
 
 	// one byte for cube color count, 4 for block/cube id
 	unsigned char * __restrict__ data = (unsigned char*)malloc(WORLD_WIDTH * WORLD_WIDTH * WORLD_HEIGHT * 5);
 	unsigned int index = 0;
 	for (unsigned int i = 0; i < WORLD_WIDTH * WORLD_WIDTH * WORLD_HEIGHT;) {
+
 		// this does some (very basic) compression; not particularly effective
 		unsigned int prevCube = cubes[i];
 		unsigned int cube = cubes[i];
@@ -99,6 +106,7 @@ void World::saveWorld() {
 			}
 			cube = cubes[i + count];
 		}
+
 		data[index] = count;
 		// ensure big endian so save files don't get corrupted between platforms
 		data[index + 1] = (unsigned char)((prevCube >> 24) & 0xff);
@@ -109,6 +117,7 @@ void World::saveWorld() {
 		i += count;
 		index += 5;
 	}
+
 	save.write((char*)data, index);
 	free(data);
 }
@@ -126,6 +135,7 @@ RayTraceInfo World::rayTraceCubes(glm::vec3 start, float rotationYaw, float rota
 	    pos.z -= glm::sin(rotationYaw + 1.5708f) * 0.05f;
 	    pos.y -= glm::tan(rotationPitch) * 0.05f;
 	    cube = getCube(pos.x, pos.y, pos.z);
+
 	    if (glm::distance(start, pos) > reach) {
 	    	RayTraceInfo info = {couldFindCube, pos, lastPos};
 	    	return info;

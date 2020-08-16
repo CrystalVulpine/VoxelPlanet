@@ -74,9 +74,11 @@ int main(unsigned int argc, char *argv[]) {
 			gamePaused = !gamePaused;
 			if (!gamePaused) {
 				glfwSetCursorPos(window, (double)windowWidth / 2.0, (double)windowHeight / 2.0);
+
 				if (!debugMode) {
 					glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 				}
+
 				// if this is not done the game will count the pause time as elapsed
 				lastTick = currentTimeMs();
 			} else {
@@ -114,6 +116,7 @@ int main(unsigned int argc, char *argv[]) {
 		for (unsigned int i = 0; i < 10; ++i) {
 			if (!numKeysPressed[i] && glfwGetKey(window, i + GLFW_KEY_0) == GLFW_PRESS) {
 				numKeysPressed[i] = true;
+
 				colorInput[colorInputIndex] = i;
 				++colorInputIndex;
 				if (colorInputIndex >= 3) {
