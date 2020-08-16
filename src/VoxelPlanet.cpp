@@ -57,7 +57,7 @@ int main(int argc, char *argv[]) {
 	}
 
 	gameRunning = true;
-	camera.setBounds(0.0f, (float)worldLength, 0.0f, (float)worldWidth);
+	camera.setBounds(0.0f, (float)mainWorld.worldLength, 0.0f, (float)mainWorld.worldWidth);
 
 	double mouseX;
 	double mouseY;
