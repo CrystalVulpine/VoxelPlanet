@@ -1,5 +1,4 @@
-#ifndef RENDERING_H_
-#define RENDERING_H_
+#pragma once
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -238,11 +237,11 @@ void renderCube(int x, int y, int z, unsigned int cube) {
 }
 
 void renderWorld() {
-	for (unsigned int z = 0; z < mainWorld.worldWidth; ++z) {
+	for (int z = 0; z < mainWorld.worldWidth; ++z) {
 		const unsigned int temp = z * mainWorld.worldLength * mainWorld.worldHeight; // stores this index number so it doesn't have to be recomputed every time a cube is set
-		for (unsigned int x = 0; x < mainWorld.worldLength; ++x) {
+		for (int x = 0; x < mainWorld.worldLength; ++x) {
 			const unsigned int temp1 = temp + (x * mainWorld.worldHeight);
-			for (unsigned int y = 0; y < mainWorld.worldHeight; ++y) {
+			for (int y = 0; y < mainWorld.worldHeight; ++y) {
 				const unsigned int cube = mainWorld.cubes[temp1 + y];
 				if (cube) {
 					renderCube(x, y, z, cube);
@@ -475,6 +474,3 @@ void cleanupOpenGL() {
 
 	glfwTerminate();
 }
-
-
-#endif

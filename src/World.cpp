@@ -10,7 +10,7 @@ World::World() {
 
 }
 
-void World::startWorld(unsigned int length, unsigned int width, unsigned int height) {
+void World::startWorld(const int length, const int width, const int height) {
 	// generate a new world if one doesn't exist, otherwise load the save file
 	struct stat st;
 	if (stat("world/cubes.dat", &st) != 0) {
@@ -20,17 +20,17 @@ void World::startWorld(unsigned int length, unsigned int width, unsigned int hei
 		worldHeight = height;
 
 		// yes I know, malloc in C++ is non-conventional. But it gets the job done.
-		cubes = (unsigned int*) malloc(worldLength * worldWidth * worldHeight * sizeof(unsigned int));
+		cubes = (unsigned int*)malloc(worldLength * worldWidth * worldHeight * sizeof(unsigned int));
 
 		// very simple flat terrain generator for now
-		for (unsigned int z = 0; z < worldWidth; ++z) {
+		for (int z = 0; z < worldWidth; ++z) {
 
 			 // store this index number in a temp variable so it doesn't have to be recomputed
-			const unsigned int temp = z * worldLength * worldHeight;
+			const int temp = z * worldLength * worldHeight;
 
-			for (unsigned int x = 0; x < worldLength; ++x) {
+			for (int x = 0; x < worldLength; ++x) {
 
-				const unsigned int temp1 = temp + x * worldHeight;
+				const int temp1 = temp + x * worldHeight;
 
 				cubes[temp1 + 0] = 0x333333ff;
 				for (unsigned int y = 1; y < 11; ++y) {
@@ -40,7 +40,7 @@ void World::startWorld(unsigned int length, unsigned int width, unsigned int hei
 					cubes[temp1 + y] = 0x662000ff;
 				}
 				cubes[temp1 + 15] = 0x00bf00ff;
-				for (unsigned int y = 16; y < worldHeight; ++y) {
+				for (int y = 16; y < worldHeight; ++y) {
 					cubes[temp1 + y] = 0;
 				}
 			}
@@ -66,7 +66,7 @@ void World::startWorld(unsigned int length, unsigned int width, unsigned int hei
 		worldLength = (unsigned short)info[0] << 8 | (unsigned short)info[1];
 		worldWidth = (unsigned short)info[2] << 8 | (unsigned short)info[3];
 		worldHeight = (unsigned short)info[4] << 8 | (unsigned short)info[5];
-		cubes = (unsigned int*) malloc(worldLength * worldWidth * worldHeight * sizeof(unsigned int));
+		cubes = (unsigned int*)malloc(worldLength * worldWidth * worldHeight * sizeof(unsigned int));
 
 		std::ifstream save("world/cubes.dat", std::ios::binary | std::ios::ate);
 		size = save.tellg();

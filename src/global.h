@@ -1,5 +1,4 @@
-#ifndef GLOBAL_H_
-#define GLOBAL_H_
+#pragma once
 
 #include "World.hpp"
 
@@ -16,6 +15,3 @@ extern unsigned int usingCube;
 
 typedef long Clock;
 Clock currentTimeMs();
-
-
-#endif

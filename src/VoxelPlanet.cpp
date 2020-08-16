@@ -20,10 +20,10 @@ unsigned int usingCube = 0x808080ff;
 bool gamePaused = false;
 bool hideGUI = false;
 
-int main(unsigned int argc, char *argv[]) {
-	unsigned int worldLength = 64;
-	unsigned int worldWidth = 64;
-	unsigned int worldHeight = 64;
+int main(int argc, char *argv[]) {
+	int worldLength = 64;
+	int worldWidth = 64;
+	int worldHeight = 64;
 	for (unsigned int i = 0; i < argc; ++i) {
 		if (strcmp(argv[i], "--debug") == 0) {
 			debugMode = true;

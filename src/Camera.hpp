@@ -1,5 +1,4 @@
-#ifndef CAMERA_HPP_
-#define CAMERA_HPP_
+#pragma once
 
 class Camera {
 public:
@@ -31,5 +30,3 @@ public:
 
 	Camera();
 };
-
-#endif
