@@ -7,24 +7,26 @@
 #include "global.h"
 
 World::World() {
-	blocks = (unsigned int*) malloc(WORLD_WIDTH * WORLD_WIDTH * WORLD_HEIGHT * sizeof(unsigned int)); // yes I know, malloc in C++ is non-conventional. But it gets the job done.
+	// yes I know, malloc in C++ is non-conventional. But it gets the job done.
+	blocks = (unsigned int*) malloc(WORLD_WIDTH * WORLD_WIDTH * WORLD_HEIGHT * sizeof(unsigned int));
 
 	// generate a new world if one doesn't exist, otherwise load the save file
 	struct stat st;
 	if (stat("world/blocks.dat", &st) != 0) {
 		// very simple flat terrain generator for now
 		for (unsigned int z = 0; z < WORLD_WIDTH; ++z) {
-			const unsigned int temp = z * WORLD_WIDTH * WORLD_HEIGHT; // stores this index number so it doesn't have to be recomputed every time a block is set
+			 // store this index number in a temp variable so it doesn't have to be recomputed
+			const unsigned int temp = z * WORLD_WIDTH * WORLD_HEIGHT;
 			for (unsigned int x = 0; x < WORLD_WIDTH; ++x) {
 				const unsigned int temp1 = temp + x * WORLD_HEIGHT;
-				blocks[temp1 + 0] = blockBedrock;
+				blocks[temp1 + 0] = 0x333333ff;
 				for (unsigned int y = 1; y < 11; ++y) {
-					blocks[temp1 + y] = blockStone;
+					blocks[temp1 + y] = 0x7f7f7fff;
 				}
 				for (unsigned int y = 11; y < 15; ++y) {
-					blocks[temp1 + y] = blockDirt;
+					blocks[temp1 + y] = 0x662000ff;
 				}
-				blocks[temp1 + 15] = blockGrass;
+				blocks[temp1 + 15] = 0x00bf00ff;
 				for (unsigned int y = 16; y < WORLD_HEIGHT; ++y) {
 					blocks[temp1 + y] = 0;
 				}
@@ -109,4 +111,42 @@ void World::saveWorld() {
 	}
 	save.write((char*)data, index);
 	free(data);
+}
+
+struct rayTraceInfo World::rayTraceBlocks(glm::vec3 start, float rotationYaw, float rotationPitch, float reach) {
+
+	bool couldFindBlock = false;
+
+	glm::vec3 pos = start;
+	glm::vec3 lastPos = start;
+	unsigned int block = 0;
+	while (!block) {
+		lastPos = pos;
+	    pos.x -= glm::cos(rotationYaw + 1.5708f) * 0.05f;
+	    pos.z -= glm::sin(rotationYaw + 1.5708f) * 0.05f;
+	    pos.y -= glm::tan(rotationPitch) * 0.05f;
+	    block = getBlock(pos.x, pos.y, pos.z);
+	    if (glm::distance(start, pos) > reach) {
+	    	struct rayTraceInfo info = {couldFindBlock, pos, lastPos};
+	    	return info;
+	    }
+	}
+
+	// this prevents the edge case of placing a cube on a corner
+    int posDiff = 0;
+    if (std::floor(pos.x) != std::floor(lastPos.x)) {
+    	posDiff += 1;
+    }
+    if (std::floor(pos.y) != std::floor(lastPos.y)) {
+    	posDiff += 1;
+    }
+    if (std::floor(pos.z) != std::floor(lastPos.z)) {
+    	posDiff += 1;
+    }
+    if (posDiff == 1) {
+    	couldFindBlock = true;
+    }
+
+	struct rayTraceInfo info = {couldFindBlock, pos, lastPos};
+	return info;
 }

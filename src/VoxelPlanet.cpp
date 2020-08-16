@@ -1,106 +1,27 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <GL/glew.h>
-#include <GLFW/glfw3.h>
-#include <chrono>
-#include <glm/gtc/matrix_transform.hpp>
-#include "World.hpp"
-#include "rendering.h"
 #include "global.h"
+#include "rendering.hpp"
+#include "World.hpp"
 
-GLFWwindow* window;
-int windowWidth = 1024;
-int windowHeight = 768;
-
-unsigned char antialiasing_level = 4;
 bool gameRunning = false;
-unsigned char renderDistance = 16;
 World mainWorld;
 
-float xPos = (float)WORLD_WIDTH / 2.0F;
-float yPos = 17.62;
-float zPos = (float)WORLD_WIDTH / 2.0F;
-float rotationYaw = 0.0F;
-float rotationPitch = 0.0F;
+// don't let GLFW capture the pointer in case the application suspends.
+bool debugMode = true;
 
-bool debugMode = true; // don't let GLFW capture the pointer in case the application suspends.
+unsigned int heldBlock = 0x7f7f7fff;
+bool isBlockSelected = false;
+bool gamePaused = false;
+bool hideGUI = false;
 
 int main(void) {
-	if (!glfwInit()) {
-		fprintf(stderr, "Failed to initialize GLFW");
-		getchar();
-		return -1;
-	}
-	glfwWindowHint(GLFW_SAMPLES, antialiasing_level);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_ANY_PROFILE);
-	window = glfwCreateWindow(windowWidth, windowHeight, "VoxelPlanet Alpha v0.1", NULL, NULL);
-	if (window == NULL) {
-		fprintf(stderr, "Failed to open GLFW window. Your GPU or CPU may not be compatible with OpenGL 3.3.");
-		getchar();
-		glfwTerminate();
-		return -1;
-	}
-	glfwMakeContextCurrent(window);
-	glfwSetInputMode(window, GLFW_STICKY_KEYS, GL_TRUE);
-	if (!debugMode) {
-		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-	}
-
-	if (glewInit() != GLEW_OK) {
-		fprintf(stderr, "Failed to initialize GLEW");
-		getchar();
-		glfwTerminate();
-		return -1;
+	int glErrorCode = setupOpenGL();
+	if (glErrorCode != 0) {
+		return glErrorCode;
 	}
 
 	gameRunning = true;
-
-	GLuint vao;
-	glGenVertexArrays(1, &vao);
-	glBindVertexArray(vao);
-
-	const GLchar *vertexShader = R"(
-	#version 330 core
-	layout(location = 0) in vec3 vertexPosition_modelspace;
-    layout(location = 1) in vec3 vertexColor;
-    out vec3 fragmentColor;
-  
-    uniform mat4 MVP;
-  
-    void main() {
-        gl_Position =  MVP * vec4(vertexPosition_modelspace,1);
-        fragmentColor = vertexColor;
-    })";
-
-	const GLchar *fragmentShader = R"(
-	#version 330 core
-    out vec3 color;
-    in vec3 fragmentColor;
-    void main() {
-        color = fragmentColor;
-    })";
-
-	GLuint program = loadShaders(vertexShader, fragmentShader);
-
-	glGenBuffers(1, &vertexbuffer);
-	glGenBuffers(1, &colorbuffer);
-	glGenBuffers(1, &linebuffer);
-
-	glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
-	glBufferData(GL_ARRAY_BUFFER, ((WORLD_WIDTH * WORLD_WIDTH * WORLD_HEIGHT) * 6 * 2 * 3 * 3) * sizeof(double), NULL, GL_STATIC_DRAW);
-	glBindBuffer(GL_ARRAY_BUFFER, colorbuffer);
-	glBufferData(GL_ARRAY_BUFFER, ((WORLD_WIDTH * WORLD_WIDTH * WORLD_HEIGHT) * 6 * 2 * 3 * 3) * sizeof(float), NULL, GL_STATIC_DRAW);
-	glBindBuffer(GL_ARRAY_BUFFER, linebuffer);
-	glBufferData(GL_ARRAY_BUFFER, 100 * sizeof(double), NULL, GL_STATIC_DRAW);
-
-	GLuint matrix = glGetUniformLocation(program, "MVP");
-
-	glClearColor(0.5f, 0.5f, 1.0f, 0.0f);
-
-	renderWorld();
 
 	double mouseX;
 	double mouseY;
@@ -108,72 +29,12 @@ int main(void) {
 
 	bool esc_pressed = false;
 	bool f1_pressed = false;
-	bool gamePaused = false;
-	bool hideGUI = false;
-
 	bool mMousePress = false;
-
-	unsigned int selectedBlock = blockStone;
 
 	Clock now;
 	Clock lastTick = currentTimeMs();
 
 	Clock clickClock = currentTimeMs();
-
-	double blockGUI[] = {
-			-0.1, -0.1, 0.1,
-			-0.1, 0.1, 0.1,
-			0.1, 0.1, 0.1,
-			-0.1, -0.1, 0.1,
-			0.1, 0.1, 0.1,
-			0.1, -0.1, 0.1,
-
-			-0.1, -0.1, 0.1,
-			-0.1, 0.1, 0.1,
-			-0.1, 0.1, -0.1,
-			-0.1, -0.1, 0.1,
-			-0.1, 0.1, -0.1,
-			-0.1, -0.1, -0.1,
-
-			0.1, 0.1, 0.1,
-			0.1, 0.1, -0.1,
-			-0.1, 0.1, -0.1,
-			-0.1, 0.1, -0.1,
-			-0.1, 0.1, 0.1,
-			0.1, 0.1, 0.1,
-	};
-
-	double crosshairs[] = {
-			-0.005, 0.05, 0.0,
-			0.005, 0.05, 0.0,
-			0.005, -0.05, 0.0,
-			0.005, -0.05, 0.0,
-			-0.005, -0.05, 0.0,
-			-0.005, 0.05, 0.0,
-
-			0.05, -0.005, 0.0,
-			0.05, 0.005, 0.0,
-			-0.05, 0.005, 0.0,
-			-0.05, 0.005, 0.0,
-			-0.05, -0.005, 0.0,
-			0.05, -0.005, 0.0,
-	};
-
-	double crosshairColor[] = {
-			1.0, 1.0, 1.0,
-			1.0, 1.0, 1.0,
-			1.0, 1.0, 1.0,
-			1.0, 1.0, 1.0,
-			1.0, 1.0, 1.0,
-			1.0, 1.0, 1.0,
-
-			1.0, 1.0, 1.0,
-			1.0, 1.0, 1.0,
-			1.0, 1.0, 1.0,
-			1.0, 1.0, 1.0,
-			1.0, 1.0, 1.0,
-			1.0, 1.0, 1.0,
-	};
 
 	bool changeRed = false;
 	bool changeGreen = false;
@@ -233,15 +94,15 @@ int main(void) {
 				if (colorInputIndex >= 3) {
 					if (changeRed) {
 						unsigned char red = colorInput[0] * 100 + colorInput[1] * 10 + colorInput[2];
-						*(((unsigned char*)&selectedBlock) + 3) = red;
+						*(((unsigned char*)&heldBlock) + 3) = red;
 						changeRed = false;
 					} else if (changeGreen) {
 						unsigned char green = colorInput[0] * 100 + colorInput[1] * 10 + colorInput[2];
-						*(((unsigned char*)&selectedBlock) + 2) = green;
+						*(((unsigned char*)&heldBlock) + 2) = green;
 						changeGreen = false;
 					} else if (changeBlue) {
 						unsigned char blue = colorInput[0] * 100 + colorInput[1] * 10 + colorInput[2];
-						*(((unsigned char*)&selectedBlock) + 1) = blue;
+						*(((unsigned char*)&heldBlock) + 1) = blue;
 						changeBlue = false;
 					}
 					colorInputIndex = 0;
@@ -255,97 +116,49 @@ int main(void) {
 
 		// we want to control the speed of things like moving the camera
 		now = currentTimeMs();
-		bool noBlockSelected = gamePaused;
+		isBlockSelected = gamePaused;
 
 		if (!gamePaused) {
-			float forward = 0.0F;
-			float sideways = 0.0F;
+			float forward = 0.0f;
+			float sideways = 0.0f;
+			float upward = 0.0f;
 			if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
-				forward = 1.0F;
+				forward = 1.0f;
 			}
 			if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
-				forward = -1.0F;
+				forward = -1.0f;
 			}
 			if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
-				sideways = -1.0F;
+				sideways = -1.0f;
 			}
 			if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
-				sideways = 1.0F;
+				sideways = 1.0f;
 			}
 			if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
-				yPos += (float)(now - lastTick) / 100.0;
+				upward = (float)(now - lastTick) / 100.0f;
 			}
 			if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) {
-				yPos -= (float)(now - lastTick) / 100.0;
+				upward = (float)-(now - lastTick) / 100.0f;
 			}
-			forward *= (float)(now - lastTick) / 100.0;
-			sideways *= (float)(now - lastTick) / 100.0;
-			xPos += forward * std::sin(rotationYaw) + sideways * std::cos(-rotationYaw);
-			zPos -= forward * std::cos(rotationYaw) + sideways * std::sin(-rotationYaw);
-
-			if (xPos < 0.0) {
-				xPos = 0.0;
-			} else if (xPos > WORLD_WIDTH) {
-				xPos = WORLD_WIDTH;
-			}
-			if (zPos < 0.0) {
-				zPos = 0.0;
-			} else if (zPos > WORLD_WIDTH) {
-				zPos = WORLD_WIDTH;
-			}
+			forward *= (float)(now - lastTick) / 100.0f;
+			sideways *= (float)(now - lastTick) / 100.0f;
 
 			glfwGetCursorPos(window, &mouseX, &mouseY);
 
-			rotationYaw += ((float)mouseX - ((float)windowWidth / 2.0)) / 180.0F;
-			rotationPitch += ((float)mouseY - ((float)windowHeight / 2.0)) / 180.0F;
-
-			// this prevents the camera from rotating too far upwards or downwards
-			if (rotationPitch > 3.14159265359F / 2.0F) {
-				rotationPitch = 3.14159265359F / 2.0F;
-			} else if (rotationPitch < -3.14159265359F / 2.0F) {
-				rotationPitch = -3.14159265359F / 2.0F;
-			}
+			camera.move(forward, upward, sideways);
+			camera.rotate(((float)mouseX - ((float)windowWidth / 2.0f)) / 180.0f, ((float)mouseY - ((float)windowHeight / 2.0f)) / 180.0f);
 
 			glfwSetCursorPos(window, (double)windowWidth / 2.0, (double)windowHeight / 2.0);
 
 			lastTick = currentTimeMs();
 
 			// here's where we trace a ray from the camera to a cube in the world
-			glm::vec3 start(xPos, yPos, zPos);
-			glm::vec3 pos = start;
-			glm::vec3 lastPos = start;
-			int bl = 0;
-			while (bl == 0) {
-				lastPos = pos;
-			    pos.x -= glm::cos(rotationYaw + 1.5708) * 0.05;
-			    pos.z -= glm::sin(rotationYaw + 1.5708) * 0.05;
-			    pos.y -= glm::tan(rotationPitch) * 0.05;
-			    bl = mainWorld.getBlock(pos.x, pos.y, pos.z);
-			    if (glm::distance(start, pos) > 6.0) {
-			    	noBlockSelected = true;
-			    	break;
-			    }
-			}
+			struct rayTraceInfo raySelection = mainWorld.rayTraceBlocks(glm::vec3(camera.xPos, camera.yPos, camera.zPos), camera.rotationYaw, camera.rotationPitch, 6.0f);
 
-			// this prevents the edge case of placing a cube on a corner
-		    int posDiff = 0;
-		    if (std::floor(pos.x) != std::floor(lastPos.x)) {
-		    	posDiff += 1;
-		    }
-		    if (std::floor(pos.y) != std::floor(lastPos.y)) {
-		    	posDiff += 1;
-		    }
-		    if (std::floor(pos.z) != std::floor(lastPos.z)) {
-		    	posDiff += 1;
-		    }
-		    if (posDiff > 1) {
-		    	noBlockSelected = true;
-		    }
-
-			if (!noBlockSelected) {
-				double sx = std::floor(pos.x);
-				double sy = std::floor(pos.y);
-				double sz = std::floor(pos.z);
+			if (raySelection.blockFound) {
+				double sx = std::floor(raySelection.pos.x);
+				double sy = std::floor(raySelection.pos.y);
+				double sz = std::floor(raySelection.pos.z);
 
 				renderSelectBlock(sx, sy, sz);
 
@@ -353,21 +166,22 @@ int main(void) {
 				int y = (int)sy;
 				int z = (int)sz;
 
+				// mouse clicking functions for placing/deleting cubes
 				if (currentTimeMs() - clickClock > 200 && glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS) {
 					clickClock = currentTimeMs();
 
-					unsigned int * __restrict__ bp = mainWorld.getBlockPointer((int)std::floor(lastPos.x), (int)std::floor(lastPos.y), (int)std::floor(lastPos.z));
-					if (bp != NULL && *bp == 0) {
-						*bp = selectedBlock;
+					unsigned int * __restrict__ block = mainWorld.getBlockPointer((int)std::floor(raySelection.lastPos.x), (int)std::floor(raySelection.lastPos.y), (int)std::floor(raySelection.lastPos.z));
+					if (block != NULL && *block == 0) {
+						*block = heldBlock;
 						reRenderWorld();
 					}
 				}
 				if (currentTimeMs() - clickClock > 200 && glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) {
 					clickClock = currentTimeMs();
 
-					unsigned int * __restrict__ blockPointer = mainWorld.getBlockPointer(x, y, z);
-					if (blockPointer != NULL && *blockPointer > 0) {
-						*blockPointer = 0;
+					unsigned int * __restrict__ block = mainWorld.getBlockPointer(x, y, z);
+					if (block != NULL && *block > 0) {
+						*block = 0;
 						reRenderWorld();
 					}
 				}
@@ -376,122 +190,21 @@ int main(void) {
 					mMousePress = true;
 					unsigned int b = mainWorld.getBlock(x, y, z);
 					if (b > 0) {
-						selectedBlock = b;
+						heldBlock = b;
 					}
 				} else if (mMousePress && glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_MIDDLE) != GLFW_PRESS) {
 					mMousePress = false;
 				}
+				isBlockSelected = true;
+			} else {
+				isBlockSelected = false;
 			}
 		}
 
-		glm::mat4 model = glm::mat4(1.0f);
-		glm::mat4 projection = glm::perspective(glm::radians(70.0f), (float) windowWidth / (float)windowHeight, 0.01f, (float)(renderDistance * 16));
-		glm::mat4 view = glm::rotate(model, rotationPitch, glm::vec3(1.0, 0.0, 0.0)) * glm::rotate(model, rotationYaw, glm::vec3(0.0, 1.0, 0.0)) * glm::translate(model, glm::vec3(-xPos, -yPos, -zPos));
-
-		glViewport(0, 0, windowWidth, windowHeight);
-
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-		glEnable(GL_DEPTH_TEST);
-		glDepthFunc(GL_LESS);
-		glEnable(GL_CULL_FACE);
-
-		glUseProgram(program);
-
-		glm::mat4 mvp = projection * view;
-		glUniformMatrix4fv(matrix, 1, GL_FALSE, &mvp[0][0]);
-
-		glEnableVertexAttribArray(1);
-		glEnableVertexAttribArray(0);
-		glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
-		glVertexAttribPointer(0, 3, GL_DOUBLE, GL_FALSE, 0, NULL);
-		glDrawArrays(GL_TRIANGLES, 0, vertexIndex / 3);
-
-		glBindBuffer(GL_ARRAY_BUFFER, colorbuffer);
-		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, NULL);
-
-		if (!hideGUI) {
-
-			glDisableVertexAttribArray(1);
-
-			if (!noBlockSelected) {
-				glLineWidth(1.0f);
-				glBindBuffer(GL_ARRAY_BUFFER, linebuffer);
-				glVertexAttribPointer(0, 3, GL_DOUBLE, GL_FALSE, 0, NULL);
-				glDrawArrays(GL_LINES, 0, 24);
-			}
-
-			glEnableVertexAttribArray(1);
-
-			glDisable(GL_CULL_FACE);
-
-			model = glm::mat4(1.0f);
-			mvp = glm::ortho<float>(-((float)windowWidth / (float)windowHeight), (float)windowWidth / (float)windowHeight, -1.0f, 1.0f, -1.0f, 1.0f) * glm::rotate(model, 0.5f, glm::vec3(1.0, 0.0, 0.0)) * glm::translate(model, glm::vec3(((double)windowWidth / (double)windowHeight) - 0.2, 0.9, 0.0)) * glm::rotate(model, 0.785398f, glm::vec3(0.0, 1.0, 0.0));
-			glUniformMatrix4fv(matrix, 1, GL_FALSE, &mvp[0][0]);
-
-			const int blockGUIVertexCount = 18;
-
-			glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
-			glBufferSubData(GL_ARRAY_BUFFER, vertexIndex * sizeof(double), sizeof(blockGUI), blockGUI);
-			glVertexAttribPointer(0, 3, GL_DOUBLE, GL_FALSE, 0, NULL);
-			glDrawArrays(GL_TRIANGLES, vertexIndex / 3, blockGUIVertexCount);
-
-			float red = (float)(selectedBlock >> 24) / 255.0F;
-			float green = (float)((selectedBlock >> 16) & 255) / 255.0F;
-			float blue = (float)((selectedBlock >> 8) & 255) / 255.0F;
-			float blockGUIColor[] = {
-					red * 0.8f, green * 0.8f, blue * 0.8f,
-					red * 0.8f, green * 0.8f, blue * 0.8f,
-					red * 0.8f, green * 0.8f, blue * 0.8f,
-					red * 0.8f, green * 0.8f, blue * 0.8f,
-					red * 0.8f, green * 0.8f, blue * 0.8f,
-					red * 0.8f, green * 0.8f, blue * 0.8f,
-
-					red * 0.6f, green * 0.6f, blue * 0.6f,
-					red * 0.6f, green * 0.6f, blue * 0.6f,
-					red * 0.6f, green * 0.6f, blue * 0.6f,
-					red * 0.6f, green * 0.6f, blue * 0.6f,
-					red * 0.6f, green * 0.6f, blue * 0.6f,
-					red * 0.6f, green * 0.6f, blue * 0.6f,
-
-					red, green, blue,
-					red, green, blue,
-					red, green, blue,
-					red, green, blue,
-					red, green, blue,
-					red, green, blue,
-			};
-			glBindBuffer(GL_ARRAY_BUFFER, colorbuffer);
-			glBufferSubData(GL_ARRAY_BUFFER, vertexIndex * sizeof(float), sizeof(blockGUIColor), blockGUIColor);
-
-			model = glm::mat4(1.0f);
-			mvp = glm::ortho<float>(-((float)windowWidth / (float)windowHeight), (float)windowWidth / (float)windowHeight, -1.0f, 1.0f, -1.0f, 1.0f);
-			glUniformMatrix4fv(matrix, 1, GL_FALSE, &mvp[0][0]);
-
-			glDisable(GL_DEPTH_TEST);
-			glEnable(GL_BLEND);
-			glBlendFunc(GL_ONE_MINUS_DST_COLOR, GL_ZERO);
-			glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
-			glBufferSubData(GL_ARRAY_BUFFER, vertexIndex * sizeof(double) + sizeof(blockGUI), sizeof(crosshairs), crosshairs);
-			glVertexAttribPointer(0, 3, GL_DOUBLE, GL_FALSE, 0, NULL);
-			glDrawArrays(GL_TRIANGLES, vertexIndex / 3 + blockGUIVertexCount, 12);
-			glBindBuffer(GL_ARRAY_BUFFER, colorbuffer);
-			glBufferSubData(GL_ARRAY_BUFFER, vertexIndex * sizeof(float) + sizeof(blockGUIColor), sizeof(crosshairColor), crosshairColor);
-			glDisable(GL_BLEND);
-		}
-
-		glDisableVertexAttribArray(1);
-		glDisableVertexAttribArray(0);
-
-		glfwSwapBuffers(window);
-		glfwPollEvents();
+		doDrawTick();
 	}
 
-	glDeleteBuffers(1, &vertexbuffer);
-	glDeleteBuffers(1, &linebuffer);
-	glDeleteVertexArrays(1, &vao);
-
-	glfwTerminate();
+	cleanupOpenGL();
 
 	mainWorld.saveWorld();
 

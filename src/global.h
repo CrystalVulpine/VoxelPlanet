@@ -3,12 +3,12 @@
 
 #include "World.hpp"
 
-#define blockGrass 0x00bf00ff
-#define blockDirt 0x662000ff
-#define blockStone 0x7f7f7fff
-#define blockBedrock 0x333333ff
-
 extern World mainWorld;
+extern bool debugMode;
+extern bool hideGUI;
+extern bool gamePaused;
+extern bool isBlockSelected;
+extern unsigned int heldBlock;
 
 typedef long Clock;
 Clock currentTimeMs();
