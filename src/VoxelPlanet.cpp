@@ -73,11 +73,10 @@ int main(unsigned int argc, char *argv[]) {
 				if (!debugMode) {
 					glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 				}
-			} else {
-				glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-
 				// if this is not done the game will count the pause time as elapsed
 				lastTick = currentTimeMs();
+			} else {
+				glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 			}
 			esc_pressed = true;
 		} else if (esc_pressed && glfwGetKey(window, GLFW_KEY_ESCAPE) != GLFW_PRESS) {
@@ -138,7 +137,7 @@ int main(unsigned int argc, char *argv[]) {
 
 		// we want to control the speed of things like moving the camera
 		now = currentTimeMs();
-		isBlockSelected = gamePaused;
+		isBlockSelected = !gamePaused;
 
 		if (!gamePaused) {
 			float forward = 0.0f;
