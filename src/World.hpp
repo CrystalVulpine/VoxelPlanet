@@ -11,9 +11,9 @@ typedef struct RayTraceInfo {
 
 class World {
 public:
-	int worldLength;
-	int worldWidth;
-	int worldHeight;
+	unsigned int worldLength;
+	unsigned int worldWidth;
+	unsigned int worldHeight;
 
 	unsigned int* __restrict__ cubes; // if WORLD_WIDTH=256 and WORLD_HEIGHT=128, the index would be z << 15 | x << 7 | y. That's the same as ((z * 32768) + x * 128) + y.
 
