@@ -19,15 +19,15 @@ unsigned int vertexIndex = 0;
 GLFWwindow* window;
 int windowWidth = 1024;
 int windowHeight = 768;
-unsigned char antialiasing_level = 4;
-float brightness = 1.0f;
+unsigned char antialiasingLevel = 4;
+float worldBrightness = 1.0f;
 float skyColorRed = 0.5f;
 float skyColorGreen = 0.5f;
 float skyColorBlue = 1.0f;
 
 Camera camera((float)WORLD_WIDTH / 2.0f, 17.6f, (float)WORLD_WIDTH / 2.0f, 0.0f, 0.0f);
 
-double blockGUI[] = {
+double usingCubeVertices[] = {
 		-0.1, -0.1, 0.1,
 		-0.1, 0.1, 0.1,
 		0.1, 0.1, 0.1,
@@ -109,19 +109,19 @@ GLuint loadShaders(GLchar const * vertexShaderCode, GLchar const * fragmentShade
 	return program;
 }
 
-void renderBlock(int x, int y, int z, unsigned int block) {
+void renderCube(int x, int y, int z, unsigned int cube) {
 	double vertices[6 * 2 * 3 * 3];
 
 	unsigned int vertexCount = 0;
 
-	// attempts to speed through the surrounding block check by going through memory as contiguously as possible. blockPointer is the block's memory location.
-	unsigned int* __restrict__ blockPointer = mainWorld.getBlockPointer(x, y, z);
-	bool renderFrontFace = z <= 0 || blockPointer[-(WORLD_WIDTH * WORLD_HEIGHT)] == 0;
-	bool renderLeftFace = x <= 0 || blockPointer[-WORLD_HEIGHT] == 0;
-	bool renderBottomFace = y <= 0 || blockPointer[-1] == 0;
-	bool renderTopFace = y >= WORLD_HEIGHT - 1 || blockPointer[1] == 0;
-	bool renderRightFace = x >= WORLD_WIDTH - 1 || blockPointer[WORLD_HEIGHT] == 0;
-	bool renderBackFace = z >= WORLD_WIDTH - 1 || blockPointer[WORLD_WIDTH * WORLD_HEIGHT] == 0;
+	// attempts to speed through the surrounding cube check by going through memory as contiguously as possible. cubePointer is the cube's memory location.
+	unsigned int* __restrict__ cubePointer = mainWorld.getCubePointer(x, y, z);
+	bool renderFrontFace = z <= 0 || cubePointer[-(WORLD_WIDTH * WORLD_HEIGHT)] == 0;
+	bool renderLeftFace = x <= 0 || cubePointer[-WORLD_HEIGHT] == 0;
+	bool renderBottomFace = y <= 0 || cubePointer[-1] == 0;
+	bool renderTopFace = y >= WORLD_HEIGHT - 1 || cubePointer[1] == 0;
+	bool renderRightFace = x >= WORLD_WIDTH - 1 || cubePointer[WORLD_HEIGHT] == 0;
+	bool renderBackFace = z >= WORLD_WIDTH - 1 || cubePointer[WORLD_WIDTH * WORLD_HEIGHT] == 0;
 
 	if (renderTopFace) {
 		vertices[vertexCount + 0] = (double)x + 1.0; vertices[vertexCount + 1] = (double)y + 1.0; vertices[vertexCount + 2] = (double)z + 1.0;
@@ -221,14 +221,14 @@ void renderBlock(int x, int y, int z, unsigned int block) {
 		vertexCount2 += 18;
 	}
 
-	float red = (float)(block >> 24) / 255.0F;
-	float green = (float)((block >> 16) & 255) / 255.0F;
-	float blue = (float)((block >> 8) & 255) / 255.0F;
+	float red = (float)(cube >> 24) / 255.0F;
+	float green = (float)((cube >> 16) & 255) / 255.0F;
+	float blue = (float)((cube >> 8) & 255) / 255.0F;
 
 	for (unsigned int i = 0; i < sizeof(colors) / sizeof(colors[0]); i += 3) {
-		colors[i + 0] *= red * brightness;
-		colors[i + 1] *= green * brightness;
-		colors[i + 2] *= blue * brightness;
+		colors[i + 0] *= red * worldBrightness;
+		colors[i + 1] *= green * worldBrightness;
+		colors[i + 2] *= blue * worldBrightness;
 	}
 
 	glBindBuffer(GL_ARRAY_BUFFER, colorbuffer);
@@ -239,13 +239,13 @@ void renderBlock(int x, int y, int z, unsigned int block) {
 
 void renderWorld() {
 	for (unsigned int z = 0; z < WORLD_WIDTH; ++z) {
-		const unsigned int temp = z * WORLD_WIDTH * WORLD_HEIGHT; // stores this index number so it doesn't have to be recomputed every time a block is set
+		const unsigned int temp = z * WORLD_WIDTH * WORLD_HEIGHT; // stores this index number so it doesn't have to be recomputed every time a cube is set
 		for (unsigned int x = 0; x < WORLD_WIDTH; ++x) {
 			const unsigned int temp1 = temp + (x * WORLD_HEIGHT);
 			for (unsigned int y = 0; y < WORLD_HEIGHT; ++y) {
-				const unsigned int block = mainWorld.blocks[temp1 + y];
-				if (block > 0) {
-					renderBlock(x, y, z, block);
+				const unsigned int cube = mainWorld.cubes[temp1 + y];
+				if (cube) {
+					renderCube(x, y, z, cube);
 				}
 			}
 		}
@@ -257,34 +257,34 @@ void reRenderWorld() {
 	renderWorld();
 }
 
-void renderSelectBlock(double sx, double sy, double sz) {
+void renderCubeSelect(double x, double y, double z) {
 	double lines[] = {
-			sx - 0.001, sy + 1.001, sz - 0.001,
-			sx + 1.001, sy + 1.001, sz - 0.001,
-			sx + 1.001, sy + 1.001, sz - 0.001,
-			sx + 1.001, sy + 1.001, sz + 1.001,
-			sx + 1.001, sy + 1.001, sz + 1.001,
-			sx - 0.001, sy + 1.001, sz + 1.001,
-			sx - 0.001, sy + 1.001, sz + 1.001,
-			sx - 0.001, sy + 1.001, sz - 0.001,
+			x - 0.001, y + 1.001, z - 0.001,
+			x + 1.001, y + 1.001, z - 0.001,
+			x + 1.001, y + 1.001, z - 0.001,
+			x + 1.001, y + 1.001, z + 1.001,
+			x + 1.001, y + 1.001, z + 1.001,
+			x - 0.001, y + 1.001, z + 1.001,
+			x - 0.001, y + 1.001, z + 1.001,
+			x - 0.001, y + 1.001, z - 0.001,
 
-			sx - 0.001, sy - 0.001, sz - 0.001,
-			sx + 1.001, sy - 0.001, sz - 0.001,
-			sx + 1.001, sy - 0.001, sz - 0.001,
-			sx + 1.001, sy - 0.001, sz + 1.001,
-			sx + 1.001, sy - 0.001, sz + 1.001,
-			sx - 0.001, sy - 0.001, sz + 1.001,
-			sx - 0.001, sy - 0.001, sz + 1.001,
-			sx - 0.001, sy - 0.001, sz - 0.001,
+			x - 0.001, y - 0.001, z - 0.001,
+			x + 1.001, y - 0.001, z - 0.001,
+			x + 1.001, y - 0.001, z - 0.001,
+			x + 1.001, y - 0.001, z + 1.001,
+			x + 1.001, y - 0.001, z + 1.001,
+			x - 0.001, y - 0.001, z + 1.001,
+			x - 0.001, y - 0.001, z + 1.001,
+			x - 0.001, y - 0.001, z - 0.001,
 
-			sx - 0.001, sy - 0.001, sz - 0.001,
-			sx - 0.001, sy + 1.001, sz - 0.001,
-			sx + 1.001, sy - 0.001, sz - 0.001,
-			sx + 1.001, sy + 1.001, sz - 0.001,
-			sx - 0.001, sy - 0.001, sz + 1.001,
-			sx - 0.001, sy + 1.001, sz + 1.001,
-			sx + 1.001, sy - 0.001, sz + 1.001,
-			sx + 1.001, sy + 1.001, sz + 1.001,
+			x - 0.001, y - 0.001, z - 0.001,
+			x - 0.001, y + 1.001, z - 0.001,
+			x + 1.001, y - 0.001, z - 0.001,
+			x + 1.001, y + 1.001, z - 0.001,
+			x - 0.001, y - 0.001, z + 1.001,
+			x - 0.001, y + 1.001, z + 1.001,
+			x + 1.001, y - 0.001, z + 1.001,
+			x + 1.001, y + 1.001, z + 1.001,
 	};
 	glBindBuffer(GL_ARRAY_BUFFER, linebuffer);
 	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(lines), lines);
@@ -296,7 +296,7 @@ int setupOpenGL() {
 		getchar();
 		return -1;
 	}
-	glfwWindowHint(GLFW_SAMPLES, antialiasing_level);
+	glfwWindowHint(GLFW_SAMPLES, antialiasingLevel);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
@@ -393,7 +393,7 @@ void doDrawTick() {
 	if (!hideGUI) {
 		glDisableVertexAttribArray(1);
 
-		if (isBlockSelected) {
+		if (isCubeSelected) {
 			glLineWidth(1.0f);
 			glBindBuffer(GL_ARRAY_BUFFER, linebuffer);
 			glVertexAttribPointer(0, 3, GL_DOUBLE, GL_FALSE, 0, NULL);
@@ -408,17 +408,17 @@ void doDrawTick() {
 		mvp = glm::ortho<float>(-((float)windowWidth / (float)windowHeight), (float)windowWidth / (float)windowHeight, -1.0f, 1.0f, -1.0f, 1.0f) * glm::rotate(model, 0.5f, glm::vec3(1.0, 0.0, 0.0)) * glm::translate(model, glm::vec3(((double)windowWidth / (double)windowHeight) - 0.2, 0.9, 0.0)) * glm::rotate(model, 0.785398f, glm::vec3(0.0, 1.0, 0.0));
 		glUniformMatrix4fv(matrix, 1, GL_FALSE, &mvp[0][0]);
 
-		const int blockGUIVertexCount = 18;
+		const int usingCubeVertexCount = 18;
 
 		glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
-		glBufferSubData(GL_ARRAY_BUFFER, vertexIndex * sizeof(double), sizeof(blockGUI), blockGUI);
+		glBufferSubData(GL_ARRAY_BUFFER, vertexIndex * sizeof(double), sizeof(usingCubeVertices), usingCubeVertices);
 		glVertexAttribPointer(0, 3, GL_DOUBLE, GL_FALSE, 0, NULL);
-		glDrawArrays(GL_TRIANGLES, vertexIndex / 3, blockGUIVertexCount);
+		glDrawArrays(GL_TRIANGLES, vertexIndex / 3, usingCubeVertexCount);
 
-		float red = (float)(heldBlock >> 24) / 255.0F;
-		float green = (float)((heldBlock >> 16) & 255) / 255.0F;
-		float blue = (float)((heldBlock >> 8) & 255) / 255.0F;
-		float blockGUIColor[] = {
+		float red = (float)(usingCube >> 24) / 255.0F;
+		float green = (float)((usingCube >> 16) & 255) / 255.0F;
+		float blue = (float)((usingCube >> 8) & 255) / 255.0F;
+		float usingCubeColor[] = {
 				red * 0.8f, green * 0.8f, blue * 0.8f,
 				red * 0.8f, green * 0.8f, blue * 0.8f,
 				red * 0.8f, green * 0.8f, blue * 0.8f,
@@ -441,7 +441,7 @@ void doDrawTick() {
 				red, green, blue,
 		};
 		glBindBuffer(GL_ARRAY_BUFFER, colorbuffer);
-		glBufferSubData(GL_ARRAY_BUFFER, vertexIndex * sizeof(float), sizeof(blockGUIColor), blockGUIColor);
+		glBufferSubData(GL_ARRAY_BUFFER, vertexIndex * sizeof(float), sizeof(usingCubeColor), usingCubeColor);
 
 		model = glm::mat4(1.0f);
 		mvp = glm::ortho<float>(-((float)windowWidth / (float)windowHeight), (float)windowWidth / (float)windowHeight, -1.0f, 1.0f, -1.0f, 1.0f);
@@ -451,11 +451,11 @@ void doDrawTick() {
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_ONE_MINUS_DST_COLOR, GL_ZERO);
 		glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
-		glBufferSubData(GL_ARRAY_BUFFER, vertexIndex * sizeof(double) + sizeof(blockGUI), sizeof(crosshairs), crosshairs);
+		glBufferSubData(GL_ARRAY_BUFFER, vertexIndex * sizeof(double) + sizeof(usingCubeVertices), sizeof(crosshairs), crosshairs);
 		glVertexAttribPointer(0, 3, GL_DOUBLE, GL_FALSE, 0, NULL);
-		glDrawArrays(GL_TRIANGLES, vertexIndex / 3 + blockGUIVertexCount, 12);
+		glDrawArrays(GL_TRIANGLES, vertexIndex / 3 + usingCubeVertexCount, 12);
 		glBindBuffer(GL_ARRAY_BUFFER, colorbuffer);
-		glBufferSubData(GL_ARRAY_BUFFER, vertexIndex * sizeof(float) + sizeof(blockGUIColor), sizeof(crosshairColor), crosshairColor);
+		glBufferSubData(GL_ARRAY_BUFFER, vertexIndex * sizeof(float) + sizeof(usingCubeColor), sizeof(crosshairColor), crosshairColor);
 		glDisable(GL_BLEND);
 	}
 

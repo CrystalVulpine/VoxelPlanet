@@ -11,8 +11,12 @@ World mainWorld;
 // don't let GLFW capture the pointer in case the application suspends.
 bool debugMode = false;
 
-unsigned int heldBlock = 0x808080ff;
-bool isBlockSelected = false;
+/** the cube the screen/crosshair is pointing at **/
+bool isCubeSelected = false;
+
+/** the cube currently in use that would be placed **/
+unsigned int usingCube = 0x808080ff;
+
 bool gamePaused = false;
 bool hideGUI = false;
 
@@ -22,11 +26,11 @@ int main(unsigned int argc, char *argv[]) {
 			debugMode = true;
 		} else if (strcmp(argv[i], "--antialiasing") == 0) {
 			if (argc > i + 1) {
-				antialiasing_level = atoi(argv[i + 1]);
+				antialiasingLevel = atoi(argv[i + 1]);
 			}
 		} else if (strcmp(argv[i], "--brightness") == 0) {
 			if (argc > i + 1) {
-				brightness = atof(argv[i + 1]);
+				worldBrightness = atof(argv[i + 1]);
 			}
 		} else if (strcmp(argv[i], "--skycolor") == 0) {
 			if (argc > i + 3) {
@@ -115,15 +119,15 @@ int main(unsigned int argc, char *argv[]) {
 				if (colorInputIndex >= 3) {
 					if (changeRed) {
 						unsigned char red = colorInput[0] * 100 + colorInput[1] * 10 + colorInput[2];
-						*(((unsigned char*)&heldBlock) + 3) = red;
+						*(((unsigned char*)&usingCube) + 3) = red;
 						changeRed = false;
 					} else if (changeGreen) {
 						unsigned char green = colorInput[0] * 100 + colorInput[1] * 10 + colorInput[2];
-						*(((unsigned char*)&heldBlock) + 2) = green;
+						*(((unsigned char*)&usingCube) + 2) = green;
 						changeGreen = false;
 					} else if (changeBlue) {
 						unsigned char blue = colorInput[0] * 100 + colorInput[1] * 10 + colorInput[2];
-						*(((unsigned char*)&heldBlock) + 1) = blue;
+						*(((unsigned char*)&usingCube) + 1) = blue;
 						changeBlue = false;
 					}
 					colorInputIndex = 0;
@@ -137,7 +141,7 @@ int main(unsigned int argc, char *argv[]) {
 
 		// we want to control the speed of things like moving the camera
 		now = currentTimeMs();
-		isBlockSelected = !gamePaused;
+		isCubeSelected = !gamePaused;
 
 		if (!gamePaused) {
 			float forward = 0.0f;
@@ -174,51 +178,51 @@ int main(unsigned int argc, char *argv[]) {
 			lastTick = currentTimeMs();
 
 			// here's where we trace a ray from the camera to a cube in the world
-			struct rayTraceInfo raySelection = mainWorld.rayTraceBlocks(glm::vec3(camera.xPos, camera.yPos, camera.zPos), camera.rotationYaw, camera.rotationPitch, 6.0f);
+			RayTraceInfo raySelection = mainWorld.rayTraceCubes(glm::vec3(camera.xPos, camera.yPos, camera.zPos), camera.rotationYaw, camera.rotationPitch, 6.0f);
 
-			if (raySelection.blockFound) {
-				double sx = std::floor(raySelection.pos.x);
-				double sy = std::floor(raySelection.pos.y);
-				double sz = std::floor(raySelection.pos.z);
+			if (raySelection.cubeFound) {
+				double xd = std::floor(raySelection.pos.x);
+				double yd = std::floor(raySelection.pos.y);
+				double zd = std::floor(raySelection.pos.z);
 
-				renderSelectBlock(sx, sy, sz);
+				renderCubeSelect(xd, yd, zd);
 
-				int x = (int)sx;
-				int y = (int)sy;
-				int z = (int)sz;
+				int x = (int)xd;
+				int y = (int)yd;
+				int z = (int)zd;
 
 				// mouse clicking functions for placing/deleting cubes
 				if (currentTimeMs() - clickClock > 200 && glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS) {
 					clickClock = currentTimeMs();
 
-					unsigned int * __restrict__ block = mainWorld.getBlockPointer((int)std::floor(raySelection.lastPos.x), (int)std::floor(raySelection.lastPos.y), (int)std::floor(raySelection.lastPos.z));
-					if (block != NULL && *block == 0) {
-						*block = heldBlock;
+					unsigned int * __restrict__ cube = mainWorld.getCubePointer((int)std::floor(raySelection.lastPos.x), (int)std::floor(raySelection.lastPos.y), (int)std::floor(raySelection.lastPos.z));
+					if (cube != NULL && *cube == 0) {
+						*cube = usingCube;
 						reRenderWorld();
 					}
 				}
 				if (currentTimeMs() - clickClock > 200 && glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) {
 					clickClock = currentTimeMs();
 
-					unsigned int * __restrict__ block = mainWorld.getBlockPointer(x, y, z);
-					if (block != NULL && *block > 0) {
-						*block = 0;
+					unsigned int * __restrict__ cube = mainWorld.getCubePointer(x, y, z);
+					if (cube != NULL && *cube > 0) {
+						*cube = 0;
 						reRenderWorld();
 					}
 				}
 
 				if (!mMousePress && glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_MIDDLE) == GLFW_PRESS) {
 					mMousePress = true;
-					unsigned int b = mainWorld.getBlock(x, y, z);
+					unsigned int b = mainWorld.getCube(x, y, z);
 					if (b > 0) {
-						heldBlock = b;
+						usingCube = b;
 					}
 				} else if (mMousePress && glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_MIDDLE) != GLFW_PRESS) {
 					mMousePress = false;
 				}
-				isBlockSelected = true;
+				isCubeSelected = true;
 			} else {
-				isBlockSelected = false;
+				isCubeSelected = false;
 			}
 		}
 
