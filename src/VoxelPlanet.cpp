@@ -20,41 +20,71 @@ unsigned int usingCube = 0x808080ff;
 bool gamePaused = false;
 bool hideGUI = false;
 
+
 int main(int argc, char *argv[]) {
+
 	int worldLength = 64;
 	int worldWidth = 64;
 	int worldHeight = 64;
-	for (unsigned int i = 0; i < argc; ++i) {
+
+	bool customSaveDir = false;
+
+	for (int i = 0; i < argc; ++i) {
+
 		if (strcmp(argv[i], "--debug") == 0) {
+
 			debugMode = true;
+
 		} else if (strcmp(argv[i], "--antialiasing") == 0) {
+
 			if (argc > i + 1) {
 				antialiasingLevel = atoi(argv[i + 1]);
 			}
+
 		} else if (strcmp(argv[i], "--brightness") == 0) {
+
 			if (argc > i + 1) {
 				worldBrightness = atof(argv[i + 1]);
 			}
+
 		} else if (strcmp(argv[i], "--skycolor") == 0) {
+
 			if (argc > i + 3) {
 				skyColorRed = (float)atoi(argv[i + 1]) / 255.0f;
 				skyColorGreen = (float)atoi(argv[i + 2]) / 255.0f;
 				skyColorBlue = (float)atoi(argv[i + 3]) / 255.0f;
 			}
+
 		} else if (strcmp(argv[i], "--worldsize") == 0) {
+
 			if (argc > i + 3) {
 				worldLength = atoi(argv[i + 1]);
 				worldWidth = atoi(argv[i + 2]);
 				worldHeight = atoi(argv[i + 3]);
 			}
+
+		} else if (strcmp(argv[i], "--worlddir") == 0) {
+
+			if (argc > i + 1) {
+				mainWorld.setSaveDir(argv[i + 1]);
+				customSaveDir = true;
+			}
 		}
 	}
+
+	if (!customSaveDir) {
+		mainWorld.setSaveDir("world");
+	}
+
 	mainWorld.startWorld(worldLength, worldWidth, worldHeight);
 
+
 	int glErrorCode = setupOpenGL();
+
 	if (glErrorCode != 0) {
 		return glErrorCode;
 	}
+
 
 	gameRunning = true;
 	camera.setBounds(0.0f, (float)mainWorld.worldLength, 0.0f, (float)mainWorld.worldWidth);
