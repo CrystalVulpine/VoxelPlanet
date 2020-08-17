@@ -11,4 +11,7 @@
 /VoxelPlanet.TestMod/src/*.h linguist-language=C++
 /VoxelPlanet.TestMod/src/*.cpp linguist-language=C++
 /VoxelPlanet.TestMod/src/*.hpp linguist-language=C++
+/VoxelPlanet.ColorChanger/src/*.h linguist-language=C++
+/VoxelPlanet.ColorChanger/src/*.cpp linguist-language=C++
+/VoxelPlanet.ColorChanger/src/*.hpp linguist-language=C++
 
