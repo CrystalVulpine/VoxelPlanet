@@ -37,7 +37,7 @@ public:
 	RayTraceInfo rayTraceCubes(glm::vec3 startPos, float rotationYaw, float rotationPitch, float reach);
 
 	/** specifies the folder in which to load/save level.dat and cubes.dat **/
-	void setSaveDir(char* __restrict__ dir);
+	void setSaveDir(const char* __restrict__ dir);
 
 	World();
 };

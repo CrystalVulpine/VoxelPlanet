@@ -244,7 +244,7 @@ RayTraceInfo World::rayTraceCubes(glm::vec3 start, float rotationYaw, float rota
 }
 
 
-void World::setSaveDir(char* __restrict__ dir) {
+void World::setSaveDir(const char* __restrict__ dir) {
 
 	if (worldDir != NULL) {
 		free(worldDir);

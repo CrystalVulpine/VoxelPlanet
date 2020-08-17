@@ -8,6 +8,7 @@
 #include "Camera.hpp"
 #include "World.hpp"
 #include "global.hpp"
+#include "mods.h"
 
 GLuint vertexbuffer;
 GLuint colorbuffer;
@@ -25,6 +26,8 @@ float skyColorGreen = 0.5f;
 float skyColorBlue = 1.0f;
 
 Camera camera;
+
+bool worldIsDirty = false;
 
 double usingCubeVertices[] = {
 		-0.1, -0.1, 0.1,
@@ -391,6 +394,11 @@ void doDrawTick() {
 	glBindBuffer(GL_ARRAY_BUFFER, colorbuffer);
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, NULL);
 
+	if (worldIsDirty) {
+		reRenderWorld();
+		worldIsDirty = false;
+	}
+
 	if (!hideGUI) {
 		glDisableVertexAttribArray(1);
 
@@ -458,6 +466,8 @@ void doDrawTick() {
 		glBindBuffer(GL_ARRAY_BUFFER, colorbuffer);
 		glBufferSubData(GL_ARRAY_BUFFER, vertexIndex * sizeof(float) + sizeof(usingCubeColor), sizeof(crosshairColor), crosshairColor);
 		glDisable(GL_BLEND);
+
+		mods_onRenderTick();
 	}
 
 	glDisableVertexAttribArray(1);

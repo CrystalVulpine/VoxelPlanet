@@ -25,7 +25,7 @@ bool hideGUI = false;
 int main(int argc, char *argv[]) {
 
 	loadMods();
-	do_modTestFunc();
+	mods_testFunc();
 
 	int worldLength = 64;
 	int worldWidth = 64;
@@ -75,6 +75,9 @@ int main(int argc, char *argv[]) {
 			}
 		}
 	}
+	mods_processGameArgs(argc, argv);
+
+	mods_onGameStart();
 
 	if (!customSaveDir) {
 		mainWorld.setSaveDir("world");
@@ -101,10 +104,13 @@ int main(int argc, char *argv[]) {
 	bool f1_pressed = false;
 	bool mMousePress = false;
 
-	Clock now;
-	Clock lastTick = currentTimeMs();
+	Clock loopTime;
+	Clock lastLoopTime = currentTimeMs();
 
 	Clock clickClock = currentTimeMs();
+
+	Clock lastTickTime = currentTimeMs();
+	Clock tickTime;
 
 	bool changeRed = false;
 	bool changeGreen = false;
@@ -123,8 +129,6 @@ int main(int argc, char *argv[]) {
 					glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 				}
 
-				// if this is not done the game will count the pause time as elapsed
-				lastTick = currentTimeMs();
 			} else {
 				glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 			}
@@ -187,7 +191,7 @@ int main(int argc, char *argv[]) {
 		glfwGetWindowSize(window, &windowWidth, &windowHeight);
 
 		// we want to control the speed of things like moving the camera
-		now = currentTimeMs();
+		loopTime = currentTimeMs();
 		isCubeSelected = !gamePaused;
 
 		if (!gamePaused) {
@@ -207,13 +211,13 @@ int main(int argc, char *argv[]) {
 				sideways = 1.0f;
 			}
 			if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
-				upward = (float)(now - lastTick) / 100.0f;
+				upward = (float)(loopTime - lastLoopTime) / 100.0f;
 			}
 			if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) {
-				upward = (float)-(now - lastTick) / 100.0f;
+				upward = (float)-(loopTime - lastLoopTime) / 100.0f;
 			}
-			forward *= (float)(now - lastTick) / 100.0f;
-			sideways *= (float)(now - lastTick) / 100.0f;
+			forward *= (float)(loopTime - lastLoopTime) / 100.0f;
+			sideways *= (float)(loopTime - lastLoopTime) / 100.0f;
 
 			glfwGetCursorPos(window, &mouseX, &mouseY);
 
@@ -221,8 +225,6 @@ int main(int argc, char *argv[]) {
 			camera.rotate(((float)mouseX - ((float)windowWidth / 2.0f)) / 180.0f, ((float)mouseY - ((float)windowHeight / 2.0f)) / 180.0f);
 
 			glfwSetCursorPos(window, (double)windowWidth / 2.0, (double)windowHeight / 2.0);
-
-			lastTick = currentTimeMs();
 
 			// here's where we trace a ray from the camera to a cube in the world
 			RayTraceInfo raySelection = mainWorld.rayTraceCubes(glm::vec3(camera.xPos, camera.yPos, camera.zPos), camera.rotationYaw, camera.rotationPitch, 6.0f);
@@ -245,7 +247,7 @@ int main(int argc, char *argv[]) {
 					unsigned int * __restrict__ cube = mainWorld.getCubePointer((int)std::floor(raySelection.lastPos.x), (int)std::floor(raySelection.lastPos.y), (int)std::floor(raySelection.lastPos.z));
 					if (cube != NULL && *cube == 0) {
 						*cube = usingCube;
-						reRenderWorld();
+						worldIsDirty = true;
 					}
 				}
 				if (currentTimeMs() - clickClock > 200 && glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) {
@@ -254,7 +256,7 @@ int main(int argc, char *argv[]) {
 					unsigned int * __restrict__ cube = mainWorld.getCubePointer(x, y, z);
 					if (cube != NULL && *cube > 0) {
 						*cube = 0;
-						reRenderWorld();
+						worldIsDirty = true;
 					}
 				}
 
@@ -271,7 +273,21 @@ int main(int argc, char *argv[]) {
 			} else {
 				isCubeSelected = false;
 			}
+
+			tickTime = currentTimeMs();
+
+			unsigned int ticksToRun = (tickTime - lastTickTime) / 50;
+			// run a tick 20 times per second
+			for (unsigned int i = 0; i <= ticksToRun; ++i) {
+				tickTime = currentTimeMs();
+				mods_onWorldTick();
+				lastTickTime = tickTime;
+			}
 		}
+
+		mods_onGameLoop(loopTime, lastLoopTime);
+
+		lastLoopTime = loopTime;
 
 		doDrawTick();
 	}
@@ -279,6 +295,8 @@ int main(int argc, char *argv[]) {
 	cleanupOpenGL();
 
 	mainWorld.saveWorld();
+
+	mods_onGameExit();
 
 	return 0;
 }

@@ -31,7 +31,7 @@ VoxelPlanet is a sandbox made out of colored cubes. It is made using basic shade
 
 ## Mods
 
-VoxelPlanet plans to support a mod API. Currently only one mod test function is available, and it's only available for Linux systems. Check the docs for more information.
+VoxelPlanet has a basic mod API. Currently it's only available for Linux systems. Check the docs for more information.
 
 ## Checklist:
 
@@ -55,7 +55,7 @@ VoxelPlanet plans to support a mod API. Currently only one mod test function is 
 
 - [ ] Sounds and music
 
-- [ ] Create a mod api (currently only for Linux)
+- [x] Create a mod api (currently only for Linux)
 
 ## Local Development:
 

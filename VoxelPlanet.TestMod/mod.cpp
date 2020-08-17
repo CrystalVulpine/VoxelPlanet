@@ -17,7 +17,11 @@ const char* getModName() {
 	return "Test Mod";
 }
 
-void modTestFunc() {
+const char* getModDescription() {
+	return "Just a test mod that prints to the console when VoxelPlanet starts.";
+}
+
+void testFunc() {
 	printf("This mod works!\n");
 }
 
