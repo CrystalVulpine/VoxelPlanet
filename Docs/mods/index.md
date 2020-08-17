@@ -2,7 +2,7 @@
 
 VoxelPlanet supports the ability to load mods into the game. Here you will find documentation on all the functions a mod can load into the game, and how to set one up. Currently mods are only available on Linux.
 
-In order to make a mod, we must create a shared library that defines the functions. You may use as many or as few as you'd like. The mod must be compiled as a shared library that is a position-independent executable (`-fPIC` on gcc). All the mod functions need to be declared as `extern "C"` or they won't work. (You can call custom functions that are not declared as such however, and you can access global variables and functions from the main program in them). After compiling the mod, it should be placed in the "mods" folder which is located in VoxelPlanet's working directory.
+In order to make a mod, we must create a shared library that defines the functions. You may use as many or as few as you'd like. The mod must be compiled as a shared library that is a position-independent executable (`-fPIC` on gcc). All the mod functions need to be declared as `extern "C"` or they won't work. (You can call custom functions that are not declared as such however, and you can access global variables and functions from the main program in them). After compiling the mod, it should be placed in the "mods" folder which is located in VoxelPlanet's working directory. If your mod isn't working, make sure you compiled the actual game with the `-rdynamic` flag or whatever your compiler's equivalent to that is.
 
 ## Functions
 
@@ -27,6 +27,10 @@ Every function in the mod API is fully documented. This includes their arguments
 `void onGameStart()` runs when the game is started.
 
 `void onGameExit()` runs when the game stops, ie the window is closed.
+
+`void onWorldLoad()` runs when the world is initially loaded.
+
+`void onWorldClose()` runs when the world exits, immediately before being saved.
 
 `void onGameLoop(Clock loopTime, Clock lastLoopTime)` allows you to perform operations in the main game loop. `loopTime` refers to the start time of the current loop, in milliseconds. `lastLoopTime` is the start of the previous loop.
 

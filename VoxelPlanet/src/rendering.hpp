@@ -8,7 +8,7 @@
 #include "Camera.hpp"
 #include "World.hpp"
 #include "global.hpp"
-#include "mods.h"
+#include "mods.hpp"
 
 GLuint vertexbuffer;
 GLuint colorbuffer;

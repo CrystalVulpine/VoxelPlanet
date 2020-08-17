@@ -4,7 +4,7 @@
 #include "global.hpp"
 #include "rendering.hpp"
 #include "World.hpp"
-#include "mods.h"
+#include "mods.hpp"
 
 bool gameRunning = false;
 World mainWorld;
@@ -294,7 +294,7 @@ int main(int argc, char *argv[]) {
 
 	cleanupOpenGL();
 
-	mainWorld.saveWorld();
+	mainWorld.closeWorld();
 
 	mods_onGameExit();
 

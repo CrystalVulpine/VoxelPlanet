@@ -23,6 +23,8 @@ public:
 	/** Starts the world, with the specified size if it is generating a new one. **/
 	void startWorld(const int length, const int width, const int height);
 
+	void closeWorld();
+
 	void setCube(const int x, const int y, const int z, const unsigned int cube);
 
 	unsigned int getCube(const int x, const int y, const int z);

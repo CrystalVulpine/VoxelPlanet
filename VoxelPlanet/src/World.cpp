@@ -6,6 +6,7 @@
 #include <sys/stat.h>
 #include "World.hpp"
 #include "global.hpp"
+#include "mods.hpp"
 
 World::World() {
 
@@ -104,6 +105,20 @@ void World::startWorld(const int length, const int width, const int height) {
 
 		free(data);
 	}
+
+	mods_onWorldLoad();
+}
+
+void World::closeWorld() {
+
+	mods_onWorldClose();
+
+	saveWorld();
+
+	free(cubes);
+	free(worldDir);
+	free(cubesDatPath);
+	free(levelDatPath);
 }
 
 

@@ -1,20 +1,19 @@
-#pragma once
-
 #include <fstream>
 #include <iostream>
-#include <experimental/filesystem>
 #include <dlfcn.h>
 #include <vector>
 #include <functional>
+#include <cstring>
 #include "global.hpp"
-
-namespace fs = std::experimental::filesystem;
+#include "mods.hpp"
 
 std::vector<void (*)()> mod_testFunc;
 std::vector<void (*)()> mod_onRenderTick;
 std::vector<void (*)()> mod_onWorldTick;
 std::vector<void (*)()> mod_onGameStart;
 std::vector<void (*)()> mod_onGameExit;
+std::vector<void (*)()> mod_onWorldLoad;
+std::vector<void (*)()> mod_onWorldClose;
 std::vector<void (*)(Clock, Clock)> mod_onGameLoop;
 std::vector<void (*)(int, char*[])> mod_processGameArgs;
 
@@ -48,6 +47,18 @@ void mods_onGameExit() {
 	}
 }
 
+void mods_onWorldLoad() {
+	for (unsigned int i = 0; i < mod_onWorldLoad.size(); ++i) {
+		mod_onWorldLoad.at(i)();
+	}
+}
+
+void mods_onWorldClose() {
+	for (unsigned int i = 0; i < mod_onWorldClose.size(); ++i) {
+		mod_onWorldClose.at(i)();
+	}
+}
+
 void mods_onGameLoop(Clock loopTime, Clock lastLoopTime) {
 	for (unsigned int i = 0; i < mod_onGameLoop.size(); ++i) {
 		mod_onGameLoop.at(i)(loopTime, lastLoopTime);
@@ -60,9 +71,9 @@ void mods_processGameArgs(int argc, char *argv[]) {
 	}
 }
 
+
 #ifdef __linux__
 
-#define API_VERSION "1.0.1"
 
 void loadModsLinux()
 {
@@ -78,6 +89,8 @@ void loadModsLinux()
 	mod_onWorldTick.reserve(5);
 	mod_onGameStart.reserve(5);
 	mod_onGameExit.reserve(5);
+	mod_onWorldLoad.reserve(5);
+	mod_onWorldClose.reserve(5);
 	mod_processGameArgs.reserve(5);
 	mod_onGameLoop.reserve(5);
 
@@ -134,6 +147,18 @@ void loadModsLinux()
 					mod_onGameExit.push_back(onGameExit);
 				}
 
+				void (*onWorldLoad)() = (void (*)())dlsym(handle, "onWorldLoad");
+
+				if (dlerror() == NULL) {
+					mod_onWorldLoad.push_back(onWorldLoad);
+				}
+
+				void (*onWorldClose)() = (void (*)())dlsym(handle, "onWorldClose");
+
+				if (dlerror() == NULL) {
+					mod_onWorldClose.push_back(onWorldClose);
+				}
+
 				void (*onGameLoop)(Clock, Clock) = (void (*)(Clock, Clock))dlsym(handle, "onGameLoop");
 
 				if (dlerror() == NULL) {
@@ -154,10 +179,6 @@ void loadModsLinux()
     }
 }
 
-#define loadMods() loadModsLinux()
-
-#else
-
-#define loadMods()
 
 #endif
+
