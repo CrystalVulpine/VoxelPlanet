@@ -1,5 +1,7 @@
 #pragma once
 
+#include "global.hpp"
+
 
 extern void mods_testFunc();
 extern void mods_onRenderTick();
