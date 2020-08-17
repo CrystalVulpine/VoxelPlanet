@@ -5,7 +5,10 @@
 *.glsl text
 *.txt text
 
-/src/*.h linguist-language=C++
-/src/*.cpp linguist-language=C++
-/src/*.hpp linguist-language=C++
+/VoxelPlanet/src/*.h linguist-language=C++
+/VoxelPlanet/src/*.cpp linguist-language=C++
+/VoxelPlanet/src/*.hpp linguist-language=C++
+/VoxelPlanet.TestMod/src/*.h linguist-language=C++
+/VoxelPlanet.TestMod/src/*.cpp linguist-language=C++
+/VoxelPlanet.TestMod/src/*.hpp linguist-language=C++
 

@@ -51,6 +51,8 @@ VoxelPlanet is a sandbox made out of colored cubes. It is made using basic shade
 
 - [ ] Sounds and music
 
+- [ ] Create a mod api (currently only for Linux)
+
 ## Local Development:
 
 VoxelPlanet is designed to be mostly platform independent, and should be compilable on most OSes provided that it works with the compiler (it is mainly built using gcc). However, the eclipse project may require some changes if you use it.

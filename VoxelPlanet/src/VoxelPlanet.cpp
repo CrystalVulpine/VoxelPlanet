@@ -1,9 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <cstring>
-#include "global.h"
+#include "global.hpp"
 #include "rendering.hpp"
 #include "World.hpp"
+#include "mods.h"
 
 bool gameRunning = false;
 World mainWorld;
@@ -22,6 +23,9 @@ bool hideGUI = false;
 
 
 int main(int argc, char *argv[]) {
+
+	loadMods();
+	do_modTestFunc();
 
 	int worldLength = 64;
 	int worldWidth = 64;

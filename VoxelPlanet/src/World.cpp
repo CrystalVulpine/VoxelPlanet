@@ -5,7 +5,7 @@
 #include <cstring>
 #include <sys/stat.h>
 #include "World.hpp"
-#include "global.h"
+#include "global.hpp"
 
 World::World() {
 

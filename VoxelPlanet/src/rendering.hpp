@@ -7,7 +7,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include "Camera.hpp"
 #include "World.hpp"
-#include "global.h"
+#include "global.hpp"
 
 GLuint vertexbuffer;
 GLuint colorbuffer;

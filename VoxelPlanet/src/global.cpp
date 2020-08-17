@@ -1,4 +1,4 @@
-#include "global.h"
+#include "global.hpp"
 #include <chrono>
 
 Clock currentTimeMs() {
