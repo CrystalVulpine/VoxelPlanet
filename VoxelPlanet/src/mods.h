@@ -22,10 +22,16 @@ void do_modTestFunc() {
 
 void loadModsLinux()
 {
-	modTestFunc.reserve(5);
     std::string path("mods/");
-    //std::string ext(".so");
+
+    // there are no mods, so don't try to load any
+    if (!fs::is_directory(path)) {
+    	return;
+    }
+
+	modTestFunc.reserve(5);
     unsigned int modCount = 0;
+
     for(auto& p: fs::recursive_directory_iterator(path))
     {
         if(strcmp(p.path().extension().c_str(), ".so") == 0) {

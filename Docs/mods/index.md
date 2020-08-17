@@ -2,7 +2,7 @@
 
 VoxelPlanet supports the ability to load mods into the game. Here you will find documentation on all the functions a mod can load into the game, and how to set one up. Currently there is only one function, and it is only available on Linux.
 
-In order to make a mod, we must create a shared library that defines the functions. You may use as many or as few as you'd like. The mod must be compiled as a shared library that is a position-independent executable (`-fPIC` on gcc). All the mod functions need to be declared as `extern "C"` or they won't work. After compiling the mod, it should be placed in the mods folder which is located in VoxelPlanet's working directory.
+In order to make a mod, we must create a shared library that defines the functions. You may use as many or as few as you'd like. The mod must be compiled as a shared library that is a position-independent executable (`-fPIC` on gcc). All the mod functions need to be declared as `extern "C"` or they won't work. After compiling the mod, it should be placed in the "mods" folder which is located in VoxelPlanet's working directory.
 
 ## Functions
 
