@@ -50,9 +50,9 @@ void loadModsLinux()
 
 				void (*func)() = (void (*)())dlsym(handle, "modTestFunc");
 
+				// skip if the function isn't used by the mod
 				error = dlerror();
 				if (error != NULL) {
-					std::cout << error << '\n';
 					continue;
 				}
 

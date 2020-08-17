@@ -29,6 +29,10 @@ VoxelPlanet is a sandbox made out of colored cubes. It is made using basic shade
 * `--worldsize` followed by 3 integers allows you to specify the size of the world in cubes. It is set in the order of length, width, then height. Be careful not to set it too large, as you will run out of memory if you do. This setting only applies to newly generated worlds; if an existing save file is loaded, its size will not be affected. The default size is 64x64x64.
 * `--worlddir` followed by a path to a folder allows you to set the directory to load/save the world from. Paths can be both relative and absolute. The default is "world".
 
+## Mods
+
+VoxelPlanet plans to support a mod API. Currently only one mod test function is available, and it's only available for Linux systems. Check the docs for more information.
+
 ## Checklist:
 
 - [X] Ray tracing for cube selection. Before this was implemented, the current cube was always the one the camera is inside of.

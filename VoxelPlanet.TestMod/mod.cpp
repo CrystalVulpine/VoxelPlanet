@@ -13,6 +13,10 @@ const char* getModVersion() {
 	return "1.0.0";
 }
 
+const char* getModName() {
+	return "Test Mod";
+}
+
 void modTestFunc() {
 	printf("This mod works!\n");
 }
