@@ -111,7 +111,7 @@ void loadModsLinux()
 				} else {
 					const char* modApiVersion = versionGetter();
 					if (strcmp(modApiVersion, API_VERSION) != 0) {
-						std::cout << "Could not load mod " << p << ". Wrong mod API version: Mod uses " << modApiVersion << " but this is " << API_VERSION << ".\n";
+						std::cout << "Could not load " << ((const char* (*)())dlsym(handle, "getModName"))() << ". Mod uses API version " << modApiVersion << " but this is " << API_VERSION << ".\n";
 						continue;
 					}
 				}
@@ -173,7 +173,7 @@ void loadModsLinux()
 
 			} else {
 
-				std::cout << "Unable to load mod \"" << p.path().string() << "\"\n";
+				std::cout << "Unable to load mod \"" << p.path().filename().string() << "\"\n";
 			}
         }
     }

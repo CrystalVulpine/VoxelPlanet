@@ -229,7 +229,16 @@ RayTraceInfo World::rayTraceCubes(glm::vec3 start, float rotationYaw, float rota
 		lastPos = pos;
 	    pos.x -= glm::cos(rotationYaw + 1.5708f) * 0.05f;
 	    pos.z -= glm::sin(rotationYaw + 1.5708f) * 0.05f;
-	    pos.y -= glm::tan(rotationPitch) * 0.05f;
+
+	    // tan can be undefined, so still move y when that happens
+	    if (rotationPitch <= -M_PI / 2.0f) {
+	    	pos.y += 1.0f;
+	    } else if (rotationPitch >= M_PI / 2.0f) {
+	    	pos.y -= 1.0f;
+	    } else {
+	    	pos.y -= glm::tan(rotationPitch) * 0.05f;
+	    }
+
 	    cube = getCube(pos.x, pos.y, pos.z);
 
 	    if (glm::distance(start, pos) > reach) {
