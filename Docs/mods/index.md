@@ -1,14 +1,16 @@
 # Mod Documentation
 
-VoxelPlanet supports the ability to load mods into the game. Here you will find documentation on all the functions a mod can load into the game, and how to set one up. Currently there is only one function, and it is only available on Linux.
+VoxelPlanet supports the ability to load mods into the game. Here you will find documentation on all the functions a mod can load into the game, and how to set one up. Currently mods are only available on Linux.
 
 In order to make a mod, we must create a shared library that defines the functions. You may use as many or as few as you'd like. The mod must be compiled as a shared library that is a position-independent executable (`-fPIC` on gcc). All the mod functions need to be declared as `extern "C"` or they won't work. (You can call custom functions that are not declared as such however, and you can access global variables and functions from the main program in them). After compiling the mod, it should be placed in the "mods" folder which is located in VoxelPlanet's working directory.
 
 ## Functions
 
+Every function in the mod API is fully documented. This includes their arguments and details about when and how they execute. You will find this information listed below.
+
 ### Mod metadata
 
-`const char* getApiVersion()` should return the API version the mod is designed for. This function is required, otherwise the mod won't work. The current version is "1.0.0".
+`const char* getApiVersion()` should return the API version the mod is designed for. This function is required, otherwise the mod won't work. The current version is 1.0.1.
 
 `const char* getModVersion()` should return the version of the mod itself.
 
@@ -46,7 +48,7 @@ mod.cpp:
     
     /** this function checks the version used for the mod against the version in the base game **/
     const char* getApiVersion() {
-    	return "1.0.0";
+    	return "1.0.1";
     }
     
     const char* getModVersion() {

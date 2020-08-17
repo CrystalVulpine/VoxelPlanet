@@ -62,7 +62,7 @@ void mods_processGameArgs(int argc, char *argv[]) {
 
 #ifdef __linux__
 
-#define API_VERSION "1.0.0"
+#define API_VERSION "1.0.1"
 
 void loadModsLinux()
 {
