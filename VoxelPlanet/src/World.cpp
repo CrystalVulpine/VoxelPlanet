@@ -23,6 +23,8 @@ void World::startWorld(const int length, const int width, const int height) {
 	// generate a new world if one doesn't exist, otherwise load the save file
 	if (stat(cubesDatPath, &st) != 0) {
 
+		isNewWorld = true;
+
 		worldLength = length;
 		worldWidth = width;
 		worldHeight = height;
@@ -74,6 +76,8 @@ void World::startWorld(const int length, const int width, const int height) {
 			printf("Could not load world size. You must move the current world so that a new one can be created.\n");
 			exit(1);
 		}
+
+		isNewWorld = false;
 
 		level.seekg(0, std::ios::beg);
 		unsigned char info[6];

@@ -20,6 +20,9 @@ public:
 
 	unsigned int* __restrict__ cubes;
 
+	bool isNewWorld;
+
+
 	/** Starts the world, with the specified size if it is generating a new one. **/
 	void startWorld(const int length, const int width, const int height);
 

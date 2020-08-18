@@ -278,8 +278,8 @@ int main(int argc, char *argv[]) {
 
 			tickTime = currentTimeMs();
 
-			unsigned int ticksToRun = (tickTime - lastTickTime) / 50;
 			// run a tick 20 times per second
+			unsigned int ticksToRun = (tickTime - lastTickTime) / 50;
 			for (unsigned int i = 0; i <= ticksToRun; ++i) {
 				tickTime = currentTimeMs();
 				mods_onWorldTick();

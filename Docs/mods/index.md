@@ -40,7 +40,7 @@ Every function in the mod API is fully documented. This includes their arguments
 
 ## Example
 
-A simple example mod is shown below for your convenience. This mod and its project files are also available in the repository.
+A simple example mod is shown below for your convenience. This mod and its project files are also available in the repository. There are also a few other example mods in addition to this one.
 
 mod.cpp:
     

@@ -17,4 +17,7 @@
 /VoxelPlanet.Disintegration/src/*.h linguist-language=C++
 /VoxelPlanet.Disintegration/src/*.cpp linguist-language=C++
 /VoxelPlanet.Disintegration/src/*.hpp linguist-language=C++
+/VoxelPlanet.PoliticalCompass/src/*.h linguist-language=C++
+/VoxelPlanet.PoliticalCompass/src/*.cpp linguist-language=C++
+/VoxelPlanet.PoliticalCompass/src/*.hpp linguist-language=C++
 
