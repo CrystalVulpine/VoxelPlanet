@@ -24,6 +24,8 @@ bool hideGUI = false;
 
 int main(int argc, char *argv[]) {
 
+	srand(time(NULL));
+
 	loadMods();
 	mods_testFunc();
 

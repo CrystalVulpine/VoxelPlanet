@@ -6,7 +6,7 @@ Clock now;
 
 void changeBlockColors() {
 
-	// replace up to 10 blocks every tick
+	// replace up to 10 cubes every tick
 	for (unsigned int i = 0; i < 10; ++i) {
 		int x = rand() % mainWorld.worldLength;
 		int y = rand() % mainWorld.worldHeight;
@@ -22,9 +22,9 @@ void changeBlockColors() {
 
 	now = currentTimeMs();
 
-	// we're doing a lot of block changes, so limit re-rendering of the world to one time per second
+	// we're doing a lot of changes, so limit re-rendering of the world to one time per second
 	if (now - lastReRender >= 1000) {
-		// make sure to render the world again once the block colors are changed!
+		// make sure to render the world again once the cube colors are changed!
 		worldIsDirty = true;
 		lastReRender = now;
 	}

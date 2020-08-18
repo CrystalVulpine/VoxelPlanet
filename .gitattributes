@@ -14,4 +14,7 @@
 /VoxelPlanet.ColorChanger/src/*.h linguist-language=C++
 /VoxelPlanet.ColorChanger/src/*.cpp linguist-language=C++
 /VoxelPlanet.ColorChanger/src/*.hpp linguist-language=C++
+/VoxelPlanet.Disintegration/src/*.h linguist-language=C++
+/VoxelPlanet.Disintegration/src/*.cpp linguist-language=C++
+/VoxelPlanet.Disintegration/src/*.hpp linguist-language=C++
 

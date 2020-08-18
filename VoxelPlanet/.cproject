@@ -104,7 +104,7 @@
 							</tool>
 							<tool id="cdt.managedbuild.tool.gnu.c.linker.exe.release.1775624987" name="GCC C Linker" superClass="cdt.managedbuild.tool.gnu.c.linker.exe.release"/>
 							<tool id="cdt.managedbuild.tool.gnu.cpp.linker.exe.release.1839300396" name="GCC C++ Linker" superClass="cdt.managedbuild.tool.gnu.cpp.linker.exe.release">
-								<option id="gnu.cpp.link.option.flags.1764746011" name="Linker flags" superClass="gnu.cpp.link.option.flags" value="-no-pie -flto -O3" valueType="string"/>
+								<option id="gnu.cpp.link.option.flags.1764746011" name="Linker flags" superClass="gnu.cpp.link.option.flags" value="-no-pie -flto -O3  -rdynamic" valueType="string"/>
 								<option id="gnu.cpp.link.option.libs.105480202" name="Libraries (-l)" superClass="gnu.cpp.link.option.libs" valueType="libs">
 									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="pthread"/>
 									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="GL"/>
