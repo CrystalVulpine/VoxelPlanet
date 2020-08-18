@@ -1,6 +1,6 @@
 # VoxelPlanet
 
-VoxelPlanet is a sandbox made out of colored cubes. It is made using basic shaders, however requires OpenGL 3.3. The intent is to provide an open world to create things, much in the same way you would draw a picture out of pixels, but in a 3-dimensional space.
+VoxelPlanet is a sandbox made out of colored cubes. It is made using basic shaders in OpenGL 3.3. The intent is to provide an open world to create things, much in the same way you would draw a picture out of pixels, but in a 3-dimensional space. It also supports mods and has a simple mod/plugin API.
 
 ![GitHub language count](https://img.shields.io/github/languages/count/CrystalVulpine/VoxelPlanet) ![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/CrystalVulpine/VoxelPlanet)
 
@@ -15,11 +15,11 @@ VoxelPlanet is a sandbox made out of colored cubes. It is made using basic shade
 * Place cube: Right Click
 * Select color of the cube you're pointing at: Middle Click
 * Pause/Unpause: Esc
+* Hide GUI: F1
 * R: set red as the color being edited
 * G: set green as the color being edited
 * B: set blue as the color being edited
-* Numbers from 000-255: sets the color being edited
-* F1: Hide GUI
+* Numbers from 000-255: sets the value of the color being edited
 
 ## Command Line Arguments:
 * `--debug` launches VoxelPlanet in debug mode. Currently, the only difference is that in debug mode, VoxelPlanet will not capture your pointer in case the application crashes or freezes.
@@ -37,11 +37,11 @@ VoxelPlanet has a basic mod API. Currently it's only available for Linux systems
 
 - [X] Ray tracing for cube selection. Before this was implemented, the current cube was always the one the camera is inside of.
 
-- [ ] Add an actual GUI
+- [ ] Add an actual GUI, including a color picker
 
 - [ ] Add settings and controls
 
-- [ ] Improve rendering, allowing a larger world size and more details.
+- [ ] Improve rendering, which would boost performance and allow a larger world size and more details.
 
 - [x] Add the ability to save worlds
 
@@ -49,22 +49,27 @@ VoxelPlanet has a basic mod API. Currently it's only available for Linux systems
 
 - [x] Add the ability to change your environment (like sky color, terrain generation)
 
-- [ ] Implement physics (maybe)
-
 - [x] Add the ability to set the size of the world as you would an image.
-
-- [ ] Sounds and music
 
 - [x] Create a mod api (currently only for Linux)
 
+- [ ] Support mods on other platforms
+
+- [ ] Sounds and music (maybe)
+
+- [ ] Possible Android app (I've never made apps before, so I have no idea how to go about doing this, but it would be very cool)
+
+- [ ] CMake build scripts
+
+- [ ] Smoother in-game camera and solid rendering
+
 ## Local Development:
 
-VoxelPlanet is designed to be mostly platform independent, and should be compilable on most OSes provided that it works with the compiler (it is mainly built using gcc). However, the eclipse project may require some changes if you use it.
+VoxelPlanet is designed to be mostly platform independent, and should be compilable on most OSes provided that the code works with your compiler (it is designed for gcc with c++17) and that it supports the required libraries and dependencies. However, the eclipse project, if you decide to use it, may require some changes as per your specific system.
 
-### Required Libraries:
+### Libraries and Dependencies:
 
 * OpenGL
 * GLEW
 * GLFW
 * GLM (GL Math)
-* In the future, probably pthread
