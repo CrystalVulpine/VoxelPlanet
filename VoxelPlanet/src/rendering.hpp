@@ -53,35 +53,63 @@ double usingCubeVertices[] = {
 };
 
 double crosshairs[] = {
-		-0.005, 0.05, 0.0,
-		0.005, 0.05, 0.0,
-		0.005, -0.05, 0.0,
-		0.005, -0.05, 0.0,
-		-0.005, -0.05, 0.0,
-		-0.005, 0.05, 0.0,
+		-0.006, 0.051, 0.0,
+		0.006, 0.051, 0.0,
+		0.006, -0.051, 0.0,
+		0.006, -0.051, 0.0,
+		-0.006, -0.051, 0.0,
+		-0.006, 0.051, 0.0,
 
-		0.05, -0.005, 0.0,
-		0.05, 0.005, 0.0,
-		-0.05, 0.005, 0.0,
-		-0.05, 0.005, 0.0,
-		-0.05, -0.005, 0.0,
-		0.05, -0.005, 0.0,
+		0.051, -0.006, 0.0,
+		0.051, 0.006, 0.0,
+		-0.051, 0.006, 0.0,
+		-0.051, 0.006, 0.0,
+		-0.051, -0.006, 0.0,
+		0.051, -0.006, 0.0,
+
+		-0.004, 0.049, 0.0,
+		0.004, 0.049, 0.0,
+		0.004, -0.049, 0.0,
+		0.004, -0.049, 0.0,
+		-0.004, -0.049, 0.0,
+		-0.004, 0.049, 0.0,
+
+		0.049, -0.004, 0.0,
+		0.049, 0.004, 0.0,
+		-0.049, 0.004, 0.0,
+		-0.049, 0.004, 0.0,
+		-0.049, -0.004, 0.0,
+		0.049, -0.004, 0.0,
 };
 
-double crosshairColor[] = {
-		1.0, 1.0, 1.0,
-		1.0, 1.0, 1.0,
-		1.0, 1.0, 1.0,
-		1.0, 1.0, 1.0,
-		1.0, 1.0, 1.0,
-		1.0, 1.0, 1.0,
+float crosshairColor[] = {
+		1.0f, 1.0f, 1.0f,
+		1.0f, 1.0f, 1.0f,
+		1.0f, 1.0f, 1.0f,
+		1.0f, 1.0f, 1.0f,
+		1.0f, 1.0f, 1.0f,
+		1.0f, 1.0f, 1.0f,
 
-		1.0, 1.0, 1.0,
-		1.0, 1.0, 1.0,
-		1.0, 1.0, 1.0,
-		1.0, 1.0, 1.0,
-		1.0, 1.0, 1.0,
-		1.0, 1.0, 1.0,
+		1.0f, 1.0f, 1.0f,
+		1.0f, 1.0f, 1.0f,
+		1.0f, 1.0f, 1.0f,
+		1.0f, 1.0f, 1.0f,
+		1.0f, 1.0f, 1.0f,
+		1.0f, 1.0f, 1.0f,
+
+		0.0f, 0.0f, 0.0f,
+		0.0f, 0.0f, 0.0f,
+		0.0f, 0.0f, 0.0f,
+		0.0f, 0.0f, 0.0f,
+		0.0f, 0.0f, 0.0f,
+		0.0f, 0.0f, 0.0f,
+
+		0.0f, 0.0f, 0.0f,
+		0.0f, 0.0f, 0.0f,
+		0.0f, 0.0f, 0.0f,
+		0.0f, 0.0f, 0.0f,
+		0.0f, 0.0f, 0.0f,
+		0.0f, 0.0f, 0.0f,
 };
 
 GLuint program;
@@ -457,15 +485,12 @@ void doDrawTick() {
 		glUniformMatrix4fv(matrix, 1, GL_FALSE, &mvp[0][0]);
 
 		glDisable(GL_DEPTH_TEST);
-		glEnable(GL_BLEND);
-		glBlendFunc(GL_ONE_MINUS_DST_COLOR, GL_ZERO);
 		glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
 		glBufferSubData(GL_ARRAY_BUFFER, vertexIndex * sizeof(double) + sizeof(usingCubeVertices), sizeof(crosshairs), crosshairs);
 		glVertexAttribPointer(0, 3, GL_DOUBLE, GL_FALSE, 0, NULL);
-		glDrawArrays(GL_TRIANGLES, vertexIndex / 3 + usingCubeVertexCount, 12);
+		glDrawArrays(GL_TRIANGLES, vertexIndex / 3 + usingCubeVertexCount, sizeof(crosshairs) / sizeof(crosshairs[0]) / 3);
 		glBindBuffer(GL_ARRAY_BUFFER, colorbuffer);
 		glBufferSubData(GL_ARRAY_BUFFER, vertexIndex * sizeof(float) + sizeof(usingCubeColor), sizeof(crosshairColor), crosshairColor);
-		glDisable(GL_BLEND);
 
 		mods_onRenderTick();
 	}
