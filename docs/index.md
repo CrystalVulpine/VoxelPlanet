@@ -2,7 +2,7 @@
 
 This is the main documentation page for VoxelPlanet.
 
-##Pages
+## Pages
 
-
+* [Mods](/mods/)
 
