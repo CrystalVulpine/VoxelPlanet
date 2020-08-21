@@ -555,9 +555,25 @@ void doDrawTick() {
 					colorBarPos - 0.01, -0.35, 0.0,
 			};
 
-			float colorBarRed = (std::abs(colorBarPos) - 0.2f) / 0.4f;
-			float colorBarGreen = 1.0f - (std::abs(colorBarPos + 0.2) / 0.4f);
-			float colorBarBlue = 1.0f - (std::abs(colorBarPos - 0.2) / 0.4f);
+			float colorBarRed;
+			float colorBarGreen;
+			float colorBarBlue;
+
+			if (colorBarPos > 0.0) {
+				colorBarRed = (colorBarPos - 0.2f) / 0.2f;
+			} else {
+				colorBarRed = (-colorBarPos - 0.2f) / 0.2f;
+			}
+			if (colorBarPos > -0.2) {
+				colorBarGreen = -(colorBarPos - 0.2f) / 0.2f;
+			} else {
+				colorBarGreen = 1.0f + (colorBarPos + 0.4f) / 0.2f;
+			}
+			if (colorBarPos > 0.2) {
+				colorBarBlue = -(colorBarPos - 0.6f) / 0.2f;
+			} else {
+				colorBarBlue = 1.0f + (colorBarPos + 0.0) / 0.2f;
+			}
 
 			if (colorBarRed < 0.0f) {
 				colorBarRed = 0.0f;
