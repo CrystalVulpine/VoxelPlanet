@@ -22,6 +22,11 @@ GLuint linebuffer;
 unsigned int vertexIndex = 0;
 
 
+double colorTriangleX = 0.0;
+double colorTriangleY = 0.0;
+double colorBarPos = 0.0;
+
+
 double usingCubeVertices[] = {
 		-0.1, -0.1, 0.1,
 		-0.1, 0.1, 0.1,
@@ -420,6 +425,7 @@ void doDrawTick() {
 		worldIsDirty = false;
 	}
 
+	// TODO: clean up this messy GUI code. Should be more usable and gui should have its own buffer.
 	if (!hideGUI) {
 		glDisableVertexAttribArray(1);
 
@@ -484,6 +490,188 @@ void doDrawTick() {
 		glDrawArrays(GL_TRIANGLES, vertexIndex / 3 + usingCubeVertexCount, sizeof(crosshairs) / sizeof(crosshairs[0]) / 3);
 		glBindBuffer(GL_ARRAY_BUFFER, colorbuffer);
 		glBufferSubData(GL_ARRAY_BUFFER, vertexIndex * sizeof(float) + sizeof(usingCubeColor), sizeof(crosshairColor), crosshairColor);
+
+		if (openedScreen == SCREEN_COLOR) {
+
+			double triangle[] = {
+					-0.6, -0.1, 0.0,
+					0.0, 0.8, 0.0,
+					0.6, -0.1, 0.0,
+
+					-0.6, -0.3, 0.0,
+					-0.6, -0.2, 0.0,
+					-0.4, -0.2, 0.0,
+					-0.4, -0.2, 0.0,
+					-0.4, -0.3, 0.0,
+					-0.6, -0.3, 0.0,
+
+					-0.4, -0.3, 0.0,
+					-0.4, -0.2, 0.0,
+					-0.2, -0.2, 0.0,
+					-0.2, -0.2, 0.0,
+					-0.2, -0.3, 0.0,
+					-0.4, -0.3, 0.0,
+
+					-0.2, -0.3, 0.0,
+					-0.2, -0.2, 0.0,
+					0.0, -0.2, 0.0,
+					0.0, -0.2, 0.0,
+					0.0, -0.3, 0.0,
+					-0.2, -0.3, 0.0,
+
+					0.0, -0.3, 0.0,
+					0.0, -0.2, 0.0,
+					0.2, -0.2, 0.0,
+					0.2, -0.2, 0.0,
+					0.2, -0.3, 0.0,
+					0.0, -0.3, 0.0,
+
+					0.2, -0.3, 0.0,
+					0.2, -0.2, 0.0,
+					0.4, -0.2, 0.0,
+					0.4, -0.2, 0.0,
+					0.4, -0.3, 0.0,
+					0.2, -0.3, 0.0,
+
+					0.4, -0.3, 0.0,
+					0.4, -0.2, 0.0,
+					0.6, -0.2, 0.0,
+					0.6, -0.2, 0.0,
+					0.6, -0.3, 0.0,
+					0.4, -0.3, 0.0,
+
+					colorTriangleX - 0.01, colorTriangleY - 0.01, 0.0,
+					colorTriangleX - 0.01, colorTriangleY + 0.01, 0.0,
+					colorTriangleX + 0.01, colorTriangleY + 0.01, 0.0,
+					colorTriangleX + 0.01, colorTriangleY + 0.01, 0.0,
+					colorTriangleX + 0.01, colorTriangleY - 0.01, 0.0,
+					colorTriangleX - 0.01, colorTriangleY - 0.01, 0.0,
+
+					colorBarPos - 0.01, -0.35, 0.0,
+					colorBarPos - 0.01, -0.15, 0.0,
+					colorBarPos + 0.01, -0.15, 0.0,
+					colorBarPos + 0.01, -0.15, 0.0,
+					colorBarPos + 0.01, -0.35, 0.0,
+					colorBarPos - 0.01, -0.35, 0.0,
+			};
+
+			float colorBarRed = (std::abs(colorBarPos) - 0.2f) / 0.4f;
+			float colorBarGreen = 1.0f - (std::abs(colorBarPos + 0.2) / 0.4f);
+			float colorBarBlue = 1.0f - (std::abs(colorBarPos - 0.2) / 0.4f);
+
+			if (colorBarRed < 0.0f) {
+				colorBarRed = 0.0f;
+			} else if (colorBarRed > 1.0f) {
+				colorBarRed = 1.0f;
+			}
+			if (colorBarGreen < 0.0f) {
+				colorBarGreen = 0.0f;
+			} else if (colorBarGreen > 1.0f) {
+				colorBarGreen = 1.0f;
+			}
+			if (colorBarBlue < 0.0f) {
+				colorBarBlue = 0.0f;
+			} else if (colorBarBlue > 1.0f) {
+				colorBarBlue = 1.0f;
+			}
+
+			float triangleColor[] = {
+					0.0f, 0.0f, 0.0f,
+					colorBarRed, colorBarGreen, colorBarBlue,
+					1.0f, 1.0f, 1.0f,
+
+					1.0f, 0.0f, 0.0f,
+					1.0f, 0.0f, 0.0f,
+					1.0f, 1.0f, 0.0f,
+					1.0f, 1.0f, 0.0f,
+					1.0f, 1.0f, 0.0f,
+					1.0f, 0.0f, 0.0f,
+
+					1.0f, 1.0f, 0.0f,
+					1.0f, 1.0f, 0.0f,
+					0.0f, 1.0f, 0.0f,
+					0.0f, 1.0f, 0.0f,
+					0.0f, 1.0f, 0.0f,
+					1.0f, 1.0f, 0.0f,
+
+					0.0f, 1.0f, 0.0f,
+					0.0f, 1.0f, 0.0f,
+					0.0f, 1.0f, 1.0f,
+					0.0f, 1.0f, 1.0f,
+					0.0f, 1.0f, 1.0f,
+					0.0f, 1.0f, 0.0f,
+
+					0.0f, 1.0f, 1.0f,
+					0.0f, 1.0f, 1.0f,
+					0.0f, 0.0f, 1.0f,
+					0.0f, 0.0f, 1.0f,
+					0.0f, 0.0f, 1.0f,
+					0.0f, 1.0f, 1.0f,
+
+					0.0f, 0.0f, 1.0f,
+					0.0f, 0.0f, 1.0f,
+					1.0f, 0.0f, 1.0f,
+					1.0f, 0.0f, 1.0f,
+					1.0f, 0.0f, 1.0f,
+					0.0f, 0.0f, 1.0f,
+
+					1.0f, 0.0f, 1.0f,
+					1.0f, 0.0f, 1.0f,
+					1.0f, 0.0f, 0.0f,
+					1.0f, 0.0f, 0.0f,
+					1.0f, 0.0f, 0.0f,
+					1.0f, 0.0f, 1.0f,
+
+					0.0f, 0.0f, 0.0f,
+					0.0f, 0.0f, 0.0f,
+					0.0f, 0.0f, 0.0f,
+					0.0f, 0.0f, 0.0f,
+					0.0f, 0.0f, 0.0f,
+					0.0f, 0.0f, 0.0f,
+
+					0.0f, 0.0f, 0.0f,
+					0.0f, 0.0f, 0.0f,
+					0.0f, 0.0f, 0.0f,
+					0.0f, 0.0f, 0.0f,
+					0.0f, 0.0f, 0.0f,
+					0.0f, 0.0f, 0.0f,
+			};
+			glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
+			glBufferSubData(GL_ARRAY_BUFFER, vertexIndex * sizeof(double) + sizeof(usingCubeVertices) + sizeof(crosshairs), sizeof(triangle), triangle);
+			glVertexAttribPointer(0, 3, GL_DOUBLE, GL_FALSE, 0, NULL);
+			glDrawArrays(GL_TRIANGLES, vertexIndex / 3 + usingCubeVertexCount + 24, sizeof(triangle) / sizeof(triangle[0]) / 3);
+			glBindBuffer(GL_ARRAY_BUFFER, colorbuffer);
+			glBufferSubData(GL_ARRAY_BUFFER, vertexIndex * sizeof(float) + sizeof(usingCubeColor) + sizeof(crosshairColor), sizeof(triangleColor), triangleColor);
+
+			float multiplierRed = ((colorTriangleY + 0.1) / 0.9) * colorBarRed;
+			multiplierRed += 0.5f * (1.0f - ((colorTriangleY + 0.1) / 0.9));
+			multiplierRed += (colorTriangleX / 1.2);
+			if (multiplierRed > 1.0f) {
+				multiplierRed = 1.0f;
+			} else if (multiplierRed < 0.0f) {
+				multiplierRed = 0.0f;
+			}
+
+			float multiplierGreen = ((colorTriangleY + 0.1) / 0.9) * colorBarGreen;
+			multiplierGreen += 0.5f * (1.0f - ((colorTriangleY + 0.1) / 0.9));
+			multiplierGreen += (colorTriangleX / 1.2);
+			if (multiplierGreen > 1.0f) {
+				multiplierGreen = 1.0f;
+			} else if (multiplierGreen < 0.0f) {
+				multiplierGreen = 0.0f;
+			}
+
+			float multiplierBlue = ((colorTriangleY + 0.1) / 0.9) * colorBarBlue;
+			multiplierBlue += 0.5f * (1.0f - ((colorTriangleY + 0.1) / 0.9));
+			multiplierBlue += (colorTriangleX / 1.2);
+			if (multiplierBlue > 1.0f) {
+				multiplierBlue = 1.0f;
+			} else if (multiplierBlue < 0.0f) {
+				multiplierBlue = 0.0f;
+			}
+
+			usingCube = (unsigned char)(multiplierRed * 255.0f) << 24 | (unsigned char)(multiplierGreen * 255.0f) << 16 | (unsigned char)(multiplierBlue * 255.0f) << 8 | 0xff;
+		}
 
 		mods_onRenderTick();
 	}

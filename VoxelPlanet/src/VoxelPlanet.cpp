@@ -19,6 +19,7 @@ bool isCubeSelected = false;
 unsigned int usingCube = 0x808080ff;
 
 bool gamePaused = false;
+unsigned int openedScreen = 0;
 bool hideGUI = false;
 
 
@@ -94,7 +95,6 @@ int main(int argc, char *argv[]) {
 		return glErrorCode;
 	}
 
-
 	gameRunning = true;
 	camera.setBounds(0.0f, (float)mainWorld.worldLength, 0.0f, (float)mainWorld.worldWidth);
 
@@ -102,8 +102,8 @@ int main(int argc, char *argv[]) {
 	double mouseY;
 	glfwGetCursorPos(window, &mouseX, &mouseY);
 
-	bool esc_pressed = false;
-	bool f1_pressed = false;
+	bool escPressed = false;
+	bool f1Pressed = false;
 	bool mMousePress = false;
 
 	Clock loopTime;
@@ -114,176 +114,175 @@ int main(int argc, char *argv[]) {
 	Clock lastTickTime = currentTimeMs();
 	Clock tickTime;
 
-	bool changeRed = false;
-	bool changeGreen = false;
-	bool changeBlue = false;
-	bool numKeysPressed[10] = { false };
-	unsigned char colorInput[3] = { 0 };
-	unsigned int colorInputIndex = 0;
+
+	bool cPressed = false;
+
+	bool colorBarActive = false;
+	bool colorTriangleActive = false;
 
 	while (glfwWindowShouldClose(window) == 0 && gameRunning) {
-		if (!esc_pressed && glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
-			gamePaused = !gamePaused;
+
+		if (!escPressed && glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
+
+			if (!openedScreen) {
+				gamePaused = !gamePaused;
+			} else {
+				openedScreen = 0;
+			}
+
 			if (!gamePaused) {
 				glfwSetCursorPos(window, (double)windowWidth / 2.0, (double)windowHeight / 2.0);
 
-				if (!debugMode) {
+				if (!debugMode && !openedScreen) {
 					glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 				}
 
 			} else {
 				glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 			}
-			esc_pressed = true;
-		} else if (esc_pressed && glfwGetKey(window, GLFW_KEY_ESCAPE) != GLFW_PRESS) {
-			esc_pressed = false;
+
+			escPressed = true;
+		} else if (escPressed && glfwGetKey(window, GLFW_KEY_ESCAPE) != GLFW_PRESS) {
+			escPressed = false;
 		}
 
-		if (!f1_pressed && glfwGetKey(window, GLFW_KEY_F1) == GLFW_PRESS) {
-			f1_pressed = true;
+		if (!f1Pressed && glfwGetKey(window, GLFW_KEY_F1) == GLFW_PRESS) {
+			f1Pressed = true;
 			hideGUI = !hideGUI;
-		} else if (f1_pressed && glfwGetKey(window, GLFW_KEY_F1) != GLFW_PRESS) {
-			f1_pressed = false;
+		} else if (f1Pressed && glfwGetKey(window, GLFW_KEY_F1) != GLFW_PRESS) {
+			f1Pressed = false;
 		}
 
-		// this lets you type in new cube colors
-		if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS) {
-			colorInputIndex = 0;
-			changeRed = true;
-			changeGreen = false;
-			changeBlue = false;
-		} else if (glfwGetKey(window, GLFW_KEY_G) == GLFW_PRESS) {
-			colorInputIndex = 0;
-			changeRed = false;
-			changeGreen = true;
-			changeBlue = false;
-		} else if (glfwGetKey(window, GLFW_KEY_B) == GLFW_PRESS) {
-			colorInputIndex = 0;
-			changeRed = false;
-			changeGreen = false;
-			changeBlue = true;
-		}
-		for (unsigned int i = 0; i < 10; ++i) {
-			if (!numKeysPressed[i] && glfwGetKey(window, i + GLFW_KEY_0) == GLFW_PRESS) {
-				numKeysPressed[i] = true;
-
-				colorInput[colorInputIndex] = i;
-				++colorInputIndex;
-				if (colorInputIndex >= 3) {
-					if (changeRed) {
-						unsigned char red = colorInput[0] * 100 + colorInput[1] * 10 + colorInput[2];
-						*(((unsigned char*)&usingCube) + 3) = red;
-						changeRed = false;
-					} else if (changeGreen) {
-						unsigned char green = colorInput[0] * 100 + colorInput[1] * 10 + colorInput[2];
-						*(((unsigned char*)&usingCube) + 2) = green;
-						changeGreen = false;
-					} else if (changeBlue) {
-						unsigned char blue = colorInput[0] * 100 + colorInput[1] * 10 + colorInput[2];
-						*(((unsigned char*)&usingCube) + 1) = blue;
-						changeBlue = false;
-					}
-					colorInputIndex = 0;
-				}
-			} else if (numKeysPressed[i] && glfwGetKey(window, i + GLFW_KEY_0) != GLFW_PRESS) {
-				numKeysPressed[i] = false;
-			}
-		}
 
 		glfwGetWindowSize(window, &windowWidth, &windowHeight);
 
 		// we want to control the speed of things like moving the camera
 		loopTime = currentTimeMs();
-		isCubeSelected = !gamePaused;
+		isCubeSelected = !gamePaused && !openedScreen;
 
 		if (!gamePaused) {
-			float forward = 0.0f;
-			float sideways = 0.0f;
-			float upward = 0.0f;
-			if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
-				forward = 1.0f;
-			}
-			if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
-				forward = -1.0f;
-			}
-			if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
-				sideways = -1.0f;
-			}
-			if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
-				sideways = 1.0f;
-			}
-			if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
-				upward = (float)(loopTime - lastLoopTime) / 100.0f;
-			}
-			if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) {
-				upward = (float)-(loopTime - lastLoopTime) / 100.0f;
-			}
-			forward *= (float)(loopTime - lastLoopTime) / 100.0f;
-			sideways *= (float)(loopTime - lastLoopTime) / 100.0f;
 
-			glfwGetCursorPos(window, &mouseX, &mouseY);
+			if (!openedScreen) {
 
-			camera.move(forward, upward, sideways);
-			camera.rotate(((float)mouseX - ((float)windowWidth / 2.0f)) / 180.0f, ((float)mouseY - ((float)windowHeight / 2.0f)) / 180.0f);
+				if (!cPressed && glfwGetKey(window, GLFW_KEY_C) == GLFW_PRESS) {
+					cPressed = true;
+					openedScreen = SCREEN_COLOR;
 
-			glfwSetCursorPos(window, (double)windowWidth / 2.0, (double)windowHeight / 2.0);
-
-			// here's where we trace a ray from the camera to a cube in the world
-			RayTraceInfo raySelection = mainWorld.rayTraceCubes(glm::vec3(camera.xPos, camera.yPos, camera.zPos), camera.rotationYaw, camera.rotationPitch, 6.0f);
-
-			if (raySelection.cubeFound) {
-				double xd = std::floor(raySelection.pos.x);
-				double yd = std::floor(raySelection.pos.y);
-				double zd = std::floor(raySelection.pos.z);
-
-				renderCubeSelect(xd, yd, zd);
-
-				int x = (int)xd;
-				int y = (int)yd;
-				int z = (int)zd;
-
-				// mouse clicking functions for placing/deleting cubes
-				if (currentTimeMs() - clickClock > 200 && glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS) {
-					clickClock = currentTimeMs();
-
-					unsigned int * __restrict__ cube = mainWorld.getCubePointer((int)std::floor(raySelection.lastPos.x), (int)std::floor(raySelection.lastPos.y), (int)std::floor(raySelection.lastPos.z));
-					if (cube != NULL && *cube == 0) {
-						*cube = usingCube;
-						worldIsDirty = true;
-					}
-				}
-				if (currentTimeMs() - clickClock > 200 && glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) {
-					clickClock = currentTimeMs();
-
-					unsigned int * __restrict__ cube = mainWorld.getCubePointer(x, y, z);
-					if (cube != NULL && *cube > 0) {
-						*cube = 0;
-						worldIsDirty = true;
-					}
+				} else if (cPressed && glfwGetKey(window, GLFW_KEY_C) != GLFW_PRESS) {
+					cPressed = false;
 				}
 
-				if (!mMousePress && glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_MIDDLE) == GLFW_PRESS) {
-					mMousePress = true;
-					unsigned int b = mainWorld.getCube(x, y, z);
-					if (b > 0) {
-						usingCube = b;
-					}
-				} else if (mMousePress && glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_MIDDLE) != GLFW_PRESS) {
-					mMousePress = false;
+
+				float forward = 0.0f;
+				float sideways = 0.0f;
+				float upward = 0.0f;
+				if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
+					forward = 1.0f;
 				}
-				isCubeSelected = true;
-			} else {
-				isCubeSelected = false;
-			}
+				if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
+					forward = -1.0f;
+				}
+				if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
+					sideways = -1.0f;
+				}
+				if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
+					sideways = 1.0f;
+				}
+				if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
+					upward = (float)(loopTime - lastLoopTime) / 100.0f;
+				}
+				if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) {
+					upward = (float)-(loopTime - lastLoopTime) / 100.0f;
+				}
+				forward *= (float)(loopTime - lastLoopTime) / 100.0f;
+				sideways *= (float)(loopTime - lastLoopTime) / 100.0f;
 
-			tickTime = currentTimeMs();
+				glfwGetCursorPos(window, &mouseX, &mouseY);
 
-			// run a tick 20 times per second
-			unsigned int ticksToRun = (tickTime - lastTickTime) / 50;
-			for (unsigned int i = 0; i <= ticksToRun; ++i) {
+				camera.move(forward, upward, sideways);
+				camera.rotate(((float)mouseX - ((float)windowWidth / 2.0f)) / 180.0f, ((float)mouseY - ((float)windowHeight / 2.0f)) / 180.0f);
+
+				glfwSetCursorPos(window, (double)windowWidth / 2.0, (double)windowHeight / 2.0);
+
+				// here's where we trace a ray from the camera to a cube in the world
+				RayTraceInfo raySelection = mainWorld.rayTraceCubes(glm::vec3(camera.xPos, camera.yPos, camera.zPos), camera.rotationYaw, camera.rotationPitch, 6.0f);
+
+				if (raySelection.cubeFound) {
+					double xd = std::floor(raySelection.pos.x);
+					double yd = std::floor(raySelection.pos.y);
+					double zd = std::floor(raySelection.pos.z);
+
+					renderCubeSelect(xd, yd, zd);
+
+					int x = (int)xd;
+					int y = (int)yd;
+					int z = (int)zd;
+
+					// mouse clicking functions for placing/deleting cubes
+					if (currentTimeMs() - clickClock > 200 && glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS) {
+						clickClock = currentTimeMs();
+
+						unsigned int * __restrict__ cube = mainWorld.getCubePointer((int)std::floor(raySelection.lastPos.x), (int)std::floor(raySelection.lastPos.y), (int)std::floor(raySelection.lastPos.z));
+						if (cube != NULL && *cube == 0) {
+							*cube = usingCube;
+							worldIsDirty = true;
+						}
+					}
+					if (currentTimeMs() - clickClock > 200 && glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) {
+						clickClock = currentTimeMs();
+
+						unsigned int * __restrict__ cube = mainWorld.getCubePointer(x, y, z);
+						if (cube != NULL && *cube > 0) {
+							*cube = 0;
+							worldIsDirty = true;
+						}
+					}
+
+					if (!mMousePress && glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_MIDDLE) == GLFW_PRESS) {
+						mMousePress = true;
+						unsigned int b = mainWorld.getCube(x, y, z);
+						if (b > 0) {
+							usingCube = b;
+						}
+					} else if (mMousePress && glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_MIDDLE) != GLFW_PRESS) {
+						mMousePress = false;
+					}
+					isCubeSelected = true;
+				} else {
+					isCubeSelected = false;
+				}
+
 				tickTime = currentTimeMs();
-				mods_onWorldTick();
-				lastTickTime = tickTime;
+
+				// run a tick 20 times per second
+				unsigned int ticksToRun = (tickTime - lastTickTime) / 50;
+				for (unsigned int i = 0; i <= ticksToRun; ++i) {
+					tickTime = currentTimeMs();
+					mods_onWorldTick();
+					lastTickTime = tickTime;
+				}
+
+			} else if (openedScreen == SCREEN_COLOR) {
+
+				if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) {
+
+					glfwGetCursorPos(window, &mouseX, &mouseY);
+
+					double mouseX2 = (mouseX / (double)windowHeight) * 2.0 - ((double)windowWidth / (double)windowHeight);
+					double mouseY2 = -(mouseY / (double)windowHeight) * 2.0 + 1.0;
+
+					if (!colorBarActive && mouseY2 <= 0.8 && mouseY2 >= -0.1 && std::abs(mouseX2) < (1.0 - ((mouseY2 + 0.1) / 0.9)) * 0.6) {
+						colorTriangleActive = true;
+						colorTriangleX = mouseX2;
+						colorTriangleY = mouseY2;
+					} else if ((colorBarActive || (!colorTriangleActive && mouseY2 >= -0.35 && mouseY2 <= -0.15)) && std::abs(mouseX2) < 0.6) {
+						colorBarActive = true;
+						colorBarPos = mouseX2;
+					}
+				} else {
+					colorTriangleActive = false;
+					colorBarActive = false;
+				}
 			}
 		}
 

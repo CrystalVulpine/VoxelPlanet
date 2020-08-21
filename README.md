@@ -16,10 +16,8 @@ VoxelPlanet is a sandbox made out of colored cubes. It is made using basic shade
 * Select color of the cube you're pointing at: Middle Click
 * Pause/Unpause: Esc
 * Hide GUI: F1
-* R: set red as the color being edited
-* G: set green as the color being edited
-* B: set blue as the color being edited
-* Numbers from 000-255: sets the value of the color being edited
+* C: Open cube color select screen
+* Esc: close a screen
 
 ## Documentation
 
