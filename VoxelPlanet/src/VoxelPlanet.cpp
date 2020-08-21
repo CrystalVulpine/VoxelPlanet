@@ -271,12 +271,38 @@ int main(int argc, char *argv[]) {
 					double mouseX2 = (mouseX / (double)windowHeight) * 2.0 - ((double)windowWidth / (double)windowHeight);
 					double mouseY2 = -(mouseY / (double)windowHeight) * 2.0 + 1.0;
 
-					if (!colorBarActive && mouseY2 <= 0.8 && mouseY2 >= -0.1 && std::abs(mouseX2) < (1.0 - ((mouseY2 + 0.1) / 0.9)) * 0.6) {
+					double maxX = (1.0 - ((mouseY2 + 0.1) / 0.9)) * 0.6;
+					if (colorTriangleActive || (!colorBarActive && mouseY2 <= 0.8 && mouseY2 >= -0.1 && std::abs(mouseX2) < maxX)) {
+
 						colorTriangleActive = true;
+
+						if (mouseY2 > 0.8) {
+							mouseY2 = 0.8;
+						} else if (mouseY2 < -0.1) {
+							mouseY2 = -0.1;
+						}
+
+						// we have to do this again since the y pos could be changed
+						maxX = (1.0 - ((mouseY2 + 0.1) / 0.9)) * 0.6;
+
+						if (mouseX2 < -maxX) {
+							mouseX2 = -maxX;
+						} else if (mouseX2 > maxX) {
+							mouseX2 = maxX;
+						}
+
 						colorTriangleX = mouseX2;
 						colorTriangleY = mouseY2;
-					} else if ((colorBarActive || (!colorTriangleActive && mouseY2 >= -0.35 && mouseY2 <= -0.15)) && std::abs(mouseX2) < 0.6) {
+					} else if (colorBarActive || (!colorTriangleActive && mouseY2 >= -0.35 && mouseY2 <= -0.15 && std::abs(mouseX2) < 0.6)) {
+
 						colorBarActive = true;
+
+						if (mouseX2 < -0.6) {
+							mouseX2 = -0.6;
+						} else if (mouseX2 > 0.6) {
+							mouseX2 = 0.6;
+						}
+
 						colorBarPos = mouseX2;
 					}
 				} else {
