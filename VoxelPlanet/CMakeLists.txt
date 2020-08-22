@@ -13,4 +13,5 @@ target_link_libraries(voxelplanet
   CONAN_PKG::opengl
   CONAN_PKG::glew
   CONAN_PKG::glfw
-  CONAN_PKG::glm)
+  CONAN_PKG::glm
+  stdc++fs)
