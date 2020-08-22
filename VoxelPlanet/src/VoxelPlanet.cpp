@@ -20,7 +20,6 @@ unsigned int usingCube = 0x808080ff;
 
 bool gamePaused = false;
 unsigned int openedScreen = 0;
-bool hideGUI = false;
 
 
 int main(int argc, char *argv[]) {
@@ -76,6 +75,10 @@ int main(int argc, char *argv[]) {
 				mainWorld.setSaveDir(argv[i + 1]);
 				customSaveDir = true;
 			}
+		} else if (strcmp(argv[i], "--fastgraphics") == 0) {
+
+			fancyGraphics = false;
+
 		}
 	}
 	mods_processGameArgs(argc, argv);

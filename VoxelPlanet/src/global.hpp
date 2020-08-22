@@ -7,6 +7,7 @@ extern World mainWorld;
 extern bool debugMode;
 extern bool hideGUI;
 extern bool gamePaused;
+extern bool fancyGraphics;
 
 /** the cube the screen/crosshair is pointing at **/
 extern bool isCubeSelected;
