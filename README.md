@@ -12,6 +12,9 @@ VoxelPlanet is a sandbox made out of colored cubes. It is made using basic shade
 For Linux and macOS, you will need to install:
 
 - A C++17 compiler
+
+And if you are building with CMake:
+
 - [CMake](https://cmake.org/download/)
 - [Conan](https://conan.io/downloads.html)
 
