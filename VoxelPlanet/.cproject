@@ -38,14 +38,14 @@
 							<tool id="cdt.managedbuild.tool.gnu.c.linker.exe.debug.1981627839" name="GCC C Linker" superClass="cdt.managedbuild.tool.gnu.c.linker.exe.debug"/>
 							<tool command="g++" commandLinePattern="${COMMAND} ${FLAGS} ${OUTPUT_FLAG} ${OUTPUT_PREFIX}${OUTPUT} ${INPUTS}" errorParsers="org.eclipse.cdt.core.GLDErrorParser" id="cdt.managedbuild.tool.gnu.cpp.linker.exe.debug.1618607199" name="GCC C++ Linker" superClass="cdt.managedbuild.tool.gnu.cpp.linker.exe.debug">
 								<option id="gnu.cpp.link.option.libs.1823394965" name="Libraries (-l)" superClass="gnu.cpp.link.option.libs" valueType="libs">
-									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="pthread"/>
-									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="GL"/>
-									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="glfw"/>
-									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="GLU"/>
-									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="GLEW"/>
-									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="OpenGL"/>
-									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="dl"/>
-									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="stdc++fs"/>
+									<listOptionValue builtIn="false" value="pthread"/>
+									<listOptionValue builtIn="false" value="GL"/>
+									<listOptionValue builtIn="false" value="glfw"/>
+									<listOptionValue builtIn="false" value="GLU"/>
+									<listOptionValue builtIn="false" value="GLEW"/>
+									<listOptionValue builtIn="false" value="OpenGL"/>
+									<listOptionValue builtIn="false" value="dl"/>
+									<listOptionValue builtIn="false" value="stdc++fs"/>
 								</option>
 								<option id="gnu.cpp.link.option.paths.1291056582" name="Library search path (-L)" superClass="gnu.cpp.link.option.paths"/>
 								<option id="gnu.cpp.link.option.flags.680907416" name="Linker flags" superClass="gnu.cpp.link.option.flags" value="-no-pie -rdynamic" valueType="string"/>
