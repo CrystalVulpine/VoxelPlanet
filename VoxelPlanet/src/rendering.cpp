@@ -27,7 +27,7 @@ unsigned int vertexIndex = 0;
 
 
 double colorTriangleX = 0.0;
-double colorTriangleY = 0.0;
+double colorTriangleY = 0.8;
 double colorBarPos = 0.0;
 double colorAlphaPos = 0.8;
 
@@ -374,7 +374,11 @@ int setupOpenGL() {
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+#ifndef __APPLE__
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_ANY_PROFILE);
+#else
+	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+#endif
 	window = glfwCreateWindow(windowWidth, windowHeight, "VoxelPlanet Alpha v0.1", NULL, NULL);
 	if (window == NULL) {
 		fprintf(stderr, "Failed to open GLFW window. Your GPU or CPU may not be compatible with OpenGL 3.3.");

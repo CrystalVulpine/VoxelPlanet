@@ -13,19 +13,15 @@ extern void mods_onWorldClose();
 extern void mods_onGameLoop(Clock loopTime, Clock lastLoopTime);
 extern void mods_processGameArgs(int argc, char *argv[]);
 
-#ifdef __linux__
-
-
 #define API_VERSION "1.0.1"
 
-extern void loadModsLinux();
-#define loadMods() loadModsLinux()
+#if defined(__linux__) || defined(__APPLE__)
 
+void loadModsUnix();
+#define loadMods() loadModsUnix()
 
 #else
 
-
 #define loadMods()
-
 
 #endif

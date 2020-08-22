@@ -1,9 +1,10 @@
 /VoxelPlanet/Debug/
 /VoxelPlanet/Release/
-/VoxelPlanet/world/
+/VoxelPlanet/world*/
 /VoxelPlanet/mods/
 /VoxelPlanet.TestMod/Release/
 /VoxelPlanet.ColorChanger/Release/
 /VoxelPlanet.Disintegration/Release/
 /VoxelPlanet.PoliticalCompass/Release/
 
+/build

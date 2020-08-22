@@ -71,13 +71,15 @@ void mods_processGameArgs(int argc, char *argv[]) {
 	}
 }
 
+#if defined(__linux__) || defined(__APPLE__)
 
-#ifdef __linux__
-
-
-void loadModsLinux()
+void loadModsUnix()
 {
+#if defined(__linux__)
     std::string path("mods/");
+#elif defined(__APPLE__)
+	std::string path("../lib");
+#endif
 
     // there are no mods, so don't try to load any
     if (!fs::is_directory(path)) {
@@ -181,6 +183,4 @@ void loadModsLinux()
     }
 }
 
-
 #endif
-
