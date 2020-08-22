@@ -172,6 +172,7 @@ int main(int argc, char *argv[]) {
 				if (!cPressed && glfwGetKey(window, GLFW_KEY_C) == GLFW_PRESS) {
 					cPressed = true;
 					openedScreen = SCREEN_COLOR;
+					glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 
 				} else if (cPressed && glfwGetKey(window, GLFW_KEY_C) != GLFW_PRESS) {
 					cPressed = false;
