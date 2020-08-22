@@ -116,6 +116,8 @@ void loadModsLinux()
 					}
 				}
 
+				std::cout << "Loaded mod " << ((const char* (*)())dlsym(handle, "getModName"))() << ": " << ((const char* (*)())dlsym(handle, "getModDescription"))() << "\n";
+
 				void (*testFunc)() = (void (*)())dlsym(handle, "testFunc");
 
 				// skip if the function isn't used by the mod
