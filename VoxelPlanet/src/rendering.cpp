@@ -17,7 +17,8 @@ bool worldIsDirty = false;
 
 GLuint vertexbuffer;
 GLuint colorbuffer;
-GLuint linebuffer;
+GLuint guiVertexBuffer;
+GLuint guiColorBuffer;
 
 unsigned int vertexIndex = 0;
 
@@ -25,6 +26,8 @@ unsigned int vertexIndex = 0;
 double colorTriangleX = 0.0;
 double colorTriangleY = 0.0;
 double colorBarPos = 0.0;
+
+unsigned int guiVertexCount;
 
 
 double usingCubeVertices[] = {
@@ -314,7 +317,7 @@ void renderCubeSelect(double x, double y, double z) {
 			x + 1.001, y - 0.001, z + 1.001,
 			x + 1.001, y + 1.001, z + 1.001,
 	};
-	glBindBuffer(GL_ARRAY_BUFFER, linebuffer);
+	glBindBuffer(GL_ARRAY_BUFFER, guiVertexBuffer);
 	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(lines), lines);
 }
 
@@ -377,14 +380,17 @@ int setupOpenGL() {
 
 	glGenBuffers(1, &vertexbuffer);
 	glGenBuffers(1, &colorbuffer);
-	glGenBuffers(1, &linebuffer);
+	glGenBuffers(1, &guiVertexBuffer);
+	glGenBuffers(1, &guiColorBuffer);
 
 	glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
 	glBufferData(GL_ARRAY_BUFFER, ((mainWorld.worldLength * mainWorld.worldWidth * mainWorld.worldHeight) * 6 * 2 * 3 * 3) * sizeof(double), NULL, GL_STATIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, colorbuffer);
 	glBufferData(GL_ARRAY_BUFFER, ((mainWorld.worldLength * mainWorld.worldWidth * mainWorld.worldHeight) * 6 * 2 * 3 * 3) * sizeof(float), NULL, GL_STATIC_DRAW);
-	glBindBuffer(GL_ARRAY_BUFFER, linebuffer);
-	glBufferData(GL_ARRAY_BUFFER, 100 * sizeof(double), NULL, GL_STATIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, guiVertexBuffer);
+	glBufferData(GL_ARRAY_BUFFER, 1000 * sizeof(double), NULL, GL_STATIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, guiColorBuffer);
+	glBufferData(GL_ARRAY_BUFFER, 1000 * sizeof(float), NULL, GL_STATIC_DRAW);
 
 	matrix = glGetUniformLocation(program, "MVP");
 
@@ -395,6 +401,19 @@ int setupOpenGL() {
 	renderWorld();
 
 	return 0;
+}
+
+/** adds and draws a list to the gui vbo. `count` refers to the number of vertices. **/
+void renderToGUI(unsigned int count, double vertices[], float colors[]) {
+	glBindBuffer(GL_ARRAY_BUFFER, guiVertexBuffer);
+	glBufferSubData(GL_ARRAY_BUFFER, guiVertexCount * 3 * sizeof(double), count * 3 * sizeof(double), vertices);
+	glVertexAttribPointer(0, 3, GL_DOUBLE, GL_FALSE, 0, NULL);
+	glBindBuffer(GL_ARRAY_BUFFER, guiColorBuffer);
+	glBufferSubData(GL_ARRAY_BUFFER, guiVertexCount * 3 * sizeof(float), count * 3 * sizeof(float), colors);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, NULL);
+	glDrawArrays(GL_TRIANGLES, guiVertexCount, count);
+
+	guiVertexCount += count;
 }
 
 void doDrawTick() {
@@ -415,25 +434,29 @@ void doDrawTick() {
 	glEnableVertexAttribArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
 	glVertexAttribPointer(0, 3, GL_DOUBLE, GL_FALSE, 0, NULL);
-	glDrawArrays(GL_TRIANGLES, 0, vertexIndex / 3);
-
 	glBindBuffer(GL_ARRAY_BUFFER, colorbuffer);
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, NULL);
+	glDrawArrays(GL_TRIANGLES, 0, vertexIndex / 3);
+
 
 	if (worldIsDirty) {
 		reRenderWorld();
 		worldIsDirty = false;
 	}
 
-	// TODO: clean up this messy GUI code. Should be more usable and gui should have its own buffer.
+
 	if (!hideGUI) {
+
+		guiVertexCount = 0;
+
 		glDisableVertexAttribArray(1);
 
 		if (isCubeSelected) {
-			glLineWidth(1.0f);
-			glBindBuffer(GL_ARRAY_BUFFER, linebuffer);
+			glBindBuffer(GL_ARRAY_BUFFER, guiVertexBuffer);
 			glVertexAttribPointer(0, 3, GL_DOUBLE, GL_FALSE, 0, NULL);
 			glDrawArrays(GL_LINES, 0, 24);
+
+			guiVertexCount += 24;
 		}
 
 		glEnableVertexAttribArray(1);
@@ -443,13 +466,6 @@ void doDrawTick() {
 		glm::mat4 model = glm::mat4(1.0f);
 		mvp = glm::ortho<float>(-((float)windowWidth / (float)windowHeight), (float)windowWidth / (float)windowHeight, -1.0f, 1.0f, -1.0f, 1.0f) * glm::rotate(model, 0.5f, glm::vec3(1.0, 0.0, 0.0)) * glm::translate(model, glm::vec3(((double)windowWidth / (double)windowHeight) - 0.2, 0.9, 0.0)) * glm::rotate(model, 0.785398f, glm::vec3(0.0, 1.0, 0.0));
 		glUniformMatrix4fv(matrix, 1, GL_FALSE, &mvp[0][0]);
-
-		const int usingCubeVertexCount = 18;
-
-		glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
-		glBufferSubData(GL_ARRAY_BUFFER, vertexIndex * sizeof(double), sizeof(usingCubeVertices), usingCubeVertices);
-		glVertexAttribPointer(0, 3, GL_DOUBLE, GL_FALSE, 0, NULL);
-		glDrawArrays(GL_TRIANGLES, vertexIndex / 3, usingCubeVertexCount);
 
 		float red = (float)(usingCube >> 24) / 255.0F;
 		float green = (float)((usingCube >> 16) & 255) / 255.0F;
@@ -476,20 +492,17 @@ void doDrawTick() {
 				red, green, blue,
 				red, green, blue,
 		};
-		glBindBuffer(GL_ARRAY_BUFFER, colorbuffer);
-		glBufferSubData(GL_ARRAY_BUFFER, vertexIndex * sizeof(float), sizeof(usingCubeColor), usingCubeColor);
+
+		renderToGUI(18, usingCubeVertices, usingCubeColor);
+
 
 		model = glm::mat4(1.0f);
 		mvp = glm::ortho<float>(-((float)windowWidth / (float)windowHeight), (float)windowWidth / (float)windowHeight, -1.0f, 1.0f, -1.0f, 1.0f);
 		glUniformMatrix4fv(matrix, 1, GL_FALSE, &mvp[0][0]);
 
 		glDisable(GL_DEPTH_TEST);
-		glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
-		glBufferSubData(GL_ARRAY_BUFFER, vertexIndex * sizeof(double) + sizeof(usingCubeVertices), sizeof(crosshairs), crosshairs);
-		glVertexAttribPointer(0, 3, GL_DOUBLE, GL_FALSE, 0, NULL);
-		glDrawArrays(GL_TRIANGLES, vertexIndex / 3 + usingCubeVertexCount, sizeof(crosshairs) / sizeof(crosshairs[0]) / 3);
-		glBindBuffer(GL_ARRAY_BUFFER, colorbuffer);
-		glBufferSubData(GL_ARRAY_BUFFER, vertexIndex * sizeof(float) + sizeof(usingCubeColor), sizeof(crosshairColor), crosshairColor);
+
+		renderToGUI(sizeof(crosshairs) / sizeof(crosshairs[0]) / 3, crosshairs, crosshairColor);
 
 		if (openedScreen == SCREEN_COLOR) {
 
@@ -652,12 +665,7 @@ void doDrawTick() {
 					0.0f, 0.0f, 0.0f,
 					0.0f, 0.0f, 0.0f,
 			};
-			glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
-			glBufferSubData(GL_ARRAY_BUFFER, vertexIndex * sizeof(double) + sizeof(usingCubeVertices) + sizeof(crosshairs), sizeof(triangle), triangle);
-			glVertexAttribPointer(0, 3, GL_DOUBLE, GL_FALSE, 0, NULL);
-			glDrawArrays(GL_TRIANGLES, vertexIndex / 3 + usingCubeVertexCount + 24, sizeof(triangle) / sizeof(triangle[0]) / 3);
-			glBindBuffer(GL_ARRAY_BUFFER, colorbuffer);
-			glBufferSubData(GL_ARRAY_BUFFER, vertexIndex * sizeof(float) + sizeof(usingCubeColor) + sizeof(crosshairColor), sizeof(triangleColor), triangleColor);
+			renderToGUI(sizeof(triangle) / sizeof(triangle[0]) / 3, triangle, triangleColor);
 
 			float multiplierRed = ((colorTriangleY + 0.1) / 0.9) * colorBarRed;
 			multiplierRed += 0.5f * (1.0f - ((colorTriangleY + 0.1) / 0.9));
@@ -699,9 +707,12 @@ void doDrawTick() {
 	glfwPollEvents();
 }
 
+
 void cleanupOpenGL() {
 	glDeleteBuffers(1, &vertexbuffer);
-	glDeleteBuffers(1, &linebuffer);
+	glDeleteBuffers(1, &colorbuffer);
+	glDeleteBuffers(1, &guiVertexBuffer);
+	glDeleteBuffers(1, &guiColorBuffer);
 	glDeleteVertexArrays(1, &vao);
 
 	glfwTerminate();
