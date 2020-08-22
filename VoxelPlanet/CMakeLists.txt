@@ -9,7 +9,7 @@ set_property(TARGET voxelplanet PROPERTY ENABLE_EXPORTS true)
 target_compile_features(voxelplanet PRIVATE cxx_std_17)
 target_compile_options(voxelplanet PRIVATE -Wall -Wextra -pedantic)
 
-if (LINUX)
+if (UNIX AND NOT APPLE)
   target_link_libraries(voxelplanet
     stdc++fs
     CONAN_PKG::opengl
