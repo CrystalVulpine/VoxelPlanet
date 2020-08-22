@@ -1,10 +1,6 @@
-#include <math.h>
-#include <glm/gtc/matrix_transform.hpp>
 #include "Camera.hpp"
 
-Camera::Camera() {
-
-}
+#include <glm/gtc/matrix_transform.hpp>
 
 void Camera::move(float forward, float vertical, float sideways) {
 	xPos += forward * glm::sin(rotationYaw) + sideways * glm::cos(-rotationYaw);

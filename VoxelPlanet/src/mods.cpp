@@ -1,11 +1,15 @@
+#include "mods.hpp"
+
+#include <dlfcn.h>
+
+#include <filesystem>
 #include <fstream>
 #include <iostream>
-#include <dlfcn.h>
 #include <vector>
 #include <functional>
 #include <cstring>
-#include "global.hpp"
-#include "mods.hpp"
+
+namespace fs = std::filesystem;
 
 std::vector<void (*)()> mod_testFunc;
 std::vector<void (*)()> mod_onRenderTick;

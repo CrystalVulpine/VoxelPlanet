@@ -1,10 +1,15 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <cstring>
 #include "global.hpp"
-#include "rendering.hpp"
 #include "World.hpp"
+#include "rendering.hpp"
 #include "mods.hpp"
+
+#include <GLFW/glfw3.h>
+#include <glm/glm.hpp>
+
+#include <cmath>
+#include <cstdlib>
+#include <cstring>
+#include <ctime>
 
 bool gameRunning = false;
 World mainWorld;

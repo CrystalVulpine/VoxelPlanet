@@ -1,5 +1,11 @@
 #include "rendering.hpp"
 
+#include "global.hpp"
+#include "mods.hpp"
+
+#include <glm/gtc/matrix_transform.hpp>
+
+#include <cstdio>
 
 GLFWwindow* window;
 int windowWidth = 1024;
