@@ -1,7 +1,6 @@
 #pragma once
 
 #include "World.hpp"
-
 #include <filesystem>
 
 extern World mainWorld;
