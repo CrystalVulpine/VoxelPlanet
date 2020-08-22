@@ -50,7 +50,7 @@ VoxelPlanet is modular and has various programmatic functions, such as a mod/plu
 
 - [ ] Possible Android app (I've never made apps before, so I have no idea how to go about doing this, but it would be very cool)
 
-- [ ] CMake build scripts
+- [x] CMake build scripts
 
 - [ ] Smoother in-game camera and solid rendering
 
@@ -87,4 +87,4 @@ Then make sure these are all installed, along with any other libraries and depen
     sudo pip3 install conan
     sudo apt install xorg-dev libxcb-* libglew1.5 libglew1.5-dev libglu1-* libgl1-*
 
-Then run build.sh.
+Then run build.sh. Note that you need to make sure to use a compiler that supports C++17 with <filesystem> (for gcc, that's version 8 and higher). You may also need to configure your conan profile to use the correct compiler version.
