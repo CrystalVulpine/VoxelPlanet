@@ -2,9 +2,10 @@
 
 VoxelPlanet is a sandbox made out of colored cubes. It is made using basic shaders in OpenGL 3.3. The intent is to provide an open world to create things, much in the same way you would draw a picture out of pixels, but in a 3-dimensional space. It also supports mods and has a simple mod/plugin API.
 
-![GitHub language count](https://img.shields.io/github/languages/count/CrystalVulpine/VoxelPlanet) ![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/CrystalVulpine/VoxelPlanet)
+![GitHub stable release](https://img.shields.io/github/v/release/CrystalVulpine/VoxelPlanet) ![GitHub prerelease](https://img.shields.io/github/v/release/CrystalVulpine/VoxelPlanet?include_prereleases) ![GitHub Download Count](https://img.shields.io/github/downloads/CrystalVulpine/VoxelPlanet/total) ![License](https://img.shields.io/github/license/CrystalVulpine/VoxelPlanet) ![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/CrystalVulpine/VoxelPlanet)
 
 ![](https://i.imgur.com/CsTJFOc.png)
+![](https://i.imgur.com/fGVsUsE.png)
 
 ## Controls:
 
@@ -16,8 +17,8 @@ VoxelPlanet is a sandbox made out of colored cubes. It is made using basic shade
 * Select color of the cube you're pointing at: Middle Click
 * Pause/Unpause: Esc
 * Hide GUI: F1
-* C: Open cube color select screen
-* Esc: close a screen
+* Open cube color select screen: C
+* Close a screen: Esc
 
 ## Documentation
 
@@ -25,9 +26,9 @@ VoxelPlanet is modular and has various programmatic functions, such as a mod/plu
 
 ## To-Do List:
 
-- [X] Ray tracing for cube selection. Before this was implemented, the current cube was always the one the camera is inside of.
+- [x] Ray tracing for cube selection. Before this was implemented, the current cube was always the one the camera is inside of.
 
-- [ ] Add an actual GUI, including a cube color picker
+- [ ] Add an actual GUI
 
 - [ ] Add settings and controls
 
