@@ -24,7 +24,7 @@ unsigned int vertexIndex = 0;
 
 
 double colorTriangleX = 0.0;
-double colorTriangleY = 0.0;
+double colorTriangleY = 0.8;
 double colorBarPos = 0.0;
 
 unsigned int guiVertexCount;
