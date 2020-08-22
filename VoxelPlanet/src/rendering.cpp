@@ -151,12 +151,12 @@ void renderCube(int x, int y, int z, unsigned int cube) {
 
 	// attempts to speed through the surrounding cube check by going through memory as contiguously as possible. cubePointer is the cube's memory location.
 	unsigned int* __restrict__ cubePointer = mainWorld.getCubePointer(x, y, z);
-	bool renderFrontFace = z <= 0 || (cubePointer[-(mainWorld.worldLength * mainWorld.worldHeight)] & 0xff) < 255;
-	bool renderLeftFace = x <= 0 || (cubePointer[-mainWorld.worldHeight] & 0xff) < 255;
-	bool renderBottomFace = y <= 0 || (cubePointer[-1] & 0xff) < 255;
-	bool renderTopFace = y >= mainWorld.worldHeight - 1 || (cubePointer[1] & 0xff) < 255;
-	bool renderRightFace = x >= mainWorld.worldLength - 1 || (cubePointer[mainWorld.worldHeight] & 0xff) < 255;
-	bool renderBackFace = z >= mainWorld.worldWidth - 1 || (cubePointer[mainWorld.worldLength * mainWorld.worldHeight] & 0xff) < 255;
+	bool renderFrontFace = z <= 0 || (cubePointer[-(mainWorld.worldLength * mainWorld.worldHeight)] & 0xff) != (cube & 0xff);
+	bool renderLeftFace = x <= 0 || (cubePointer[-mainWorld.worldHeight] & 0xff) != (cube & 0xff);
+	bool renderBottomFace = y <= 0 || (cubePointer[-1] & 0xff) != (cube & 0xff);
+	bool renderTopFace = y >= mainWorld.worldHeight - 1 || (cubePointer[1] & 0xff) != (cube & 0xff);
+	bool renderRightFace = x >= mainWorld.worldLength - 1 || (cubePointer[mainWorld.worldHeight] & 0xff) != (cube & 0xff);
+	bool renderBackFace = z >= mainWorld.worldWidth - 1 || (cubePointer[mainWorld.worldLength * mainWorld.worldHeight] & 0xff) != (cube & 0xff);
 
 	if (renderTopFace) {
 		vertices[vertexCount + 0] = (double)x + 1.0; vertices[vertexCount + 1] = (double)y + 1.0; vertices[vertexCount + 2] = (double)z + 1.0;
@@ -505,7 +505,7 @@ void doDrawTick() {
 	glEnable(GL_CULL_FACE);
 	glDepthMask(false);
 
-	if (!hideGUI) {
+	if (!hideGUI || openedScreen) {
 
 		guiVertexCount = 0;
 
