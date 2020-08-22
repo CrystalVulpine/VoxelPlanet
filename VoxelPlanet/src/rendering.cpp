@@ -289,7 +289,7 @@ void renderCube(int x, int y, int z, unsigned int cube) {
 	vertexIndex += vertexCount;
 }
 
-unsigned int vertexPass2 = 0;
+unsigned int vertexPass1 = 0;
 
 void renderWorld() {
 
@@ -308,7 +308,7 @@ void renderWorld() {
 	}
 
 	// render all transparent cubes in pass 2
-	vertexPass2 = vertexIndex;
+	vertexPass1 = vertexIndex;
 	for (int z = 0; z < mainWorld.worldWidth; ++z) {
 		const unsigned int temp = z * mainWorld.worldLength * mainWorld.worldHeight; // stores this index number so it doesn't have to be recomputed every time a cube is set
 		for (int x = 0; x < mainWorld.worldLength; ++x) {
@@ -460,7 +460,7 @@ void doDrawTick() {
 	glViewport(0, 0, windowWidth, windowHeight);
 
 	glEnable(GL_DEPTH_TEST);
-	glDepthFunc(GL_LESS);
+	glDepthFunc(GL_LEQUAL);
 	glEnable(GL_CULL_FACE);
 	glDepthMask(true);
 
@@ -471,13 +471,23 @@ void doDrawTick() {
 	glm::mat4 mvp = camera.getMatrix((float)windowWidth / (float)windowHeight);
 	glUniformMatrix4fv(matrix, 1, GL_FALSE, &mvp[0][0]);
 
+	glDisable(GL_BLEND);
+
 	glEnableVertexAttribArray(1);
 	glEnableVertexAttribArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
 	glVertexAttribPointer(0, 3, GL_DOUBLE, GL_FALSE, 0, NULL);
 	glBindBuffer(GL_ARRAY_BUFFER, colorbuffer);
 	glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 0, NULL);
-	glDrawArrays(GL_TRIANGLES, 0, vertexIndex / 3);
+	glDrawArrays(GL_TRIANGLES, 0, vertexPass1 / 3);
+
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+	glColorMask(false, false, false, false);
+	glDrawArrays(GL_TRIANGLES, vertexPass1 / 3, (vertexIndex - vertexPass1) / 3);
+	glColorMask(true, true, true, true);
+	glDrawArrays(GL_TRIANGLES, vertexPass1 / 3, (vertexIndex - vertexPass1) / 3);
 
 	if (worldIsDirty) {
 		reRenderWorld();
@@ -487,9 +497,6 @@ void doDrawTick() {
 
 	glDisable(GL_CULL_FACE);
 	glDepthMask(false);
-
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	if (!hideGUI) {
 
