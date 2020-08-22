@@ -82,9 +82,12 @@ If you are using CMake, you need to install these dependencies:
 
 Then make sure these are all installed, along with any other libraries and dependencies:
 
-    sudo apt install cmake clang pkg-config
-    sudo apt install python3-pip
-    sudo pip3 install conan
+    sudo apt install cmake clang pkg-config python3-pip
     sudo apt install xorg-dev libxcb-* libglew1.5 libglew1.5-dev libglu1-* libgl1-*
+    sudo pip3 install conan
 
-Then run build.sh. Note that you need to make sure to use a compiler that supports C++17 with <filesystem> (for gcc, that's version 8 and higher). You may also need to configure your conan profile to use the correct compiler version.
+Then run build.sh. Note that you need to make sure to use a compiler that supports C++17 with <filesystem> (for gcc, that's version 8 and higher). You may also need to configure your conan profile to use the correct compiler version. For example, if you have GCC 8 installed:
+
+    conan profile new --detect gcc8
+    conan profile update settings.compiler=gcc gcc8
+    conan profile update settings.compiler.version=8 gcc8
