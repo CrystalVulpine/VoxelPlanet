@@ -21,6 +21,7 @@ public:
 	unsigned int* __restrict__ cubes;
 
 	bool isNewWorld;
+	bool isSaving;
 
 
 	/** Starts the world, with the specified size if it is generating a new one. **/

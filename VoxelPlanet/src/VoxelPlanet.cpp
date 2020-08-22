@@ -140,6 +140,7 @@ int main(int argc, char *argv[]) {
 
 			} else {
 				glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+				mainWorld.saveWorld();
 			}
 
 			escPressed = true;
