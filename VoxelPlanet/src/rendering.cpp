@@ -26,6 +26,7 @@ unsigned int vertexIndex = 0;
 double colorTriangleX = 0.0;
 double colorTriangleY = 0.0;
 double colorBarPos = 0.0;
+double colorAlphaPos = 0.0;
 
 unsigned int guiVertexCount;
 
@@ -84,33 +85,33 @@ double crosshairs[] = {
 };
 
 float crosshairColor[] = {
-		1.0f, 1.0f, 1.0f,
-		1.0f, 1.0f, 1.0f,
-		1.0f, 1.0f, 1.0f,
-		1.0f, 1.0f, 1.0f,
-		1.0f, 1.0f, 1.0f,
-		1.0f, 1.0f, 1.0f,
+		1.0f, 1.0f, 1.0f, 1.0f,
+		1.0f, 1.0f, 1.0f, 1.0f,
+		1.0f, 1.0f, 1.0f, 1.0f,
+		1.0f, 1.0f, 1.0f, 1.0f,
+		1.0f, 1.0f, 1.0f, 1.0f,
+		1.0f, 1.0f, 1.0f, 1.0f,
 
-		1.0f, 1.0f, 1.0f,
-		1.0f, 1.0f, 1.0f,
-		1.0f, 1.0f, 1.0f,
-		1.0f, 1.0f, 1.0f,
-		1.0f, 1.0f, 1.0f,
-		1.0f, 1.0f, 1.0f,
+		1.0f, 1.0f, 1.0f, 1.0f,
+		1.0f, 1.0f, 1.0f, 1.0f,
+		1.0f, 1.0f, 1.0f, 1.0f,
+		1.0f, 1.0f, 1.0f, 1.0f,
+		1.0f, 1.0f, 1.0f, 1.0f,
+		1.0f, 1.0f, 1.0f, 1.0f,
 
-		0.0f, 0.0f, 0.0f,
-		0.0f, 0.0f, 0.0f,
-		0.0f, 0.0f, 0.0f,
-		0.0f, 0.0f, 0.0f,
-		0.0f, 0.0f, 0.0f,
-		0.0f, 0.0f, 0.0f,
+		0.0f, 0.0f, 0.0f, 1.0f,
+		0.0f, 0.0f, 0.0f, 1.0f,
+		0.0f, 0.0f, 0.0f, 1.0f,
+		0.0f, 0.0f, 0.0f, 1.0f,
+		0.0f, 0.0f, 0.0f, 1.0f,
+		0.0f, 0.0f, 0.0f, 1.0f,
 
-		0.0f, 0.0f, 0.0f,
-		0.0f, 0.0f, 0.0f,
-		0.0f, 0.0f, 0.0f,
-		0.0f, 0.0f, 0.0f,
-		0.0f, 0.0f, 0.0f,
-		0.0f, 0.0f, 0.0f,
+		0.0f, 0.0f, 0.0f, 1.0f,
+		0.0f, 0.0f, 0.0f, 1.0f,
+		0.0f, 0.0f, 0.0f, 1.0f,
+		0.0f, 0.0f, 0.0f, 1.0f,
+		0.0f, 0.0f, 0.0f, 1.0f,
+		0.0f, 0.0f, 0.0f, 1.0f,
 };
 
 GLuint program;
@@ -147,12 +148,12 @@ void renderCube(int x, int y, int z, unsigned int cube) {
 
 	// attempts to speed through the surrounding cube check by going through memory as contiguously as possible. cubePointer is the cube's memory location.
 	unsigned int* __restrict__ cubePointer = mainWorld.getCubePointer(x, y, z);
-	bool renderFrontFace = z <= 0 || cubePointer[-(mainWorld.worldLength * mainWorld.worldHeight)] == 0;
-	bool renderLeftFace = x <= 0 || cubePointer[-mainWorld.worldHeight] == 0;
-	bool renderBottomFace = y <= 0 || cubePointer[-1] == 0;
-	bool renderTopFace = y >= mainWorld.worldHeight - 1 || cubePointer[1] == 0;
-	bool renderRightFace = x >= mainWorld.worldLength - 1 || cubePointer[mainWorld.worldHeight] == 0;
-	bool renderBackFace = z >= mainWorld.worldWidth - 1 || cubePointer[mainWorld.worldLength * mainWorld.worldHeight] == 0;
+	bool renderFrontFace = z <= 0 || (cubePointer[-(mainWorld.worldLength * mainWorld.worldHeight)] & 0xff) < 255;
+	bool renderLeftFace = x <= 0 || (cubePointer[-mainWorld.worldHeight] & 0xff) < 255;
+	bool renderBottomFace = y <= 0 || (cubePointer[-1] & 0xff) < 255;
+	bool renderTopFace = y >= mainWorld.worldHeight - 1 || (cubePointer[1] & 0xff) < 255;
+	bool renderRightFace = x >= mainWorld.worldLength - 1 || (cubePointer[mainWorld.worldHeight] & 0xff) < 255;
+	bool renderBackFace = z >= mainWorld.worldWidth - 1 || (cubePointer[mainWorld.worldLength * mainWorld.worldHeight] & 0xff) < 255;
 
 	if (renderTopFace) {
 		vertices[vertexCount + 0] = (double)x + 1.0; vertices[vertexCount + 1] = (double)y + 1.0; vertices[vertexCount + 2] = (double)z + 1.0;
@@ -212,70 +213,109 @@ void renderCube(int x, int y, int z, unsigned int cube) {
 	glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
 	glBufferSubData(GL_ARRAY_BUFFER, vertexIndex * sizeof(vertices[0]), sizeof(vertices[0]) * vertexCount, vertices);
 
-	GLfloat colors[6 * 2 * 3 * 3];
+	GLfloat colors[6 * 2 * 3 * 4];
 
 	int vertexCount2 = 0;
 	if (renderTopFace) {
-		for (unsigned int i = 0; i < 18; ++i) {
-			colors[vertexCount2 + i] = 1.0;
+		for (unsigned int i = 0; i < 24; i += 4) {
+			colors[vertexCount2 + i + 0] = 1.0;
+			colors[vertexCount2 + i + 1] = 1.0;
+			colors[vertexCount2 + i + 2] = 1.0;
+			colors[vertexCount2 + i + 3] = 1.0;
 		}
-		vertexCount2 += 18;
+		vertexCount2 += 24;
 	}
 	if (renderFrontFace) {
-		for (unsigned int i = 0; i < 18; ++i) {
-			colors[vertexCount2 + i] = 0.8;
+		for (unsigned int i = 0; i < 24; i += 4) {
+			colors[vertexCount2 + i + 0] = 0.8;
+			colors[vertexCount2 + i + 1] = 0.8;
+			colors[vertexCount2 + i + 2] = 0.8;
+			colors[vertexCount2 + i + 3] = 1.0;
 		}
-		vertexCount2 += 18;
+		vertexCount2 += 24;
 	}
 	if (renderLeftFace) {
-		for (unsigned int i = 0; i < 18; ++i) {
-			colors[vertexCount2 + i] = 0.6;
+		for (unsigned int i = 0; i < 24; i += 4) {
+			colors[vertexCount2 + i + 0] = 0.6;
+			colors[vertexCount2 + i + 1] = 0.6;
+			colors[vertexCount2 + i + 2] = 0.6;
+			colors[vertexCount2 + i + 3] = 1.0;
 		}
-		vertexCount2 += 18;
+		vertexCount2 += 24;
 	}
 	if (renderBackFace) {
-		for (unsigned int i = 0; i < 18; ++i) {
-			colors[vertexCount2 + i] = 0.8;
+		for (unsigned int i = 0; i < 24; i += 4) {
+			colors[vertexCount2 + i + 0] = 0.8;
+			colors[vertexCount2 + i + 1] = 0.8;
+			colors[vertexCount2 + i + 2] = 0.8;
+			colors[vertexCount2 + i + 3] = 1.0;
 		}
-		vertexCount2 += 18;
+		vertexCount2 += 24;
 	}
 	if (renderRightFace) {
-		for (unsigned int i = 0; i < 18; ++i) {
-			colors[vertexCount2 + i] = 0.6;
+		for (unsigned int i = 0; i < 24; i += 4) {
+			colors[vertexCount2 + i + 0] = 0.6;
+			colors[vertexCount2 + i + 1] = 0.6;
+			colors[vertexCount2 + i + 2] = 0.6;
+			colors[vertexCount2 + i + 3] = 1.0;
 		}
-		vertexCount2 += 18;
+		vertexCount2 += 24;
 	}
 	if (renderBottomFace) {
-		for (unsigned int i = 0; i < 18; ++i) {
-			colors[vertexCount2 + i] = 0.5;
+		for (unsigned int i = 0; i < 24; i += 4) {
+			colors[vertexCount2 + i + 0] = 0.5;
+			colors[vertexCount2 + i + 1] = 0.5;
+			colors[vertexCount2 + i + 2] = 0.5;
+			colors[vertexCount2 + i + 3] = 1.0;
 		}
-		vertexCount2 += 18;
+		vertexCount2 += 24;
 	}
 
-	float red = (float)(cube >> 24) / 255.0F;
-	float green = (float)((cube >> 16) & 255) / 255.0F;
-	float blue = (float)((cube >> 8) & 255) / 255.0F;
+	float red = (float)(cube >> 24) / 255.0f;
+	float green = (float)((cube >> 16) & 255) / 255.0f;
+	float blue = (float)((cube >> 8) & 255) / 255.0f;
+	float alpha = (float)(cube & 255) / 255.0f;
 
-	for (unsigned int i = 0; i < sizeof(colors) / sizeof(colors[0]); i += 3) {
+	for (unsigned int i = 0; i < sizeof(colors) / sizeof(colors[0]); i += 4) {
 		colors[i + 0] *= red * worldBrightness;
 		colors[i + 1] *= green * worldBrightness;
 		colors[i + 2] *= blue * worldBrightness;
+		colors[i + 3] *= alpha;
 	}
 
 	glBindBuffer(GL_ARRAY_BUFFER, colorbuffer);
-	glBufferSubData(GL_ARRAY_BUFFER, vertexIndex * sizeof(colors[0]), sizeof(colors[0]) * vertexCount2, colors);
+	glBufferSubData(GL_ARRAY_BUFFER, (vertexIndex / 3) * 4 * sizeof(colors[0]), sizeof(colors[0]) * vertexCount2, colors);
 
-	vertexIndex += vertexCount2;
+	vertexIndex += vertexCount;
 }
 
+unsigned int vertexPass2 = 0;
+
 void renderWorld() {
+
+	// render all solid cubes in pass 1
 	for (int z = 0; z < mainWorld.worldWidth; ++z) {
 		const unsigned int temp = z * mainWorld.worldLength * mainWorld.worldHeight; // stores this index number so it doesn't have to be recomputed every time a cube is set
 		for (int x = 0; x < mainWorld.worldLength; ++x) {
 			const unsigned int temp1 = temp + (x * mainWorld.worldHeight);
 			for (int y = 0; y < mainWorld.worldHeight; ++y) {
 				const unsigned int cube = mainWorld.cubes[temp1 + y];
-				if (cube) {
+				if (cube && (cube & 0xff) == 255) {
+					renderCube(x, y, z, cube);
+				}
+			}
+		}
+	}
+
+	// render all transparent cubes in pass 2
+	vertexPass2 = vertexIndex;
+	for (int z = 0; z < mainWorld.worldWidth; ++z) {
+		const unsigned int temp = z * mainWorld.worldLength * mainWorld.worldHeight; // stores this index number so it doesn't have to be recomputed every time a cube is set
+		for (int x = 0; x < mainWorld.worldLength; ++x) {
+			const unsigned int temp1 = temp + (x * mainWorld.worldHeight);
+			for (int y = 0; y < mainWorld.worldHeight; ++y) {
+				const unsigned int cube = mainWorld.cubes[temp1 + y];
+				if (cube && (cube & 0xff) < 255) {
 					renderCube(x, y, z, cube);
 				}
 			}
@@ -358,8 +398,8 @@ int setupOpenGL() {
 	const GLchar *vertexShader = R"(
 	#version 330 core
 	layout(location = 0) in vec3 vertexPosition_modelspace;
-    layout(location = 1) in vec3 vertexColor;
-    out vec3 fragmentColor;
+    layout(location = 1) in vec4 vertexColor;
+    out vec4 fragmentColor;
   
     uniform mat4 MVP;
   
@@ -370,8 +410,8 @@ int setupOpenGL() {
 
 	const GLchar *fragmentShader = R"(
 	#version 330 core
-    out vec3 color;
-    in vec3 fragmentColor;
+    out vec4 color;
+    in vec4 fragmentColor;
     void main() {
         color = fragmentColor;
     })";
@@ -386,7 +426,7 @@ int setupOpenGL() {
 	glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
 	glBufferData(GL_ARRAY_BUFFER, ((mainWorld.worldLength * mainWorld.worldWidth * mainWorld.worldHeight) * 6 * 2 * 3 * 3) * sizeof(double), NULL, GL_STATIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, colorbuffer);
-	glBufferData(GL_ARRAY_BUFFER, ((mainWorld.worldLength * mainWorld.worldWidth * mainWorld.worldHeight) * 6 * 2 * 3 * 3) * sizeof(float), NULL, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, ((mainWorld.worldLength * mainWorld.worldWidth * mainWorld.worldHeight) * 6 * 2 * 3 * 4) * sizeof(float), NULL, GL_STATIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, guiVertexBuffer);
 	glBufferData(GL_ARRAY_BUFFER, 1000 * sizeof(double), NULL, GL_STATIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, guiColorBuffer);
@@ -396,7 +436,7 @@ int setupOpenGL() {
 
 	camera.initCamera((float)mainWorld.worldLength / 2.0f, 17.6f, (float)mainWorld.worldWidth / 2.0f, 0.0f, 0.0f);
 
-	glClearColor(skyColorRed, skyColorGreen, skyColorBlue, 0.0f);
+	glClearColor(skyColorRed, skyColorGreen, skyColorBlue, 1.0f);
 
 	renderWorld();
 
@@ -409,8 +449,8 @@ void renderToGUI(unsigned int count, double vertices[], float colors[]) {
 	glBufferSubData(GL_ARRAY_BUFFER, guiVertexCount * 3 * sizeof(double), count * 3 * sizeof(double), vertices);
 	glVertexAttribPointer(0, 3, GL_DOUBLE, GL_FALSE, 0, NULL);
 	glBindBuffer(GL_ARRAY_BUFFER, guiColorBuffer);
-	glBufferSubData(GL_ARRAY_BUFFER, guiVertexCount * 3 * sizeof(float), count * 3 * sizeof(float), colors);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, NULL);
+	glBufferSubData(GL_ARRAY_BUFFER, guiVertexCount * 4 * sizeof(float), count * 4 * sizeof(float), colors);
+	glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 0, NULL);
 	glDrawArrays(GL_TRIANGLES, guiVertexCount, count);
 
 	guiVertexCount += count;
@@ -419,11 +459,12 @@ void renderToGUI(unsigned int count, double vertices[], float colors[]) {
 void doDrawTick() {
 	glViewport(0, 0, windowWidth, windowHeight);
 
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LESS);
 	glEnable(GL_CULL_FACE);
+	glDepthMask(true);
+
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	glUseProgram(program);
 
@@ -435,15 +476,20 @@ void doDrawTick() {
 	glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
 	glVertexAttribPointer(0, 3, GL_DOUBLE, GL_FALSE, 0, NULL);
 	glBindBuffer(GL_ARRAY_BUFFER, colorbuffer);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, NULL);
+	glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 0, NULL);
 	glDrawArrays(GL_TRIANGLES, 0, vertexIndex / 3);
-
 
 	if (worldIsDirty) {
 		reRenderWorld();
 		worldIsDirty = false;
 	}
 
+
+	glDisable(GL_CULL_FACE);
+	glDepthMask(false);
+
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	if (!hideGUI) {
 
@@ -461,36 +507,36 @@ void doDrawTick() {
 
 		glEnableVertexAttribArray(1);
 
-		glDisable(GL_CULL_FACE);
 
 		glm::mat4 model = glm::mat4(1.0f);
 		mvp = glm::ortho<float>(-((float)windowWidth / (float)windowHeight), (float)windowWidth / (float)windowHeight, -1.0f, 1.0f, -1.0f, 1.0f) * glm::rotate(model, 0.5f, glm::vec3(1.0, 0.0, 0.0)) * glm::translate(model, glm::vec3(((double)windowWidth / (double)windowHeight) - 0.2, 0.9, 0.0)) * glm::rotate(model, 0.785398f, glm::vec3(0.0, 1.0, 0.0));
 		glUniformMatrix4fv(matrix, 1, GL_FALSE, &mvp[0][0]);
 
-		float red = (float)(usingCube >> 24) / 255.0F;
-		float green = (float)((usingCube >> 16) & 255) / 255.0F;
-		float blue = (float)((usingCube >> 8) & 255) / 255.0F;
+		float red = (float)(usingCube >> 24) / 255.0f;
+		float green = (float)((usingCube >> 16) & 255) / 255.0f;
+		float blue = (float)((usingCube >> 8) & 255) / 255.0f;
+		float alpha = (float)(usingCube & 255) / 255.0f;
 		float usingCubeColor[] = {
-				red * 0.8f, green * 0.8f, blue * 0.8f,
-				red * 0.8f, green * 0.8f, blue * 0.8f,
-				red * 0.8f, green * 0.8f, blue * 0.8f,
-				red * 0.8f, green * 0.8f, blue * 0.8f,
-				red * 0.8f, green * 0.8f, blue * 0.8f,
-				red * 0.8f, green * 0.8f, blue * 0.8f,
+				red * 0.8f, green * 0.8f, blue * 0.8f, alpha,
+				red * 0.8f, green * 0.8f, blue * 0.8f, alpha,
+				red * 0.8f, green * 0.8f, blue * 0.8f, alpha,
+				red * 0.8f, green * 0.8f, blue * 0.8f, alpha,
+				red * 0.8f, green * 0.8f, blue * 0.8f, alpha,
+				red * 0.8f, green * 0.8f, blue * 0.8f, alpha,
 
-				red * 0.6f, green * 0.6f, blue * 0.6f,
-				red * 0.6f, green * 0.6f, blue * 0.6f,
-				red * 0.6f, green * 0.6f, blue * 0.6f,
-				red * 0.6f, green * 0.6f, blue * 0.6f,
-				red * 0.6f, green * 0.6f, blue * 0.6f,
-				red * 0.6f, green * 0.6f, blue * 0.6f,
+				red * 0.6f, green * 0.6f, blue * 0.6f, alpha,
+				red * 0.6f, green * 0.6f, blue * 0.6f, alpha,
+				red * 0.6f, green * 0.6f, blue * 0.6f, alpha,
+				red * 0.6f, green * 0.6f, blue * 0.6f, alpha,
+				red * 0.6f, green * 0.6f, blue * 0.6f, alpha,
+				red * 0.6f, green * 0.6f, blue * 0.6f, alpha,
 
-				red, green, blue,
-				red, green, blue,
-				red, green, blue,
-				red, green, blue,
-				red, green, blue,
-				red, green, blue,
+				red, green, blue, alpha,
+				red, green, blue, alpha,
+				red, green, blue, alpha,
+				red, green, blue, alpha,
+				red, green, blue, alpha,
+				red, green, blue, alpha,
 		};
 
 		renderToGUI(18, usingCubeVertices, usingCubeColor);
@@ -503,6 +549,28 @@ void doDrawTick() {
 		glDisable(GL_DEPTH_TEST);
 
 		renderToGUI(sizeof(crosshairs) / sizeof(crosshairs[0]) / 3, crosshairs, crosshairColor);
+
+		if (gamePaused || openedScreen) {
+
+			// render darkened background
+			double background[] = {
+					-(double)windowWidth / (double)windowHeight, 1.0, 0.0,
+					(double)windowWidth / (double)windowHeight, 1.0, 0.0,
+					(double)windowWidth / (double)windowHeight, -1.0, 0.0,
+					(double)windowWidth / (double)windowHeight, -1.0, 0.0,
+					-(double)windowWidth / (double)windowHeight, -1.0, 0.0,
+					-(double)windowWidth / (double)windowHeight, 1.0, 0.0
+			};
+			float backgroundColor[] = {
+					0.5f, 0.5f, 0.5f, 0.5f,
+					0.5f, 0.5f, 0.5f, 0.5f,
+					0.5f, 0.5f, 0.5f, 0.5f,
+					0.5f, 0.5f, 0.5f, 0.5f,
+					0.5f, 0.5f, 0.5f, 0.5f,
+					0.5f, 0.5f, 0.5f, 0.5f,
+			};
+			renderToGUI(6, background, backgroundColor);
+		}
 
 		if (openedScreen == SCREEN_COLOR) {
 
@@ -566,6 +634,20 @@ void doDrawTick() {
 					colorBarPos + 0.01, -0.15, 0.0,
 					colorBarPos + 0.01, -0.35, 0.0,
 					colorBarPos - 0.01, -0.35, 0.0,
+
+					-0.8, -0.1, 0.0,
+					-0.8, 0.8, 0.0,
+					-0.7, 0.8, 0.0,
+					-0.7, 0.8, 0.0,
+					-0.7, -0.1, 0.0,
+					-0.8, -0.1, 0.0,
+
+					-0.85, colorAlphaPos - 0.01, 0.0,
+					-0.85, colorAlphaPos + 0.01, 0.0,
+					-0.65, colorAlphaPos + 0.01, 0.0,
+					-0.65, colorAlphaPos + 0.01, 0.0,
+					-0.65, colorAlphaPos - 0.01, 0.0,
+					-0.85, colorAlphaPos - 0.01, 0.0,
 			};
 
 			float colorBarRed;
@@ -604,69 +686,6 @@ void doDrawTick() {
 				colorBarBlue = 1.0f;
 			}
 
-			float triangleColor[] = {
-					0.0f, 0.0f, 0.0f,
-					colorBarRed, colorBarGreen, colorBarBlue,
-					1.0f, 1.0f, 1.0f,
-
-					1.0f, 0.0f, 0.0f,
-					1.0f, 0.0f, 0.0f,
-					1.0f, 1.0f, 0.0f,
-					1.0f, 1.0f, 0.0f,
-					1.0f, 1.0f, 0.0f,
-					1.0f, 0.0f, 0.0f,
-
-					1.0f, 1.0f, 0.0f,
-					1.0f, 1.0f, 0.0f,
-					0.0f, 1.0f, 0.0f,
-					0.0f, 1.0f, 0.0f,
-					0.0f, 1.0f, 0.0f,
-					1.0f, 1.0f, 0.0f,
-
-					0.0f, 1.0f, 0.0f,
-					0.0f, 1.0f, 0.0f,
-					0.0f, 1.0f, 1.0f,
-					0.0f, 1.0f, 1.0f,
-					0.0f, 1.0f, 1.0f,
-					0.0f, 1.0f, 0.0f,
-
-					0.0f, 1.0f, 1.0f,
-					0.0f, 1.0f, 1.0f,
-					0.0f, 0.0f, 1.0f,
-					0.0f, 0.0f, 1.0f,
-					0.0f, 0.0f, 1.0f,
-					0.0f, 1.0f, 1.0f,
-
-					0.0f, 0.0f, 1.0f,
-					0.0f, 0.0f, 1.0f,
-					1.0f, 0.0f, 1.0f,
-					1.0f, 0.0f, 1.0f,
-					1.0f, 0.0f, 1.0f,
-					0.0f, 0.0f, 1.0f,
-
-					1.0f, 0.0f, 1.0f,
-					1.0f, 0.0f, 1.0f,
-					1.0f, 0.0f, 0.0f,
-					1.0f, 0.0f, 0.0f,
-					1.0f, 0.0f, 0.0f,
-					1.0f, 0.0f, 1.0f,
-
-					0.0f, 0.0f, 0.0f,
-					0.0f, 0.0f, 0.0f,
-					0.0f, 0.0f, 0.0f,
-					0.0f, 0.0f, 0.0f,
-					0.0f, 0.0f, 0.0f,
-					0.0f, 0.0f, 0.0f,
-
-					0.0f, 0.0f, 0.0f,
-					0.0f, 0.0f, 0.0f,
-					0.0f, 0.0f, 0.0f,
-					0.0f, 0.0f, 0.0f,
-					0.0f, 0.0f, 0.0f,
-					0.0f, 0.0f, 0.0f,
-			};
-			renderToGUI(sizeof(triangle) / sizeof(triangle[0]) / 3, triangle, triangleColor);
-
 			float multiplierRed = ((colorTriangleY + 0.1) / 0.9) * colorBarRed;
 			multiplierRed += 0.5f * (1.0f - ((colorTriangleY + 0.1) / 0.9));
 			multiplierRed += (colorTriangleX / 1.2);
@@ -694,7 +713,84 @@ void doDrawTick() {
 				multiplierBlue = 0.0f;
 			}
 
-			usingCube = (unsigned char)(multiplierRed * 255.0f) << 24 | (unsigned char)(multiplierGreen * 255.0f) << 16 | (unsigned char)(multiplierBlue * 255.0f) << 8 | 0xff;
+			float triangleColor[] = {
+					0.0f, 0.0f, 0.0f, 1.0f,
+					colorBarRed, colorBarGreen, colorBarBlue, 1.0f,
+					1.0f, 1.0f, 1.0f, 1.0f,
+
+					1.0f, 0.0f, 0.0f, 1.0f,
+					1.0f, 0.0f, 0.0f, 1.0f,
+					1.0f, 1.0f, 0.0f, 1.0f,
+					1.0f, 1.0f, 0.0f, 1.0f,
+					1.0f, 1.0f, 0.0f, 1.0f,
+					1.0f, 0.0f, 0.0f, 1.0f,
+
+					1.0f, 1.0f, 0.0f, 1.0f,
+					1.0f, 1.0f, 0.0f, 1.0f,
+					0.0f, 1.0f, 0.0f, 1.0f,
+					0.0f, 1.0f, 0.0f, 1.0f,
+					0.0f, 1.0f, 0.0f, 1.0f,
+					1.0f, 1.0f, 0.0f, 1.0f,
+
+					0.0f, 1.0f, 0.0f, 1.0f,
+					0.0f, 1.0f, 0.0f, 1.0f,
+					0.0f, 1.0f, 1.0f, 1.0f,
+					0.0f, 1.0f, 1.0f, 1.0f,
+					0.0f, 1.0f, 1.0f, 1.0f,
+					0.0f, 1.0f, 0.0f, 1.0f,
+
+					0.0f, 1.0f, 1.0f, 1.0f,
+					0.0f, 1.0f, 1.0f, 1.0f,
+					0.0f, 0.0f, 1.0f, 1.0f,
+					0.0f, 0.0f, 1.0f, 1.0f,
+					0.0f, 0.0f, 1.0f, 1.0f,
+					0.0f, 1.0f, 1.0f, 1.0f,
+
+					0.0f, 0.0f, 1.0f, 1.0f,
+					0.0f, 0.0f, 1.0f, 1.0f,
+					1.0f, 0.0f, 1.0f, 1.0f,
+					1.0f, 0.0f, 1.0f, 1.0f,
+					1.0f, 0.0f, 1.0f, 1.0f,
+					0.0f, 0.0f, 1.0f, 1.0f,
+
+					1.0f, 0.0f, 1.0f, 1.0f,
+					1.0f, 0.0f, 1.0f, 1.0f,
+					1.0f, 0.0f, 0.0f, 1.0f,
+					1.0f, 0.0f, 0.0f, 1.0f,
+					1.0f, 0.0f, 0.0f, 1.0f,
+					1.0f, 0.0f, 1.0f, 1.0f,
+
+					0.0f, 0.0f, 0.0f, 1.0f,
+					0.0f, 0.0f, 0.0f, 1.0f,
+					0.0f, 0.0f, 0.0f, 1.0f,
+					0.0f, 0.0f, 0.0f, 1.0f,
+					0.0f, 0.0f, 0.0f, 1.0f,
+					0.0f, 0.0f, 0.0f, 1.0f,
+
+					0.0f, 0.0f, 0.0f, 1.0f,
+					0.0f, 0.0f, 0.0f, 1.0f,
+					0.0f, 0.0f, 0.0f, 1.0f,
+					0.0f, 0.0f, 0.0f, 1.0f,
+					0.0f, 0.0f, 0.0f, 1.0f,
+					0.0f, 0.0f, 0.0f, 1.0f,
+
+					multiplierRed, multiplierGreen, multiplierBlue, 0.0f,
+					multiplierRed, multiplierGreen, multiplierBlue, 1.0f,
+					multiplierRed, multiplierGreen, multiplierBlue, 1.0f,
+					multiplierRed, multiplierGreen, multiplierBlue, 1.0f,
+					multiplierRed, multiplierGreen, multiplierBlue, 0.0f,
+					multiplierRed, multiplierGreen, multiplierBlue, 0.0f,
+
+					0.0f, 0.0f, 0.0f, 1.0f,
+					0.0f, 0.0f, 0.0f, 1.0f,
+					0.0f, 0.0f, 0.0f, 1.0f,
+					0.0f, 0.0f, 0.0f, 1.0f,
+					0.0f, 0.0f, 0.0f, 1.0f,
+					0.0f, 0.0f, 0.0f, 1.0f,
+			};
+			renderToGUI(sizeof(triangle) / sizeof(triangle[0]) / 3, triangle, triangleColor);
+
+			usingCube = (unsigned char)(multiplierRed * 255.0f) << 24 | (unsigned char)(multiplierGreen * 255.0f) << 16 | (unsigned char)(multiplierBlue * 255.0f) << 8 | (unsigned char)(((colorAlphaPos + 0.1f) / 0.9f) * 255.0f);
 		}
 
 		mods_onRenderTick();

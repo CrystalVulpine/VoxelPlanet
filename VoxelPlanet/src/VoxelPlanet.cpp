@@ -118,6 +118,7 @@ int main(int argc, char *argv[]) {
 	bool cPressed = false;
 
 	bool colorBarActive = false;
+	bool colorAlphaBarActive = false;
 	bool colorTriangleActive = false;
 
 	while (glfwWindowShouldClose(window) == 0 && gameRunning) {
@@ -272,7 +273,7 @@ int main(int argc, char *argv[]) {
 					double mouseY2 = -(mouseY / (double)windowHeight) * 2.0 + 1.0;
 
 					double maxX = (1.0 - ((mouseY2 + 0.1) / 0.9)) * 0.6;
-					if (colorTriangleActive || (!colorBarActive && mouseY2 <= 0.8 && mouseY2 >= -0.1 && std::abs(mouseX2) < maxX)) {
+					if (colorTriangleActive || ((!colorBarActive && !colorAlphaBarActive) && mouseY2 <= 0.8 && mouseY2 >= -0.1 && std::abs(mouseX2) < maxX)) {
 
 						colorTriangleActive = true;
 
@@ -293,7 +294,8 @@ int main(int argc, char *argv[]) {
 
 						colorTriangleX = mouseX2;
 						colorTriangleY = mouseY2;
-					} else if (colorBarActive || (!colorTriangleActive && mouseY2 >= -0.35 && mouseY2 <= -0.15 && std::abs(mouseX2) < 0.6)) {
+
+					} else if (colorBarActive || ((!colorTriangleActive && !colorAlphaBarActive) && mouseY2 >= -0.35 && mouseY2 <= -0.15 && std::abs(mouseX2) < 0.6)) {
 
 						colorBarActive = true;
 
@@ -304,10 +306,24 @@ int main(int argc, char *argv[]) {
 						}
 
 						colorBarPos = mouseX2;
+
+					} else if (colorAlphaBarActive || ((!colorTriangleActive && !colorBarActive) && mouseY2 <= 0.8 && mouseY2 >= -0.1 && mouseX2 >= -0.8 && mouseX2 <= -0.7)) {
+
+						colorAlphaBarActive = true;
+
+						if (mouseY2 > 0.8) {
+							mouseY2 = 0.8;
+						} else if (mouseY2 < -0.1) {
+							mouseY2 = -0.1;
+						}
+
+						colorAlphaPos = mouseY2;
+
 					}
 				} else {
 					colorTriangleActive = false;
 					colorBarActive = false;
+					colorAlphaBarActive = false;
 				}
 			}
 		}

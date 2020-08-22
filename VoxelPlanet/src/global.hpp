@@ -21,6 +21,7 @@ extern bool worldIsDirty;
 extern double colorTriangleX;
 extern double colorTriangleY;
 extern double colorBarPos;
+extern double colorAlphaPos;
 
 /** id of the screen that is currently open. 0 if none. **/
 extern unsigned int openedScreen;
