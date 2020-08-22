@@ -2,7 +2,7 @@
 
 #include "World.hpp"
 
-#include <filesystem>
+#include <experimental/filesystem>
 
 extern World mainWorld;
 extern bool debugMode;
@@ -26,7 +26,7 @@ extern double colorBarPos;
 /** id of the screen that is currently open. 0 if none. **/
 extern unsigned int openedScreen;
 
-namespace fs = std::filesystem;
+namespace fs = std::experimental::filesystem;
 
 #ifdef __cplusplus
 extern "C" {
