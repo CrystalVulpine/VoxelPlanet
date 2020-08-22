@@ -18,7 +18,7 @@ extern void mods_processGameArgs(int argc, char *argv[]);
 #if defined(__linux__) || defined(__APPLE__)
 
 void loadModsUnix();
-#define loadMods loadModsUnix
+#define loadMods() loadModsUnix()
 
 #else
 
