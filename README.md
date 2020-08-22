@@ -50,7 +50,7 @@ VoxelPlanet is modular and has various programmatic functions, such as a mod/plu
 
 - [ ] Possible Android app (I've never made apps before, so I have no idea how to go about doing this, but it would be very cool)
 
-- [ ] CMake build scripts
+- [x] CMake build scripts
 
 - [ ] Smoother in-game camera and solid rendering
 
@@ -58,9 +58,33 @@ VoxelPlanet is modular and has various programmatic functions, such as a mod/plu
 
 VoxelPlanet is designed to be mostly platform independent, and should be compilable on most OSes provided that the code works with your compiler (it is designed for gcc with C++17) and that it supports the required libraries and dependencies. However, the eclipse project, if you decide to use it, may require some changes as per your specific system.
 
+### Requirements
+
+For Linux and macOS, you will need to install:
+
+- A C++17 compiler
+
+\*If you are using gcc, make sure you are using version 8 or higher.
+
 ### Libraries and Dependencies:
 
 * OpenGL
 * GLEW
 * GLFW
 * GLM (GL Math)
+
+### CMake:
+
+If you are using CMake, you need to install these dependencies:
+
+- [CMake](https://cmake.org/download/)
+- [Conan](https://conan.io/downloads.html)
+
+Then make sure these are all installed, along with any other libraries and dependencies:
+
+    sudo apt install cmake clang pkg-config
+    sudo apt install python3-pip
+    sudo pip3 install conan
+    sudo apt install xorg-dev libxcb-* libglew1.5 libglew1.5-dev libglu1-* libgl1-*
+
+Then run build.sh. Note that you need to make sure to use a compiler that supports C++17 with <filesystem> (for gcc, that's version 8 and higher). You may also need to configure your conan profile to use the correct compiler version.

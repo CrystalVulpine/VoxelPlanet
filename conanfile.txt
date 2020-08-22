@@ -1,0 +1,8 @@
+[requires]
+opengl/system
+glew/2.1.0
+glfw/3.3.2
+glm/0.9.9.8
+
+[generators]
+cmake
