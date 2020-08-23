@@ -1,6 +1,7 @@
 #include <math.h>
 #include <glm/gtc/matrix_transform.hpp>
 #include "Camera.hpp"
+#include "global.hpp"
 
 Camera::Camera() {
 

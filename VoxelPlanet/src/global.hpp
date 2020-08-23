@@ -3,6 +3,10 @@
 #include "World.hpp"
 #include <filesystem>
 
+#ifndef M_PI
+    #define M_PI 3.14159265358979323846
+#endif
+
 extern World mainWorld;
 extern bool debugMode;
 extern bool hideGUI;

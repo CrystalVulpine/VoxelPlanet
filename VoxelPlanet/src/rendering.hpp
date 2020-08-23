@@ -1,8 +1,13 @@
 #pragma once
 
+#ifdef _WIN32
+#include <windef.h>
+#endif
 #include <stdio.h>
 #include <stdlib.h>
 #include <GL/glew.h>
+#include <GL/gl.h>
+#include <GL/glu.h>
 #include <GLFW/glfw3.h>
 #include <glm/gtc/matrix_transform.hpp>
 #include "Camera.hpp"

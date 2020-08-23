@@ -1,9 +1,9 @@
 #include <fstream>
 #include <iostream>
-#include <dlfcn.h>
 #include <vector>
 #include <functional>
 #include <cstring>
+#include <dlfcn.h>
 #include "global.hpp"
 #include "mods.hpp"
 
@@ -71,14 +71,13 @@ void mods_processGameArgs(int argc, char *argv[]) {
 	}
 }
 
-#if defined(__linux__) || defined(__APPLE__)
 
-void loadModsUnix()
+void loadMods()
 {
-#if defined(__linux__)
-    std::string path("mods/");
-#elif defined(__APPLE__)
-	std::string path("../lib");
+#if defined(__APPLE__)
+    std::string path("../mods");
+#else
+	std::string path("mods/");
 #endif
 
     // there are no mods, so don't try to load any
@@ -182,5 +181,3 @@ void loadModsUnix()
         }
     }
 }
-
-#endif
