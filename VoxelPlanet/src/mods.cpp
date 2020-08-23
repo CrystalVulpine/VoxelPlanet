@@ -77,11 +77,7 @@ void mods_processGameArgs(int argc, char *argv[]) {
 
 void loadMods()
 {
-#if defined(__APPLE__)
-    std::string path("../mods");
-#else
 	std::string path("mods/");
-#endif
 
     // there are no mods, so don't try to load any
     if (!fs::is_directory(path)) {
