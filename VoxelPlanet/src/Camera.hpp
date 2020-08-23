@@ -1,5 +1,7 @@
 #pragma once
 
+#include <glm/glm.hpp>
+
 class Camera {
 public:
 	float xPos;
@@ -27,6 +29,4 @@ public:
 
 	/** Specify the position and rotation to start the camera at **/
 	void initCamera(float x, float y, float z, float rotationYaw, float rotationPitch);
-
-	Camera();
 };

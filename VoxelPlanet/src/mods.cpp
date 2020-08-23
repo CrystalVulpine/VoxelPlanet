@@ -1,11 +1,15 @@
+#include "mods.hpp"
+
+#include <dlfcn.h>
+
+#include <filesystem>
 #include <fstream>
 #include <iostream>
 #include <vector>
 #include <functional>
 #include <cstring>
-#include <dlfcn.h>
-#include "global.hpp"
-#include "mods.hpp"
+
+namespace fs = std::filesystem;
 
 std::vector<void (*)()> mod_testFunc;
 std::vector<void (*)()> mod_onRenderTick;
@@ -71,14 +75,9 @@ void mods_processGameArgs(int argc, char *argv[]) {
 	}
 }
 
-
 void loadMods()
 {
-#if defined(__APPLE__)
-    std::string path("../mods");
-#else
 	std::string path("mods/");
-#endif
 
     // there are no mods, so don't try to load any
     if (!fs::is_directory(path)) {

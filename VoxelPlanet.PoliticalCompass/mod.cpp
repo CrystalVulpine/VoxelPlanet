@@ -1,6 +1,4 @@
-#include <stdio.h>
 #include "global.hpp"
-
 
 void generateCompass() {
 
@@ -64,7 +62,6 @@ const char* getModDescription() {
 void onWorldLoad() {
 	generateCompass();
 }
-
 
 #ifdef __cplusplus
 }

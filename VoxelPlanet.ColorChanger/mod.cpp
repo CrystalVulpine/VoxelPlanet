@@ -1,4 +1,3 @@
-#include <stdio.h>
 #include "global.hpp"
 
 Clock lastReRender;

@@ -10,16 +10,12 @@ target_compile_features(voxelplanet PRIVATE cxx_std_17)
 target_compile_options(voxelplanet PRIVATE -Wall -Wextra -pedantic)
 
 if (UNIX AND NOT APPLE)
-  target_link_libraries(voxelplanet
-    stdc++fs
-    CONAN_PKG::opengl
-    CONAN_PKG::glew
-    CONAN_PKG::glfw
-    CONAN_PKG::glm)
-else()
-  target_link_libraries(voxelplanet
-    CONAN_PKG::opengl
-    CONAN_PKG::glew
-    CONAN_PKG::glfw
-    CONAN_PKG::glm)
+  set(ADDITIONAL_LINK_LIBRARIES stdc++fs)
 endif()
+
+target_link_libraries(voxelplanet
+  ${ADDITIONAL_LINK_LIBRARIES}
+  CONAN_PKG::opengl
+  CONAN_PKG::glew
+  CONAN_PKG::glfw
+  CONAN_PKG::glm)

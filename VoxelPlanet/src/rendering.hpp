@@ -1,20 +1,13 @@
 #pragma once
 
+#include "Camera.hpp"
+
+#include <GL/glew.h>
+#include <GLFW/glfw3.h>
+
 #ifdef _WIN32
 #include <windef.h>
 #endif
-#include <stdio.h>
-#include <stdlib.h>
-#include <GL/glew.h>
-#include <GL/gl.h>
-#include <GL/glu.h>
-#include <GLFW/glfw3.h>
-#include <glm/gtc/matrix_transform.hpp>
-#include "Camera.hpp"
-#include "World.hpp"
-#include "global.hpp"
-#include "mods.hpp"
-
 
 extern GLFWwindow* window;
 extern int windowWidth;
@@ -29,7 +22,6 @@ extern float skyColorBlue;
 extern Camera camera;
 
 extern bool worldIsDirty;
-
 
 extern GLuint loadShaders(GLchar const * vertexShaderCode, GLchar const * fragmentShaderCode);
 extern void renderCube(int x, int y, int z, unsigned int cube);

@@ -1,13 +1,13 @@
-#include <stdlib.h>
-#include <stdio.h>
-#include <iostream>
-#include <fstream>
-#include <cstring>
-#include <sys/stat.h>
 #include "World.hpp"
+
 #include "global.hpp"
 #include "mods.hpp"
-#include <glm/gtc/matrix_transform.hpp>
+
+#include <iostream>
+#include <fstream>
+#include <cstdlib>
+#include <cstring>
+#include <sys/stat.h>
 
 World::World() {
 
@@ -16,7 +16,6 @@ World::World() {
 	levelDatPath = NULL;
 	isSaving = false;
 }
-
 
 void World::startWorld(const int length, const int width, const int height) {
 

@@ -1,7 +1,6 @@
 #pragma once
 
 #include "World.hpp"
-#include <filesystem>
 
 #ifndef M_PI
     #define M_PI 3.14159265358979323846
@@ -30,8 +29,6 @@ extern double colorAlphaPos;
 
 /** id of the screen that is currently open. 0 if none. **/
 extern unsigned int openedScreen;
-
-namespace fs = std::filesystem;
 
 #ifdef __cplusplus
 extern "C" {
