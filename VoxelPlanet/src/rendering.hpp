@@ -5,6 +5,10 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
+#ifdef _WIN32
+#include <windef.h>
+#endif
+
 extern GLFWwindow* window;
 extern int windowWidth;
 extern int windowHeight;

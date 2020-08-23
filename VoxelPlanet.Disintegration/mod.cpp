@@ -17,7 +17,7 @@ void disintegrateBlocks() {
 	if (now - lastTime >= 1000) {
 
 		for (unsigned int i = 0; i < radius * radius; ++i) {
-			mainWorld.setCube(disintegrationX + (rand() % radius) - (rand() % radius), disintegrationY - (rand() % radius), disintegrationZ +  + (rand() % radius) - (rand() % radius), 0);
+			mainWorld.setCube(disintegrationX + (rand() % radius) - (rand() % radius), disintegrationY + (rand() % radius) - (rand() % radius), disintegrationZ +  + (rand() % radius) - (rand() % radius), 0);
 		}
 
 		++radius;
