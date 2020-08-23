@@ -1,10 +1,11 @@
 # VoxelPlanet
 
+![](https://i.imgur.com/CsTJFOc.png)
+
 VoxelPlanet is a sandbox made out of colored cubes. It is made using basic shaders in OpenGL 3.3. The intent is to provide an open world to create things, much in the same way you would draw a picture out of pixels, but in a 3-dimensional space. It also supports mods and has a simple mod/plugin API.
 
-![GitHub stable release](https://img.shields.io/github/v/release/CrystalVulpine/VoxelPlanet) ![GitHub prerelease](https://img.shields.io/github/v/release/CrystalVulpine/VoxelPlanet?include_prereleases) ![GitHub Download Count](https://img.shields.io/github/downloads/CrystalVulpine/VoxelPlanet/total) ![License](https://img.shields.io/github/license/CrystalVulpine/VoxelPlanet) ![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/CrystalVulpine/VoxelPlanet)
+![GitHub prerelease](https://img.shields.io/github/v/release/CrystalVulpine/VoxelPlanet?include_prereleases) ![GitHub Download Count](https://img.shields.io/github/downloads/CrystalVulpine/VoxelPlanet/total) ![License](https://img.shields.io/github/license/CrystalVulpine/VoxelPlanet) ![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/CrystalVulpine/VoxelPlanet)
 
-![](https://i.imgur.com/CsTJFOc.png)
 ![](https://i.imgur.com/fGVsUsE.png)
 
 ## Controls:
@@ -64,7 +65,7 @@ For Linux and macOS, you will need to install:
 
 - A C++17 compiler
 
-\*If you are using gcc, make sure you are using version 8 or higher.
+\*If you are using gcc, make sure you are using version 8 or higher, or VoxelPlanet will fail to compile.
 
 ### Libraries and Dependencies:
 
