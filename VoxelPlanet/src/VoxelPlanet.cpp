@@ -227,6 +227,7 @@ int main(int argc, char *argv[]) {
 					if (currentTimeMs() - clickClock > 200 && glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS) {
 						clickClock = currentTimeMs();
 
+						// calling glfwGetKey here is necessary since otherwise it won't queue the key state, which would cause the fill to activate after any Ctrl press, even if it were released before left clicking
 						glfwGetKey(window, GLFW_KEY_LEFT_CONTROL);
 						glfwGetKey(window, GLFW_KEY_RIGHT_CONTROL);
 						if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_CONTROL) == GLFW_PRESS) {

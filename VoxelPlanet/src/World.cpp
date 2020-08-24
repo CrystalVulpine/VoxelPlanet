@@ -307,12 +307,16 @@ void World::setSaveDir(const char* __restrict__ dir) {
 }
 
 void World::fillCubes(const unsigned int color, int x, int y, int z) {
-	const unsigned int indexX = ((z * worldLength * worldHeight) + x * worldHeight);
-	const unsigned int originalColor = cubes[indexX + y];
+	unsigned int* __restrict__ cubePointer = getCubePointer(x, y, z);
+	if (cubePointer == NULL) {
+		return;
+	}
+
+	const unsigned int originalColor = *cubePointer;
 	if (originalColor == color) {
 		return;
 	}
-	cubes[indexX + y] = color;
+	*cubePointer = color;
 
 	if (getCube(x, y, z + 1) == originalColor) {
 		fillCubes(color, x, y, z + 1);
