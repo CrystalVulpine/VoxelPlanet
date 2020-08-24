@@ -480,6 +480,11 @@ void doDrawTick() {
 
 	glDisable(GL_BLEND);
 
+	if (worldIsDirty) {
+		reRenderWorld();
+		worldIsDirty = false;
+	}
+
 	glEnableVertexAttribArray(1);
 	glEnableVertexAttribArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
@@ -493,18 +498,16 @@ void doDrawTick() {
 
 	if (fancyGraphics) {
 		glDisable(GL_CULL_FACE);
+		glDepthMask(true);
 		glColorMask(false, false, false, false);
 		glDrawArrays(GL_TRIANGLES, vertexPass1 / 3, (vertexIndex - vertexPass1) / 3);
+		glDepthMask(false);
 		glColorMask(true, true, true, true);
 		glDrawArrays(GL_TRIANGLES, vertexPass1 / 3, (vertexIndex - vertexPass1) / 3);
 	} else {
 		glDrawArrays(GL_TRIANGLES, vertexPass1 / 3, (vertexIndex - vertexPass1) / 3);
 	}
 
-	if (worldIsDirty) {
-		reRenderWorld();
-		worldIsDirty = false;
-	}
 
 	glEnable(GL_CULL_FACE);
 	glDepthMask(false);

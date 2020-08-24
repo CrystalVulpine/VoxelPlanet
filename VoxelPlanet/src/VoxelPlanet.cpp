@@ -227,10 +227,17 @@ int main(int argc, char *argv[]) {
 					if (currentTimeMs() - clickClock > 200 && glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS) {
 						clickClock = currentTimeMs();
 
-						unsigned int * __restrict__ cube = mainWorld.getCubePointer((int)std::floor(raySelection.lastPos.x), (int)std::floor(raySelection.lastPos.y), (int)std::floor(raySelection.lastPos.z));
-						if (cube != NULL && *cube == 0) {
-							*cube = usingCube;
+						glfwGetKey(window, GLFW_KEY_LEFT_CONTROL);
+						glfwGetKey(window, GLFW_KEY_RIGHT_CONTROL);
+						if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_CONTROL) == GLFW_PRESS) {
+							mainWorld.fillCubes(usingCube, x, y, z);
 							worldIsDirty = true;
+						} else {
+							unsigned int * __restrict__ cube = mainWorld.getCubePointer((int)std::floor(raySelection.lastPos.x), (int)std::floor(raySelection.lastPos.y), (int)std::floor(raySelection.lastPos.z));
+							if (cube != NULL && *cube == 0) {
+								*cube = usingCube;
+								worldIsDirty = true;
+							}
 						}
 					}
 					if (currentTimeMs() - clickClock > 200 && glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) {

@@ -305,3 +305,31 @@ void World::setSaveDir(const char* __restrict__ dir) {
 	strcpy(levelDatPath, dir);
 	strcat(levelDatPath, "/level.dat");
 }
+
+void World::fillCubes(const unsigned int color, int x, int y, int z) {
+	const unsigned int indexX = ((z * worldLength * worldHeight) + x * worldHeight);
+	const unsigned int originalColor = cubes[indexX + y];
+	if (originalColor == color) {
+		return;
+	}
+	cubes[indexX + y] = color;
+
+	if (getCube(x, y, z + 1) == originalColor) {
+		fillCubes(color, x, y, z + 1);
+	}
+	if (getCube(x + 1, y, z) == originalColor) {
+		fillCubes(color, x + 1, y, z);
+	}
+	if (getCube(x, y + 1, z) == originalColor) {
+		fillCubes(color, x, y + 1, z);
+	}
+	if (getCube(x, y - 1, z) == originalColor) {
+		fillCubes(color, x, y - 1, z);
+	}
+	if (getCube(x - 1, y, z) == originalColor) {
+		fillCubes(color, x - 1, y, z);
+	}
+	if (getCube(x, y, z - 1) == originalColor) {
+		fillCubes(color, x, y, z - 1);
+	}
+}

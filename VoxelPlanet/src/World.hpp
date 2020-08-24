@@ -45,5 +45,8 @@ public:
 	/** specifies the folder in which to load/save level.dat and cubes.dat **/
 	void setSaveDir(const char* __restrict__ dir);
 
+	/** fills the cubes starting at the coords with the given color **/
+	void fillCubes(const unsigned int color, int x, int y, int z);
+
 	World();
 };
