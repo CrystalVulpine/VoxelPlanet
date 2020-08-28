@@ -20,6 +20,7 @@ VoxelPlanet is a sandbox made out of colored cubes. It is made using basic shade
 * Open cube color select screen: C
 * Close a screen: Esc
 * Ctrl+RClick: Fills cubes of one color to the selected one (like the fill tool on a paint app)
+* F2: Take screenshot
 
 ## Documentation
 

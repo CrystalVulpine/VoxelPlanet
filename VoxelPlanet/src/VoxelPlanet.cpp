@@ -94,9 +94,7 @@ int main(int argc, char *argv[]) {
 
 	int glErrorCode = setupOpenGL();
 
-	if (glErrorCode != 0) {
-		return glErrorCode;
-	}
+	if (glErrorCode != 0) return glErrorCode;
 
 	gameRunning = true;
 	camera.setBounds(0.0f, (float)mainWorld.worldLength, 0.0f, (float)mainWorld.worldWidth);
@@ -108,6 +106,7 @@ int main(int argc, char *argv[]) {
 	bool escPressed = false;
 	bool f1Pressed = false;
 	bool mMousePress = false;
+	bool f2Pressed = false;
 
 	Clock loopTime;
 	Clock lastLoopTime = currentTimeMs();
@@ -156,6 +155,19 @@ int main(int argc, char *argv[]) {
 			hideGUI = !hideGUI;
 		} else if (f1Pressed && glfwGetKey(window, GLFW_KEY_F1) != GLFW_PRESS) {
 			f1Pressed = false;
+		}
+
+		if (!f2Pressed && glfwGetKey(window, GLFW_KEY_F2) == GLFW_PRESS) {
+			f2Pressed = true;
+
+			char timeString[96] = "screenshots/";
+			time_t* __restrict__ rawtime;
+			time(rawtime);
+			strftime(&timeString[12], sizeof(char[80]),"%d-%m-%Y %H-%M-%S", localtime(rawtime));
+			strcat(timeString, ".png");
+			takeScreenshot(timeString, "screenshots/");
+		} else if (f2Pressed && glfwGetKey(window, GLFW_KEY_F2) != GLFW_PRESS) {
+			f2Pressed = false;
 		}
 
 

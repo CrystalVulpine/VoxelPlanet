@@ -82,9 +82,7 @@ void loadModsUnix()
 #endif
 
     // there are no mods, so don't try to load any
-    if (!fs::is_directory(path)) {
-    	return;
-    }
+    if (!fs::is_directory(path)) return;
 
 	mod_testFunc.reserve(5);
 	mod_onRenderTick.reserve(5);

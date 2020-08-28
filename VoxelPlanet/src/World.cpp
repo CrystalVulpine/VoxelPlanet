@@ -129,9 +129,7 @@ void World::closeWorld() {
 
 void World::setCube(const int x, const int y, const int z, const unsigned int cube) {
 
-	if (x >= worldLength || x < 0 || z >= worldWidth || z < 0 || y >= worldHeight || y < 0) {
-		return;
-	}
+	if (x >= worldLength || x < 0 || z >= worldWidth || z < 0 || y >= worldHeight || y < 0) return;
 
 	cubes[((z * worldLength * worldHeight) + x * worldHeight) + y] = cube;
 }
@@ -139,9 +137,7 @@ void World::setCube(const int x, const int y, const int z, const unsigned int cu
 
 unsigned int World::getCube(const int x, const int y, const int z) {
 
-	if (x >= worldLength || x < 0 || z >= worldWidth || z < 0 || y >= worldHeight || y < 0) {
-		return 0;
-	}
+	if (x >= worldLength || x < 0 || z >= worldWidth || z < 0 || y >= worldHeight || y < 0) return 0;
 
 	return cubes[((z * worldLength * worldHeight) + x * worldHeight) + y];
 }
@@ -149,9 +145,7 @@ unsigned int World::getCube(const int x, const int y, const int z) {
 
 unsigned int* World::getCubePointer(const int x, const int y, const int z) {
 
-	if (x >= worldLength || x < 0 || z >= worldWidth || z < 0 || y >= worldHeight || y < 0) {
-		return NULL;
-	}
+	if (x >= worldLength || x < 0 || z >= worldWidth || z < 0 || y >= worldHeight || y < 0) return NULL;
 
 	return &cubes[((z * worldLength * worldHeight) + x * worldHeight) + y];
 }
@@ -200,9 +194,7 @@ void World::saveWorld() {
 			while (prevCube == cube) {
 
 				++count;
-				if (count >= 255 || i + count >= worldLength * worldWidth * worldHeight) {
-					break;
-				}
+				if (count >= 255 || i + count >= worldLength * worldWidth * worldHeight) break;
 
 				cube = cubes[i + count];
 			}
@@ -308,14 +300,10 @@ void World::setSaveDir(const char* __restrict__ dir) {
 
 void World::fillCubes(const unsigned int color, int x, int y, int z) {
 	unsigned int* __restrict__ cubePointer = getCubePointer(x, y, z);
-	if (cubePointer == NULL) {
-		return;
-	}
+	if (cubePointer == NULL) return;
 
 	const unsigned int originalColor = *cubePointer;
-	if (originalColor == color) {
-		return;
-	}
+	if (originalColor == color) return;
 	*cubePointer = color;
 
 	if (getCube(x, y, z + 1) == originalColor) {

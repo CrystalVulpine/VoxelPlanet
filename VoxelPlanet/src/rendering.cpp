@@ -1,3 +1,6 @@
+#include <png.h>
+#include <sys/stat.h>
+#include <iostream>
 #include "rendering.hpp"
 
 
@@ -872,6 +875,40 @@ void doDrawTick() {
 
 	glfwSwapBuffers(window);
 	glfwPollEvents();
+}
+
+
+void takeScreenshot(char filename[], char folder[]) {
+    unsigned char pixels[windowWidth * windowHeight * 3];
+    glPixelStorei(GL_PACK_ALIGNMENT, 1);
+    glReadBuffer(GL_FRONT);
+    glReadPixels(0, 0, windowWidth, windowHeight, GL_RGB, GL_UNSIGNED_BYTE, pixels);
+
+	struct stat st;
+    if (stat(folder, &st) != 0 && mkdir(folder, 0777) != 0) {
+    	printf("Could not create screenshot directory");
+    	return;
+    }
+    png_structp png = png_create_write_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
+    png_infop info = png_create_info_struct(png);
+    FILE* file = fopen(filename, "wb");
+    png_init_io(png, file);
+    png_set_IHDR(png, info, windowWidth, windowHeight, 8, PNG_COLOR_TYPE_RGB, PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_BASE, PNG_FILTER_TYPE_BASE);
+    png_colorp palette = (png_colorp)png_malloc(png, sizeof(png_color[PNG_MAX_PALETTE_LENGTH]));
+    png_set_PLTE(png, info, palette, PNG_MAX_PALETTE_LENGTH);
+    png_write_info(png, info);
+    png_set_packing(png);
+    png_bytepp rows = (png_bytepp)png_malloc(png, sizeof(png_bytep[windowHeight]));
+    for (int i = 0; i < windowHeight; ++i) {
+        rows[i] = (png_bytep)(pixels + (windowHeight - i - 1) * windowWidth * 3);
+    }
+    png_write_image(png, rows);
+    png_write_end(png, info);
+    png_free(png, palette);
+    png_destroy_write_struct(&png, &info);
+    fclose(file);
+	std::cout << "Saved screenshot '" << filename << "'\n";
+    delete[] rows;
 }
 
 

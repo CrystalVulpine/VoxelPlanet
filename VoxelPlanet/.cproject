@@ -46,6 +46,7 @@
 									<listOptionValue builtIn="false" value="OpenGL"/>
 									<listOptionValue builtIn="false" value="dl"/>
 									<listOptionValue builtIn="false" value="stdc++fs"/>
+									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="png"/>
 								</option>
 								<option id="gnu.cpp.link.option.paths.1291056582" name="Library search path (-L)" superClass="gnu.cpp.link.option.paths"/>
 								<option id="gnu.cpp.link.option.flags.680907416" name="Linker flags" superClass="gnu.cpp.link.option.flags" value="-no-pie -rdynamic" valueType="string"/>
@@ -114,6 +115,7 @@
 									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="OpenGL"/>
 									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="dl"/>
 									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="stdc++fs"/>
+									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="png"/>
 								</option>
 								<option id="gnu.cpp.link.option.paths.1791093161" name="Library search path (-L)" superClass="gnu.cpp.link.option.paths" valueType="libPaths">
 									<listOptionValue builtIn="false" value="/usr/lib/x86_64-linux-gnu"/>
