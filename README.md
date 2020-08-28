@@ -75,6 +75,7 @@ For Linux and macOS, you will need to install:
 * GLEW
 * GLFW
 * GLM (GL Math)
+* libpng
 
 ### CMake:
 
