@@ -1,15 +1,13 @@
 #pragma once
 
-#include <stdio.h>
-#include <stdlib.h>
+#include "Camera.hpp"
+
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
-#include <glm/gtc/matrix_transform.hpp>
-#include "Camera.hpp"
-#include "World.hpp"
-#include "global.hpp"
-#include "mods.hpp"
 
+#ifdef _WIN32
+#include <windef.h>
+#endif
 
 extern GLFWwindow* window;
 extern int windowWidth;
@@ -24,7 +22,6 @@ extern float skyColorBlue;
 extern Camera camera;
 
 extern bool worldIsDirty;
-
 
 extern GLuint loadShaders(GLchar const * vertexShaderCode, GLchar const * fragmentShaderCode);
 extern void takeScreenshot(char filename[], char folder[]);

@@ -1,10 +1,15 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <cstring>
 #include "global.hpp"
-#include "rendering.hpp"
 #include "World.hpp"
+#include "rendering.hpp"
 #include "mods.hpp"
+
+#include <GLFW/glfw3.h>
+#include <glm/glm.hpp>
+
+#include <cmath>
+#include <cstdlib>
+#include <cstring>
+#include <ctime>
 
 bool gameRunning = false;
 World mainWorld;
@@ -184,6 +189,7 @@ int main(int argc, char *argv[]) {
 				if (!cPressed && glfwGetKey(window, GLFW_KEY_C) == GLFW_PRESS) {
 					cPressed = true;
 					openedScreen = SCREEN_COLOR;
+					glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 
 				} else if (cPressed && glfwGetKey(window, GLFW_KEY_C) != GLFW_PRESS) {
 					cPressed = false;

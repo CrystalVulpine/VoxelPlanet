@@ -1,6 +1,6 @@
 #pragma once
 
-#include <glm/gtc/matrix_transform.hpp>
+#include <glm/glm.hpp>
 
 struct RayTraceInfo {
 	bool cubeFound;
@@ -22,7 +22,6 @@ public:
 
 	bool isNewWorld;
 	bool isSaving;
-
 
 	/** Starts the world, with the specified size if it is generating a new one. **/
 	void startWorld(const int length, const int width, const int height);

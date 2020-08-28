@@ -1,3 +1,6 @@
+/.metadata/
+/RemoteSystemsTempFiles/
+
 /VoxelPlanet/Debug/
 /VoxelPlanet/Release/
 /VoxelPlanet/world*/
@@ -7,4 +10,4 @@
 /VoxelPlanet.Disintegration/Release/
 /VoxelPlanet.PoliticalCompass/Release/
 
-/build
+/build/
