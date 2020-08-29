@@ -884,7 +884,7 @@ void doDrawTick() {
 }
 
 
-void takeScreenshot(char filename[], char folder[]) {
+void takeScreenshot(const char filename[], const char folder[]) {
     unsigned char pixels[windowWidth * windowHeight * 3];
     glPixelStorei(GL_PACK_ALIGNMENT, 1);
     glReadBuffer(GL_FRONT);

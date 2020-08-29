@@ -166,7 +166,7 @@ int main(int argc, char *argv[]) {
 			f2Pressed = true;
 
 			char timeString[96] = "screenshots/";
-			time_t* __restrict__ rawtime;
+			time_t* __restrict__ rawtime = (time_t*)malloc(sizeof(time_t));
 			time(rawtime);
 			strftime(&timeString[12], sizeof(char[80]),"%d-%m-%Y %H-%M-%S", localtime(rawtime));
 			strcat(timeString, ".png");
