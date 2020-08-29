@@ -8,6 +8,10 @@ VoxelPlanet is a sandbox made out of colored cubes. It is made using basic shade
 
 ![](https://i.imgur.com/fGVsUsE.png)
 
+## Installation
+
+VoxelPlanet does not require any installation, just [download a release](https://github.com/CrystalVulpine/VoxelPlanet/releases), extract the files and run the executable. You might need to install some dependencies such as glfw3 and glew, because I'm not sure if it's legal for me to distribute them in an MIT-licensed project. There is currently no download for macOS, because I don't have a Mac, however if someone wants to provide a build for it I'd be happy to release it.
+
 ## Controls:
 
 * Move: WASD
