@@ -10,15 +10,15 @@ struct RayTraceInfo {
 
 class World {
 public:
-	char* __restrict__ worldDir;
-	char* __restrict__ cubesDatPath;
-	char* __restrict__ levelDatPath;
+	char* __restrict worldDir;
+	char* __restrict cubesDatPath;
+	char* __restrict levelDatPath;
 
 	int worldLength;
 	int worldWidth;
 	int worldHeight;
 
-	unsigned int* __restrict__ cubes;
+	unsigned int* __restrict cubes;
 
 	bool isNewWorld;
 	bool isSaving;
@@ -42,7 +42,7 @@ public:
 	RayTraceInfo rayTraceCubes(glm::vec3 startPos, float rotationYaw, float rotationPitch, float reach);
 
 	/** specifies the folder in which to load/save level.dat and cubes.dat **/
-	void setSaveDir(const char* __restrict__ dir);
+	void setSaveDir(const char* __restrict dir);
 
 	/** fills the cubes starting at the coords with the given color **/
 	void fillCubes(const unsigned int color, int x, int y, int z);

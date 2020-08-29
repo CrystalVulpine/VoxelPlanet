@@ -166,7 +166,7 @@ int main(int argc, char *argv[]) {
 			f2Pressed = true;
 
 			char timeString[96] = "screenshots/";
-			time_t* __restrict__ rawtime = (time_t*)malloc(sizeof(time_t));
+			time_t* __restrict rawtime = (time_t*)malloc(sizeof(time_t));
 			time(rawtime);
 			strftime(&timeString[12], sizeof(char[80]),"%d-%m-%Y %H-%M-%S", localtime(rawtime));
 			strcat(timeString, ".png");
@@ -252,7 +252,7 @@ int main(int argc, char *argv[]) {
 							mainWorld.fillCubes(usingCube, x, y, z);
 							worldIsDirty = true;
 						} else {
-							unsigned int * __restrict__ cube = mainWorld.getCubePointer((int)std::floor(raySelection.lastPos.x), (int)std::floor(raySelection.lastPos.y), (int)std::floor(raySelection.lastPos.z));
+							unsigned int * __restrict cube = mainWorld.getCubePointer((int)std::floor(raySelection.lastPos.x), (int)std::floor(raySelection.lastPos.y), (int)std::floor(raySelection.lastPos.z));
 							if (cube != NULL && *cube == 0) {
 								*cube = usingCube;
 								worldIsDirty = true;
@@ -262,7 +262,7 @@ int main(int argc, char *argv[]) {
 					if (currentTimeMs() - clickClock > 200 && glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) {
 						clickClock = currentTimeMs();
 
-						unsigned int * __restrict__ cube = mainWorld.getCubePointer(x, y, z);
+						unsigned int * __restrict cube = mainWorld.getCubePointer(x, y, z);
 						if (cube != NULL && *cube > 0) {
 							*cube = 0;
 							worldIsDirty = true;

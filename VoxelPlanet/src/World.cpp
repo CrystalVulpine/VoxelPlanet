@@ -91,7 +91,7 @@ void World::startWorld(const int length, const int width, const int height) {
 		std::ifstream save(cubesDatPath, std::ios::binary | std::ios::ate);
 		size = save.tellg();
 		save.seekg(0, std::ios::beg);
-		unsigned char* __restrict__ data = (unsigned char*)malloc(size);
+		unsigned char* __restrict data = (unsigned char*)malloc(size);
 		save.read((char*)data, size);
 
 		unsigned int worldIndex = 0;
@@ -181,7 +181,7 @@ void World::saveWorld() {
 		std::ofstream save(cubesDatPath);
 
 		// one byte for cube color count, 4 for block/cube id
-		unsigned char * __restrict__ data = (unsigned char*)malloc(worldLength * worldWidth * worldHeight * 5);
+		unsigned char * __restrict data = (unsigned char*)malloc(worldLength * worldWidth * worldHeight * 5);
 		unsigned int index = 0;
 
 		for (int i = 0; i < worldLength * worldWidth * worldHeight;) {
@@ -272,7 +272,7 @@ RayTraceInfo World::rayTraceCubes(glm::vec3 start, float rotationYaw, float rota
 }
 
 
-void World::setSaveDir(const char* __restrict__ dir) {
+void World::setSaveDir(const char* __restrict dir) {
 
 	if (worldDir != NULL) {
 		free(worldDir);
@@ -299,7 +299,7 @@ void World::setSaveDir(const char* __restrict__ dir) {
 }
 
 void World::fillCubes(const unsigned int color, int x, int y, int z) {
-	unsigned int* __restrict__ cubePointer = getCubePointer(x, y, z);
+	unsigned int* __restrict cubePointer = getCubePointer(x, y, z);
 	if (cubePointer == NULL) return;
 
 	const unsigned int originalColor = *cubePointer;

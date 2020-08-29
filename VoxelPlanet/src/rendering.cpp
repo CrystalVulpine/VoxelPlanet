@@ -159,7 +159,7 @@ void renderCube(int x, int y, int z, unsigned int cube) {
 	unsigned int vertexCount = 0;
 
 	// attempts to speed through the surrounding cube check by going through memory as contiguously as possible. cubePointer is the cube's memory location.
-	unsigned int* __restrict__ cubePointer = mainWorld.getCubePointer(x, y, z);
+	unsigned int* __restrict cubePointer = mainWorld.getCubePointer(x, y, z);
 	bool renderFrontFace = z > 0 && (cubePointer[-(mainWorld.worldLength * mainWorld.worldHeight)] & 0xff) != (cube & 0xff);
 	bool renderLeftFace = x > 0 && (cubePointer[-mainWorld.worldHeight] & 0xff) != (cube & 0xff);
 	bool renderBottomFace = y <= 0 || (cubePointer[-1] & 0xff) != (cube & 0xff);
