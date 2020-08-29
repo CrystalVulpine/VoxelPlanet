@@ -892,7 +892,10 @@ void takeScreenshot(const char filename[], const char folder[]) {
 
 	struct stat st;
     if (stat(folder, &st) != 0 && mkdir(folder, 0777) != 0) {
-    	printf("Could not create screenshot directory");
+    	printf("Could not create screenshot directory\n");
+    	return;
+    } else if (stat(filename, &st) == 0) {
+    	printf("Could not take screenshot, file already exists!\n");
     	return;
     }
     png_structp png = png_create_write_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
