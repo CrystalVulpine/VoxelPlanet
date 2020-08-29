@@ -2,12 +2,12 @@
 
 #include "Camera.hpp"
 
-#include <GL/glew.h>
-#include <GLFW/glfw3.h>
-
-#ifdef _WIN32
+#if defined(_WIN32)
 #include <windef.h>
 #endif
+
+#include <GL/glew.h>
+#include <GLFW/glfw3.h>
 
 extern GLFWwindow* window;
 extern int windowWidth;

@@ -11,7 +11,7 @@ void changeBlockColors() {
 		int y = rand() % mainWorld.worldHeight;
 		int z = rand() % mainWorld.worldWidth;
 
-		unsigned int* __restrict__ cubePointer = mainWorld.getCubePointer(x, y, z);
+		unsigned int* __restrict cubePointer = mainWorld.getCubePointer(x, y, z);
 		if (*cubePointer > 0) {
 
 			// randomize between any non-transparent color
