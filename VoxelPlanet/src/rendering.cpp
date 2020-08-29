@@ -388,7 +388,7 @@ int setupOpenGL() {
 #else
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 #endif
-	window = glfwCreateWindow(windowWidth, windowHeight, "VoxelPlanet v0.1", NULL, NULL);
+	window = glfwCreateWindow(windowWidth, windowHeight, "VoxelPlanet v0.2", NULL, NULL);
 	if (window == NULL) {
 		fprintf(stderr, "Failed to open GLFW window. Your GPU or CPU may not be compatible with OpenGL 3.3.");
 		getchar();
