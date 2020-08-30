@@ -113,7 +113,7 @@ void loadMods()
 					std::cout << error << '\n';
 					continue;
 				} else {
-					const char* modApiVersion = versionGetter();
+					const char * const __restrict modApiVersion = versionGetter();
 					if (strcmp(modApiVersion, API_VERSION) != 0) {
 						std::cout << "Could not load " << ((const char* (*)())GetProcAddress(handle, "getModName"))() << ". Mod uses API version " << modApiVersion << " but this is " << API_VERSION << ".\n";
 						continue;
@@ -212,7 +212,7 @@ void loadMods()
 					std::cout << error << '\n';
 					continue;
 				} else {
-					const char* modApiVersion = versionGetter();
+					const char * const __restrict modApiVersion = versionGetter();
 					if (strcmp(modApiVersion, API_VERSION) != 0) {
 						std::cout << "Could not load " << ((const char* (*)())dlsym(handle, "getModName"))() << ". Mod uses API version " << modApiVersion << " but this is " << API_VERSION << ".\n";
 						continue;

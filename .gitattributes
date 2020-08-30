@@ -1,23 +1,8 @@
 *.cpp text
-*.c text
 *.hpp text
+*.c text
 *.h text
 *.glsl text
 *.txt text
-
-/VoxelPlanet/src/*.h linguist-language=C++
-/VoxelPlanet/src/*.cpp linguist-language=C++
-/VoxelPlanet/src/*.hpp linguist-language=C++
-/VoxelPlanet.TestMod/src/*.h linguist-language=C++
-/VoxelPlanet.TestMod/src/*.cpp linguist-language=C++
-/VoxelPlanet.TestMod/src/*.hpp linguist-language=C++
-/VoxelPlanet.ColorChanger/src/*.h linguist-language=C++
-/VoxelPlanet.ColorChanger/src/*.cpp linguist-language=C++
-/VoxelPlanet.ColorChanger/src/*.hpp linguist-language=C++
-/VoxelPlanet.Disintegration/src/*.h linguist-language=C++
-/VoxelPlanet.Disintegration/src/*.cpp linguist-language=C++
-/VoxelPlanet.Disintegration/src/*.hpp linguist-language=C++
-/VoxelPlanet.PoliticalCompass/src/*.h linguist-language=C++
-/VoxelPlanet.PoliticalCompass/src/*.cpp linguist-language=C++
-/VoxelPlanet.PoliticalCompass/src/*.hpp linguist-language=C++
+*.rc text
 
