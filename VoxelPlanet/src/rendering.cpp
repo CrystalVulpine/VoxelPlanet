@@ -1,6 +1,8 @@
 #include <png.h>
 #include <sys/stat.h>
 #include <iostream>
+#include <fstream>
+#include <string>
 #include "rendering.hpp"
 
 #include "global.hpp"
@@ -130,7 +132,27 @@ GLuint program;
 GLuint matrix;
 GLuint vao;
 
-GLuint loadShaders(GLchar const * vertexShaderCode, GLchar const * fragmentShaderCode) {
+GLuint loadShaders(const GLchar* const __restrict vertexShaderPath, const GLchar* const __restrict fragmentShaderPath) {
+	std::ifstream shaderStream;
+	shaderStream.open(vertexShaderPath);
+	shaderStream.seekg(0, std::ios::end);
+	unsigned int shaderLength = shaderStream.tellg();
+	shaderStream.seekg(0, std::ios::beg);
+	GLchar * const vertexShaderCode = (GLchar*)malloc(sizeof(GLchar[shaderLength + 1]));
+	vertexShaderCode[shaderLength] = '\0';
+	shaderStream.read(vertexShaderCode, shaderLength);
+	shaderStream.close();
+	shaderStream.clear();
+
+	shaderStream.open(fragmentShaderPath);
+	shaderStream.seekg(0, std::ios::end);
+	shaderLength = shaderStream.tellg();
+	shaderStream.seekg(0, std::ios::beg);
+	GLchar * const fragmentShaderCode = (GLchar*)malloc(sizeof(GLchar[shaderLength + 1]));
+	fragmentShaderCode[shaderLength] = '\0';
+	shaderStream.read(fragmentShaderCode, shaderLength);
+	shaderStream.close();
+
 	GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
 	GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
 
@@ -139,6 +161,24 @@ GLuint loadShaders(GLchar const * vertexShaderCode, GLchar const * fragmentShade
 
 	glShaderSource(fragmentShader, 1, &fragmentShaderCode, NULL);
 	glCompileShader(fragmentShader);
+
+	GLint isCompiled = 0;
+	glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &isCompiled);
+	if (!isCompiled) {
+		GLint errorLength = 0;
+		glGetShaderiv(vertexShader, GL_INFO_LOG_LENGTH, &errorLength);
+		char error[errorLength];
+		glGetShaderInfoLog(vertexShader, errorLength, &errorLength, error);
+		std::cout << vertexShaderPath << ": " << error;
+	}
+	glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &isCompiled);
+	if (!isCompiled) {
+		GLint errorLength = 0;
+		glGetShaderiv(fragmentShader, GL_INFO_LOG_LENGTH, &errorLength);
+		char error[errorLength];
+		glGetShaderInfoLog(fragmentShader, errorLength, &errorLength, error);
+		std::cout << fragmentShaderPath << ": " << error;
+	}
 
 	GLuint program = glCreateProgram();
 	glAttachShader(program, vertexShader);
@@ -411,28 +451,7 @@ int setupOpenGL() {
 	glGenVertexArrays(1, &vao);
 	glBindVertexArray(vao);
 
-	const GLchar *vertexShader = R"(
-	#version 330 core
-	layout(location = 0) in vec3 vertexPosition_modelspace;
-    layout(location = 1) in vec4 vertexColor;
-    out vec4 fragmentColor;
-  
-    uniform mat4 MVP;
-  
-    void main() {
-        gl_Position =  MVP * vec4(vertexPosition_modelspace,1);
-        fragmentColor = vertexColor;
-    })";
-
-	const GLchar *fragmentShader = R"(
-	#version 330 core
-    out vec4 color;
-    in vec4 fragmentColor;
-    void main() {
-        color = fragmentColor;
-    })";
-
-	program = loadShaders(vertexShader, fragmentShader);
+	program = loadShaders("assets/shaders/world/vertex.glsl", "assets/shaders/world/fragment.glsl");
 
 	glGenBuffers(1, &vertexbuffer);
 	glGenBuffers(1, &colorbuffer);
