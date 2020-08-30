@@ -12,7 +12,7 @@
 
 #include <cstdio>
 
-GLFWwindow* window;
+GLFWwindow * __restrict window;
 int windowWidth = 1024;
 int windowHeight = 768;
 
@@ -132,7 +132,16 @@ GLuint program;
 GLuint matrix;
 GLuint vao;
 
-GLuint loadShaders(const GLchar* const __restrict vertexShaderPath, const GLchar* const __restrict fragmentShaderPath) {
+GLuint loadShaders(const GLchar * const __restrict vertexShaderPath, const GLchar * const __restrict fragmentShaderPath) {
+	struct stat st;
+	if (stat(vertexShaderPath, &st) != 0) {
+		std::cout << "Could not load shader " << vertexShaderPath << ", exiting\n";
+		exit(-1);
+	} else if (stat(fragmentShaderPath, &st) != 0) {
+		std::cout << "Could not load shader " << fragmentShaderPath << ", exiting\n";
+		exit(-1);
+	}
+
 	std::ifstream shaderStream;
 	shaderStream.open(vertexShaderPath);
 	shaderStream.seekg(0, std::ios::end);
@@ -199,7 +208,7 @@ void renderCube(int x, int y, int z, unsigned int cube) {
 	unsigned int vertexCount = 0;
 
 	// attempts to speed through the surrounding cube check by going through memory as contiguously as possible. cubePointer is the cube's memory location.
-	unsigned int* __restrict cubePointer = mainWorld.getCubePointer(x, y, z);
+	const unsigned int * const __restrict cubePointer = mainWorld.getCubePointer(x, y, z);
 	bool renderFrontFace = z > 0 && (cubePointer[-(mainWorld.worldLength * mainWorld.worldHeight)] & 0xff) != (cube & 0xff);
 	bool renderLeftFace = x > 0 && (cubePointer[-mainWorld.worldHeight] & 0xff) != (cube & 0xff);
 	bool renderBottomFace = y <= 0 || (cubePointer[-1] & 0xff) != (cube & 0xff);

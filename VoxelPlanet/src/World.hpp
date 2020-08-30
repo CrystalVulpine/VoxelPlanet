@@ -23,6 +23,9 @@ public:
 	bool isNewWorld;
 	bool isSaving;
 
+
+	World();
+
 	/** Starts the world, with the specified size if it is generating a new one. **/
 	void startWorld(const int length, const int width, const int height);
 
@@ -46,6 +49,4 @@ public:
 
 	/** fills the cubes starting at the coords with the given color **/
 	void fillCubes(const unsigned int color, int x, int y, int z);
-
-	World();
 };

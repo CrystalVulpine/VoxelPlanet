@@ -15,6 +15,9 @@ public:
 	float maxZ;
 	unsigned char renderDistance;
 
+
+	Camera();
+
 	/** moves the camera in the specified directions **/
 	void move(float forward, float vertical, float sideways);
 

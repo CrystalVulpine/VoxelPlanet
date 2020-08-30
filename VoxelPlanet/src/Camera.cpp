@@ -3,7 +3,11 @@
 
 #include <glm/gtc/matrix_transform.hpp>
 
-void Camera::move(float forward, float vertical, float sideways) {
+Camera::Camera() __restrict {
+
+}
+
+void Camera::move(float forward, float vertical, float sideways) __restrict {
 	xPos += forward * glm::sin(rotationYaw) + sideways * glm::cos(-rotationYaw);
 	zPos -= forward * glm::cos(rotationYaw) + sideways * glm::sin(-rotationYaw);
 	yPos += vertical;
@@ -20,7 +24,7 @@ void Camera::move(float forward, float vertical, float sideways) {
 	}
 }
 
-void Camera::rotate(float yaw, float pitch) {
+void Camera::rotate(float yaw, float pitch) __restrict {
 	rotationYaw += yaw;
 	rotationPitch += pitch;
 
@@ -32,21 +36,21 @@ void Camera::rotate(float yaw, float pitch) {
 	}
 }
 
-void Camera::setBounds(float lx, float hx, float lz, float hz) {
+void Camera::setBounds(float lx, float hx, float lz, float hz) __restrict {
 	minX = lx;
 	maxX = hx;
 	minZ = lz;
 	maxZ = hz;
 }
 
-glm::mat4 Camera::getMatrix(float windowSizeRatio) {
+glm::mat4 Camera::getMatrix(float windowSizeRatio) __restrict {
 	glm::mat4 model = glm::mat4(1.0f);
 	glm::mat4 projection = glm::perspective(glm::radians(70.0f), windowSizeRatio, 0.01f, (float)(renderDistance * 16));
 	glm::mat4 view = glm::rotate(model, rotationPitch, glm::vec3(1.0, 0.0, 0.0)) * glm::rotate(model, rotationYaw, glm::vec3(0.0, 1.0, 0.0)) * glm::translate(model, glm::vec3(-xPos, -yPos, -zPos));
 	return model * projection * view;
 }
 
-void Camera::initCamera(float x, float y, float z, float yaw, float pitch) {
+void Camera::initCamera(float x, float y, float z, float yaw, float pitch) __restrict {
 	xPos = x;
 	yPos = y;
 	zPos = z;

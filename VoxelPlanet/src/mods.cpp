@@ -67,7 +67,7 @@ void mods_onGameLoop(Clock loopTime, Clock lastLoopTime) {
 	}
 }
 
-void mods_processGameArgs(int argc, char *argv[]) {
+void mods_processGameArgs(int argc, char * argv[]) {
 	for (unsigned int i = 0; i < mod_processGameArgs.size(); ++i) {
 		mod_processGameArgs.at(i)(argc, argv);
 	}

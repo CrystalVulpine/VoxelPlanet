@@ -9,7 +9,7 @@
 #include <cstring>
 #include <sys/stat.h>
 
-World::World() {
+World::World() __restrict {
 
 	worldDir = NULL;
 	cubesDatPath = NULL;
@@ -17,7 +17,7 @@ World::World() {
 	isSaving = false;
 }
 
-void World::startWorld(const int length, const int width, const int height) {
+void World::startWorld(const int length, const int width, const int height) __restrict {
 
 	struct stat st;
 
@@ -83,6 +83,7 @@ void World::startWorld(const int length, const int width, const int height) {
 		level.seekg(0, std::ios::beg);
 		unsigned char info[6];
 		level.read((char*)info, size);
+		level.close();
 		worldLength = (unsigned short)info[0] << 8 | (unsigned short)info[1];
 		worldWidth = (unsigned short)info[2] << 8 | (unsigned short)info[3];
 		worldHeight = (unsigned short)info[4] << 8 | (unsigned short)info[5];
@@ -93,6 +94,7 @@ void World::startWorld(const int length, const int width, const int height) {
 		save.seekg(0, std::ios::beg);
 		unsigned char* __restrict data = (unsigned char*)malloc(size);
 		save.read((char*)data, size);
+		save.close();
 
 		unsigned int worldIndex = 0;
 
@@ -114,7 +116,7 @@ void World::startWorld(const int length, const int width, const int height) {
 	mods_onWorldLoad();
 }
 
-void World::closeWorld() {
+void World::closeWorld() __restrict {
 
 	mods_onWorldClose();
 
@@ -127,7 +129,7 @@ void World::closeWorld() {
 }
 
 
-void World::setCube(const int x, const int y, const int z, const unsigned int cube) {
+void World::setCube(const int x, const int y, const int z, const unsigned int cube) __restrict {
 
 	if (x >= worldLength || x < 0 || z >= worldWidth || z < 0 || y >= worldHeight || y < 0) return;
 
@@ -135,7 +137,7 @@ void World::setCube(const int x, const int y, const int z, const unsigned int cu
 }
 
 
-unsigned int World::getCube(const int x, const int y, const int z) {
+unsigned int World::getCube(const int x, const int y, const int z) __restrict {
 
 	if (x >= worldLength || x < 0 || z >= worldWidth || z < 0 || y >= worldHeight || y < 0) return 0;
 
@@ -143,7 +145,7 @@ unsigned int World::getCube(const int x, const int y, const int z) {
 }
 
 
-unsigned int* World::getCubePointer(const int x, const int y, const int z) {
+unsigned int* World::getCubePointer(const int x, const int y, const int z) __restrict {
 
 	if (x >= worldLength || x < 0 || z >= worldWidth || z < 0 || y >= worldHeight || y < 0) return NULL;
 
@@ -151,7 +153,7 @@ unsigned int* World::getCubePointer(const int x, const int y, const int z) {
 }
 
 
-void World::saveWorld() {
+void World::saveWorld() __restrict {
 
 	if (!isSaving) {
 
@@ -176,6 +178,7 @@ void World::saveWorld() {
 		worldSizeInfo[5] = worldHeight & 0xff;
 
 		level.write((char*)worldSizeInfo, 6);
+		level.close();
 
 
 		std::ofstream save(cubesDatPath);
@@ -212,6 +215,7 @@ void World::saveWorld() {
 		}
 
 		save.write((char*)data, index);
+		save.close();
 
 		free(data);
 
@@ -220,7 +224,7 @@ void World::saveWorld() {
 }
 
 
-RayTraceInfo World::rayTraceCubes(glm::vec3 start, float rotationYaw, float rotationPitch, float reach) {
+RayTraceInfo World::rayTraceCubes(glm::vec3 start, float rotationYaw, float rotationPitch, float reach) __restrict {
 
 	bool couldFindCube = false;
 
@@ -272,7 +276,7 @@ RayTraceInfo World::rayTraceCubes(glm::vec3 start, float rotationYaw, float rota
 }
 
 
-void World::setSaveDir(const char* __restrict dir) {
+void World::setSaveDir(const char* __restrict dir) __restrict {
 
 	if (worldDir != NULL) {
 		free(worldDir);
@@ -298,7 +302,7 @@ void World::setSaveDir(const char* __restrict dir) {
 	strcat(levelDatPath, "/level.dat");
 }
 
-void World::fillCubes(const unsigned int color, int x, int y, int z) {
+void World::fillCubes(const unsigned int color, int x, int y, int z) __restrict {
 	unsigned int* __restrict cubePointer = getCubePointer(x, y, z);
 	if (cubePointer == NULL) return;
 
