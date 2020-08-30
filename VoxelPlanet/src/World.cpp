@@ -65,7 +65,7 @@ void World::startWorld(const int length, const int width, const int height) __re
 
 		if (stat(levelDatPath, &st) != 0) {
 
-			printf("Could not load level information. You must move the current world so that a new one can be created.\n");
+			std::cout << "Could not load level information. You must move the current world so that a new one can be created.\n";
 			exit(1);
 		}
 
@@ -74,7 +74,7 @@ void World::startWorld(const int length, const int width, const int height) __re
 
 		if (size < 6) {
 
-			printf("Could not load world size. You must move the current world so that a new one can be created.\n");
+			std::cout << "Could not load world size. You must move the current world so that a new one can be created.\n";
 			exit(1);
 		}
 
@@ -163,7 +163,7 @@ void World::saveWorld() __restrict {
 
 		if (stat(worldDir, &st) != 0 && mkdir(worldDir, 0777) != 0) {
 
-			printf("Could not save world: directory 'world' cannot be created.\n");
+			std::cout << "Could not save world: directory 'world' cannot be created.\n";
 			return;
 		}
 

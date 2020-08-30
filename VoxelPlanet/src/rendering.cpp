@@ -424,8 +424,7 @@ void renderCubeSelect(double x, double y, double z) {
 
 int setupOpenGL() {
 	if (!glfwInit()) {
-		fprintf(stderr, "Failed to initialize GLFW");
-		getchar();
+		std::cout << "Failed to initialize GLFW\n";
 		return -1;
 	}
 	glfwWindowHint(GLFW_SAMPLES, antialiasingLevel);
@@ -439,8 +438,7 @@ int setupOpenGL() {
 #endif
 	window = glfwCreateWindow(windowWidth, windowHeight, "VoxelPlanet v0.2", NULL, NULL);
 	if (window == NULL) {
-		fprintf(stderr, "Failed to open GLFW window. Your GPU or CPU may not be compatible with OpenGL 3.3.");
-		getchar();
+		std::cout << "Failed to open GLFW window. Your GPU or CPU may not be compatible with OpenGL 3.3.\n";
 		glfwTerminate();
 		return -1;
 	}
@@ -451,8 +449,7 @@ int setupOpenGL() {
 	}
 
 	if (glewInit() != GLEW_OK) {
-		fprintf(stderr, "Failed to initialize GLEW");
-		getchar();
+		std::cout << "Failed to initialize GLEW\n";
 		glfwTerminate();
 		return -1;
 	}
@@ -920,10 +917,10 @@ void takeScreenshot(const char filename[], const char folder[]) {
 
 	struct stat st;
     if (stat(folder, &st) != 0 && mkdir(folder, 0777) != 0) {
-    	printf("Could not create screenshot directory\n");
+    	std::cout << "Could not create screenshot directory\n";
     	return;
     } else if (stat(filename, &st) == 0) {
-    	printf("Could not take screenshot, file already exists!\n");
+    	std::cout << "Could not take screenshot, file already exists!\n";
     	return;
     }
     png_structp png = png_create_write_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
