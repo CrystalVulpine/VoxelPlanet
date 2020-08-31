@@ -92,7 +92,7 @@ void World::startWorld(const int length, const int width, const int height) __re
 		std::ifstream save(cubesDatPath, std::ios::binary | std::ios::ate);
 		size = save.tellg();
 		save.seekg(0, std::ios::beg);
-		unsigned char* __restrict data = (unsigned char*)malloc(size);
+		unsigned char * const __restrict data = (unsigned char*)malloc(size);
 		save.read((char*)data, size);
 		save.close();
 
@@ -184,7 +184,7 @@ void World::saveWorld() __restrict {
 		std::ofstream save(cubesDatPath);
 
 		// one byte for cube color count, 4 for block/cube id
-		unsigned char * __restrict data = (unsigned char*)malloc(worldLength * worldWidth * worldHeight * 5);
+		unsigned char * const __restrict data = (unsigned char*)malloc(worldLength * worldWidth * worldHeight * 5);
 		unsigned int index = 0;
 
 		for (int i = 0; i < worldLength * worldWidth * worldHeight;) {
@@ -224,7 +224,7 @@ void World::saveWorld() __restrict {
 }
 
 
-RayTraceInfo World::rayTraceCubes(glm::vec3 start, float rotationYaw, float rotationPitch, float reach) __restrict {
+RayTraceInfo World::rayTraceCubes(const glm::vec3 start, const float rotationYaw, const float rotationPitch, const float reach) __restrict {
 
 	bool couldFindCube = false;
 
@@ -232,11 +232,14 @@ RayTraceInfo World::rayTraceCubes(glm::vec3 start, float rotationYaw, float rota
 	glm::vec3 lastPos = start;
 	unsigned int cube = 0;
 
+	const float changeX = glm::cos(rotationYaw + 1.5708f) * 0.05f;
+	const float changeZ = glm::sin(rotationYaw + 1.5708f) * 0.05f;
+	const float changeY = glm::tan(rotationPitch) * 0.05f;
 	while (!cube) {
 
 		lastPos = pos;
-	    pos.x -= glm::cos(rotationYaw + 1.5708f) * 0.05f;
-	    pos.z -= glm::sin(rotationYaw + 1.5708f) * 0.05f;
+	    pos.x -= changeX;
+	    pos.z -= changeZ;
 
 	    // tan can be undefined, so still move y when that happens
 	    if (rotationPitch <= -M_PI / 2.0f) {
@@ -244,13 +247,13 @@ RayTraceInfo World::rayTraceCubes(glm::vec3 start, float rotationYaw, float rota
 	    } else if (rotationPitch >= M_PI / 2.0f) {
 	    	pos.y -= 1.0f;
 	    } else {
-	    	pos.y -= glm::tan(rotationPitch) * 0.05f;
+	    	pos.y -= changeY;
 	    }
 
 	    cube = getCube(pos.x, pos.y, pos.z);
 
 	    if (glm::distance(start, pos) > reach) {
-	    	RayTraceInfo info = {couldFindCube, pos, lastPos};
+	    	const RayTraceInfo info = {couldFindCube, pos, lastPos};
 	    	return info;
 	    }
 	}
@@ -271,12 +274,12 @@ RayTraceInfo World::rayTraceCubes(glm::vec3 start, float rotationYaw, float rota
     	couldFindCube = true;
     }
 
-	RayTraceInfo info = {couldFindCube, pos, lastPos};
+	const RayTraceInfo info = {couldFindCube, pos, lastPos};
 	return info;
 }
 
 
-void World::setSaveDir(const char* __restrict dir) __restrict {
+void World::setSaveDir(const char * const __restrict dir) __restrict {
 
 	if (worldDir != NULL) {
 		free(worldDir);
@@ -302,7 +305,7 @@ void World::setSaveDir(const char* __restrict dir) __restrict {
 	strcat(levelDatPath, "/level.dat");
 }
 
-void World::fillCubes(const unsigned int color, int x, int y, int z) __restrict {
+void World::fillCubes(const unsigned int color, const int x, const int y, const int z) __restrict {
 	unsigned int* __restrict cubePointer = getCubePointer(x, y, z);
 	if (cubePointer == NULL) return;
 

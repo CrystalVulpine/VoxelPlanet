@@ -12,40 +12,39 @@
 
 #include <cstdio>
 
+
+Camera camera;
+
 GLFWwindow * __restrict window;
 int windowWidth = 1024;
 int windowHeight = 768;
 
+bool hideGUI = false;
+bool fancyGraphics = true;
+unsigned int renderDistance = 16;
 unsigned char antialiasingLevel = 4;
 float worldBrightness = 1.0f;
 float skyColorRed = 0.5f;
 float skyColorGreen = 0.5f;
 float skyColorBlue = 1.0f;
 
-bool hideGUI = false;
-bool fancyGraphics = true;
-
-Camera camera;
-
 bool worldIsDirty = false;
-
-GLuint vertexbuffer;
-GLuint colorbuffer;
-GLuint guiVertexBuffer;
-GLuint guiColorBuffer;
-
-unsigned int vertexIndex = 0;
-
 
 double colorTriangleX = 0.0;
 double colorTriangleY = 0.8;
 double colorBarPos = 0.0;
 double colorAlphaPos = 0.8;
 
-unsigned int guiVertexCount;
+static GLuint vertexbuffer;
+static GLuint colorbuffer;
+static GLuint guiVertexBuffer;
+static GLuint guiColorBuffer;
+
+static unsigned int vertexIndex = 0;
+static unsigned int guiVertexCount;
 
 
-double usingCubeVertices[] = {
+static double usingCubeVertices[] = {
 		-0.1, 0.1, 0.1,
 		-0.1, -0.1, 0.1,
 		0.1, -0.1, 0.1,
@@ -68,7 +67,7 @@ double usingCubeVertices[] = {
 		0.1, 0.1, 0.1,
 };
 
-double crosshairs[] = {
+static double crosshairs[] = {
 		-0.006, -0.051, 0.0,
 		0.006, -0.051, 0.0,
 		0.006, 0.051, 0.0,
@@ -98,7 +97,7 @@ double crosshairs[] = {
 		0.049, -0.004, 0.0,
 };
 
-float crosshairColor[] = {
+static float crosshairColor[] = {
 		1.0f, 1.0f, 1.0f, 1.0f,
 		1.0f, 1.0f, 1.0f, 1.0f,
 		1.0f, 1.0f, 1.0f, 1.0f,
@@ -128,11 +127,11 @@ float crosshairColor[] = {
 		0.0f, 0.0f, 0.0f, 1.0f,
 };
 
-GLuint program;
-GLuint matrix;
-GLuint vao;
+static GLuint program;
+static GLuint matrix;
+static GLuint vao;
 
-GLuint loadShaders(const GLchar * const __restrict vertexShaderPath, const GLchar * const __restrict fragmentShaderPath) {
+static GLuint loadShaders(const GLchar * const __restrict vertexShaderPath, const GLchar * const __restrict fragmentShaderPath) {
 	struct stat st;
 	if (stat(vertexShaderPath, &st) != 0) {
 		std::cout << "Could not load shader " << vertexShaderPath << ", exiting\n";
@@ -202,7 +201,7 @@ GLuint loadShaders(const GLchar * const __restrict vertexShaderPath, const GLcha
 	return program;
 }
 
-void renderCube(int x, int y, int z, unsigned int cube) {
+static void renderCube(int x, int y, int z, unsigned int cube) {
 	double vertices[6 * 2 * 3 * 3];
 
 	unsigned int vertexCount = 0;
@@ -389,7 +388,7 @@ void reRenderWorld() {
 	renderWorld();
 }
 
-void renderCubeSelect(double x, double y, double z) {
+void renderCubeSelect(const double x, const double y, const double z) {
 	double lines[] = {
 			x - 0.001, y + 1.001, z - 0.001,
 			x + 1.001, y + 1.001, z - 0.001,
@@ -485,7 +484,7 @@ int setupOpenGL() {
 }
 
 /** adds and draws a list to the gui vbo. `count` refers to the number of vertices. **/
-void renderToGUI(unsigned int count, double vertices[], float colors[]) {
+static void renderToGUI(unsigned int count, double vertices[], float colors[]) {
 	glBindBuffer(GL_ARRAY_BUFFER, guiVertexBuffer);
 	glBufferSubData(GL_ARRAY_BUFFER, guiVertexCount * 3 * sizeof(double), count * 3 * sizeof(double), vertices);
 	glVertexAttribPointer(0, 3, GL_DOUBLE, GL_FALSE, 0, NULL);
@@ -909,7 +908,7 @@ void doDrawTick() {
 }
 
 
-void takeScreenshot(const char filename[], const char folder[]) {
+void takeScreenshot(const char * const __restrict filename, const char * const __restrict folder) {
     unsigned char pixels[windowWidth * windowHeight * 3];
     glPixelStorei(GL_PACK_ALIGNMENT, 1);
     glReadBuffer(GL_FRONT);

@@ -98,7 +98,6 @@ int main(int argc, char * argv[]) {
 
 
 	int glErrorCode = setupOpenGL();
-
 	if (glErrorCode != 0) return glErrorCode;
 
 	gameRunning = true;
@@ -116,11 +115,10 @@ int main(int argc, char * argv[]) {
 	Clock loopTime;
 	Clock lastLoopTime = currentTimeMs();
 
-	Clock clickClock = currentTimeMs();
-
 	Clock lastTickTime = currentTimeMs();
 	Clock tickTime;
 
+	Clock clickClock = currentTimeMs();
 
 	bool cPressed = false;
 

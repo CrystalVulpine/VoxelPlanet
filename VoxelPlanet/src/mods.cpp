@@ -98,7 +98,7 @@ void loadMods()
 	mod_processGameArgs.reserve(5);
 	mod_onGameLoop.reserve(5);
 
-    for(auto& p: fs::recursive_directory_iterator(path))
+    for(auto & p: fs::recursive_directory_iterator(path))
     {
         if(strcmp(p.path().extension().c_str(), ".so") == 0) {
 
@@ -106,7 +106,7 @@ void loadMods()
 
 			if ((handle = LoadLibrary(p.path().string().c_str(), RTLD_LAZY)) != NULL) {
 
-				const char* (*versionGetter)() = (const char* (*)())GetProcAddress(handle, "getApiVersion");
+				const char * (*versionGetter)() = (const char * (*)())GetProcAddress(handle, "getApiVersion");
 
 				auto error = dlerror();
 				if (error != NULL) {
@@ -115,12 +115,12 @@ void loadMods()
 				} else {
 					const char * const __restrict modApiVersion = versionGetter();
 					if (strcmp(modApiVersion, API_VERSION) != 0) {
-						std::cout << "Could not load " << ((const char* (*)())GetProcAddress(handle, "getModName"))() << ". Mod uses API version " << modApiVersion << " but this is " << API_VERSION << ".\n";
+						std::cout << "Could not load " << ((const char * (*)())GetProcAddress(handle, "getModName"))() << ". Mod uses API version " << modApiVersion << " but this is " << API_VERSION << ".\n";
 						continue;
 					}
 				}
 
-				std::cout << "Loaded mod " << ((const char* (*)())GetProcAddress(handle, "getModName"))() << ": " << ((const char* (*)())GetProcAddress(handle, "getModDescription"))() << "\n";
+				std::cout << "Loaded mod " << ((const char * (*)())GetProcAddress(handle, "getModName"))() << ": " << ((const char * (*)())GetProcAddress(handle, "getModDescription"))() << "\n";
 
 				void (*testFunc)() = (void (*)())GetProcAddress(handle, "testFunc");
 				if (testFunc) {
@@ -162,7 +162,7 @@ void loadMods()
 					mod_onGameLoop.push_back(onGameLoop);
 				}
 
-				void (*processGameArgs)(int, char*[]) = (void (*)(int, char*[]))GetProcAddress(handle, "processGameArgs");
+				void (*processGameArgs)(int, char * []) = (void (*)(int, char * []))GetProcAddress(handle, "processGameArgs");
 				if (processGameArgs) {
 					mod_processGameArgs.push_back(processGameArgs);
 				}
@@ -205,7 +205,7 @@ void loadMods()
 
 			if ((handle = dlopen(p.path().string().c_str(), RTLD_LAZY)) != NULL) {
 
-				const char* (*versionGetter)() = (const char* (*)())dlsym(handle, "getApiVersion");
+				const char * (*versionGetter)() = (const char * (*)())dlsym(handle, "getApiVersion");
 
 				auto error = dlerror();
 				if (error != NULL) {
@@ -214,12 +214,12 @@ void loadMods()
 				} else {
 					const char * const __restrict modApiVersion = versionGetter();
 					if (strcmp(modApiVersion, API_VERSION) != 0) {
-						std::cout << "Could not load " << ((const char* (*)())dlsym(handle, "getModName"))() << ". Mod uses API version " << modApiVersion << " but this is " << API_VERSION << ".\n";
+						std::cout << "Could not load " << ((const char * (*)())dlsym(handle, "getModName"))() << ". Mod uses API version " << modApiVersion << " but this is " << API_VERSION << ".\n";
 						continue;
 					}
 				}
 
-				std::cout << "Loaded mod " << ((const char* (*)())dlsym(handle, "getModName"))() << ": " << ((const char* (*)())dlsym(handle, "getModDescription"))() << "\n";
+				std::cout << "Loaded mod " << ((const char * (*)())dlsym(handle, "getModName"))() << ": " << ((const char * (*)())dlsym(handle, "getModDescription"))() << "\n";
 
 				void (*testFunc)() = (void (*)())dlsym(handle, "testFunc");
 				if (dlerror() == NULL) {
@@ -261,7 +261,7 @@ void loadMods()
 					mod_onGameLoop.push_back(onGameLoop);
 				}
 
-				void (*processGameArgs)(int, char*[]) = (void (*)(int, char*[]))dlsym(handle, "processGameArgs");
+				void (*processGameArgs)(int, char * []) = (void (*)(int, char * []))dlsym(handle, "processGameArgs");
 				if (dlerror() == NULL) {
 					mod_processGameArgs.push_back(processGameArgs);
 				}

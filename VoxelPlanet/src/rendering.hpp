@@ -23,12 +23,10 @@ extern Camera camera;
 
 extern bool worldIsDirty;
 
-extern GLuint loadShaders(GLchar const * vertexShaderCode, GLchar const * fragmentShaderCode);
-extern void takeScreenshot(const char filename[], const char folder[]);
-extern void renderCube(int x, int y, int z, unsigned int cube);
+extern void takeScreenshot(const char * const __restrict filename, const char * const __restrict folder);
 extern void renderWorld();
 extern void reRenderWorld();
-extern void renderCubeSelect(double x, double y, double z);
+extern void renderCubeSelect(const double x, const double y, const double z);
 extern int setupOpenGL();
 extern void doDrawTick();
 extern void cleanupOpenGL();

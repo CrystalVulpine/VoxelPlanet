@@ -13,23 +13,22 @@ public:
 	float maxX;
 	float minZ;
 	float maxZ;
-	unsigned char renderDistance;
 
 
 	Camera();
 
 	/** moves the camera in the specified directions **/
-	void move(float forward, float vertical, float sideways);
+	void move(const float forward, const float vertical, const float sideways);
 
 	/** adds to the rotation of the camera **/
-	void rotate(float yaw, float pitch);
+	void rotate(const float yaw, const float pitch);
 
 	/** the camera will not move outside of this area **/
-	void setBounds(float minX, float maxX, float minZ, float maxZ);
+	void setBounds(const float minX, const float maxX, const float minZ, const float maxZ);
 
 	/** calculates a matrix for the camera for OpenGL **/
-	glm::mat4 getMatrix(float windowSizeRatio);
+	glm::mat4 getMatrix(const float windowSizeRatio);
 
 	/** Specify the position and rotation to start the camera at **/
-	void initCamera(float x, float y, float z, float rotationYaw, float rotationPitch);
+	void initCamera(const float x, const float y, const float z, const float rotationYaw, const float rotationPitch);
 };
