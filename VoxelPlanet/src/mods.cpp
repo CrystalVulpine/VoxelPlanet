@@ -130,47 +130,47 @@ void loadMods()
 				std::cout << "Loaded mod " << ((const char * (*)())loadModFunc(handle, "getModName"))() << ": " << ((const char * (*)())loadModFunc(handle, "getModDescription"))() << "\n";
 
 				void (*testFunc)() = (void (*)())loadModFunc(handle, "testFunc");
-				if (dlerror() == NULL) {
+				if (testFunc) {
 					mod_testFunc.push_back(testFunc);
 				}
 
 				void (*onRenderTick)() = (void (*)())loadModFunc(handle, "onRenderTick");
-				if (dlerror() == NULL) {
+				if (onRenderTick) {
 					mod_onRenderTick.push_back(onRenderTick);
 				}
 
 				void (*onWorldTick)() = (void (*)())loadModFunc(handle, "onWorldTick");
-				if (dlerror() == NULL) {
+				if (onWorldTick) {
 					mod_onWorldTick.push_back(onWorldTick);
 				}
 
 				void (*onGameStart)() = (void (*)())loadModFunc(handle, "onGameStart");
-				if (dlerror() == NULL) {
+				if (onGameStart) {
 					mod_onGameStart.push_back(onGameStart);
 				}
 
 				void (*onGameExit)() = (void (*)())loadModFunc(handle, "onGameExit");
-				if (dlerror() == NULL) {
+				if (onGameExit) {
 					mod_onGameExit.push_back(onGameExit);
 				}
 
 				void (*onWorldLoad)() = (void (*)())loadModFunc(handle, "onWorldLoad");
-				if (dlerror() == NULL) {
+				if (onWorldLoad) {
 					mod_onWorldLoad.push_back(onWorldLoad);
 				}
 
 				void (*onWorldClose)() = (void (*)())loadModFunc(handle, "onWorldClose");
-				if (dlerror() == NULL) {
+				if (onWorldClose) {
 					mod_onWorldClose.push_back(onWorldClose);
 				}
 
 				void (*onGameLoop)(Clock, Clock) = (void (*)(Clock, Clock))loadModFunc(handle, "onGameLoop");
-				if (dlerror() == NULL) {
+				if (onGameLoop) {
 					mod_onGameLoop.push_back(onGameLoop);
 				}
 
 				void (*processGameArgs)(int, char * []) = (void (*)(int, char * []))loadModFunc(handle, "processGameArgs");
-				if (dlerror() == NULL) {
+				if (processGameArgs) {
 					mod_processGameArgs.push_back(processGameArgs);
 				}
 
