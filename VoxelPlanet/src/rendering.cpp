@@ -23,8 +23,6 @@ float skyColorBlue = 1.0f;
 bool hideGUI = false;
 bool fancyGraphics = true;
 
-Camera camera;
-
 bool worldIsDirty = false;
 
 GLuint vertexbuffer;
@@ -450,8 +448,6 @@ int setupOpenGL() {
 
 	matrix = glGetUniformLocation(program, "MVP");
 
-	camera.initCamera((float)mainWorld.worldLength / 2.0f, 17.6f, (float)mainWorld.worldWidth / 2.0f, 0.0f, 0.0f);
-
 	glClearColor(skyColorRed, skyColorGreen, skyColorBlue, 1.0f);
 
 	renderWorld();
@@ -484,7 +480,7 @@ void doDrawTick() {
 
 	glUseProgram(program);
 
-	glm::mat4 mvp = camera.getMatrix((float)windowWidth / (float)windowHeight);
+	glm::mat4 mvp = player.getMatrix((float)windowWidth / (float)windowHeight, 16);
 	glUniformMatrix4fv(matrix, 1, GL_FALSE, &mvp[0][0]);
 
 	glDisable(GL_BLEND);
@@ -545,6 +541,7 @@ void doDrawTick() {
 			mvp = glm::ortho<float>(-((float)windowWidth / (float)windowHeight), (float)windowWidth / (float)windowHeight, -1.0f, 1.0f, -1.0f, 1.0f) * glm::rotate(model, 0.5f, glm::vec3(1.0, 0.0, 0.0)) * glm::translate(model, glm::vec3(((double)windowWidth / (double)windowHeight) - 0.2, 0.9, 0.0)) * glm::rotate(model, 0.785398f, glm::vec3(0.0, 1.0, 0.0));
 			glUniformMatrix4fv(matrix, 1, GL_FALSE, &mvp[0][0]);
 
+			const unsigned int usingCube = player.usingCube;
 			float red = (float)(usingCube >> 24) / 255.0f;
 			float green = (float)((usingCube >> 16) & 255) / 255.0f;
 			float blue = (float)((usingCube >> 8) & 255) / 255.0f;
@@ -838,7 +835,8 @@ void doDrawTick() {
 			};
 			renderToGUI(sizeof(triangle) / sizeof(triangle[0]) / 3, triangle, triangleColor);
 
-			usingCube = (unsigned char)(multiplierRed * 255.0f) << 24 | (unsigned char)(multiplierGreen * 255.0f) << 16 | (unsigned char)(multiplierBlue * 255.0f) << 8 | (unsigned char)(((colorAlphaPos + 0.1f) / 0.9f) * 255.0f);
+			const unsigned int usingCube = (unsigned char)(multiplierRed * 255.0f) << 24 | (unsigned char)(multiplierGreen * 255.0f) << 16 | (unsigned char)(multiplierBlue * 255.0f) << 8 | (unsigned char)(((colorAlphaPos + 0.1f) / 0.9f) * 255.0f);
+			player.usingCube = usingCube;
 
 			glm::mat4 model = glm::mat4(1.0f);
 			mvp = glm::ortho<float>(-((float)windowWidth / (float)windowHeight), (float)windowWidth / (float)windowHeight, -1.0f, 1.0f, -1.0f, 1.0f) * glm::rotate(model, 0.5f, glm::vec3(1.0, 0.0, 0.0)) * glm::translate(model, glm::vec3(((double)windowWidth / (double)windowHeight) - 0.2, 0.9, 0.0)) * glm::rotate(model, 0.785398f, glm::vec3(0.0, 1.0, 0.0));

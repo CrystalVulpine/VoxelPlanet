@@ -11,17 +11,16 @@
 #include <cstring>
 #include <ctime>
 
-bool gameRunning = false;
 World mainWorld;
+Player player;
 
-// don't let GLFW capture the pointer in case the application suspends.
-bool debugMode = false;
+bool gameRunning = false;
 
 /** the cube the screen/crosshair is pointing at **/
 bool isCubeSelected = false;
 
-/** the cube currently in use that would be placed **/
-unsigned int usingCube = 0x808080ff;
+// don't let GLFW capture the pointer in case the application suspends.
+bool debugMode = false;
 
 bool gamePaused = false;
 unsigned int openedScreen = 0;
@@ -102,7 +101,7 @@ int main(int argc, char *argv[]) {
 	if (glErrorCode != 0) return glErrorCode;
 
 	gameRunning = true;
-	camera.setBounds(0.0f, (float)mainWorld.worldLength, 0.0f, (float)mainWorld.worldWidth);
+	player.setBounds(0.0f, (float)mainWorld.worldLength, 0.0f, (float)mainWorld.worldWidth);
 
 	double mouseX;
 	double mouseY;
@@ -178,7 +177,7 @@ int main(int argc, char *argv[]) {
 
 		glfwGetWindowSize(window, &windowWidth, &windowHeight);
 
-		// we want to control the speed of things like moving the camera
+		// we want to control the speed of things like moving the player
 		loopTime = currentTimeMs();
 		isCubeSelected = !gamePaused && !openedScreen;
 
@@ -222,13 +221,13 @@ int main(int argc, char *argv[]) {
 
 				glfwGetCursorPos(window, &mouseX, &mouseY);
 
-				camera.move(forward, upward, sideways);
-				camera.rotate(((float)mouseX - ((float)windowWidth / 2.0f)) / 180.0f, ((float)mouseY - ((float)windowHeight / 2.0f)) / 180.0f);
+				player.move(forward, upward, sideways);
+				player.rotate(((float)mouseX - ((float)windowWidth / 2.0f)) / 180.0f, ((float)mouseY - ((float)windowHeight / 2.0f)) / 180.0f);
 
 				glfwSetCursorPos(window, (double)windowWidth / 2.0, (double)windowHeight / 2.0);
 
-				// here's where we trace a ray from the camera to a cube in the world
-				RayTraceInfo raySelection = mainWorld.rayTraceCubes(glm::vec3(camera.xPos, camera.yPos, camera.zPos), camera.rotationYaw, camera.rotationPitch, 6.0f);
+				// here's where we trace a ray from the player to a cube in the world
+				RayTraceInfo raySelection = mainWorld.rayTraceCubes(glm::vec3(player.xPos, player.yPos, player.zPos), player.rotationYaw, player.rotationPitch, 6.0f);
 
 				if (raySelection.cubeFound) {
 					double xd = std::floor(raySelection.pos.x);
@@ -249,12 +248,12 @@ int main(int argc, char *argv[]) {
 						glfwGetKey(window, GLFW_KEY_LEFT_CONTROL);
 						glfwGetKey(window, GLFW_KEY_RIGHT_CONTROL);
 						if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_CONTROL) == GLFW_PRESS) {
-							mainWorld.fillCubes(usingCube, x, y, z);
+							mainWorld.fillCubes(player.usingCube, x, y, z);
 							worldIsDirty = true;
 						} else {
 							unsigned int * __restrict cube = mainWorld.getCubePointer((int)std::floor(raySelection.lastPos.x), (int)std::floor(raySelection.lastPos.y), (int)std::floor(raySelection.lastPos.z));
 							if (cube != NULL && *cube == 0) {
-								*cube = usingCube;
+								*cube = player.usingCube;
 								worldIsDirty = true;
 							}
 						}
@@ -273,7 +272,7 @@ int main(int argc, char *argv[]) {
 						mMousePress = true;
 						unsigned int b = mainWorld.getCube(x, y, z);
 						if (b > 0) {
-							usingCube = b;
+							player.usingCube = b;
 						}
 					} else if (mMousePress && glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_MIDDLE) != GLFW_PRESS) {
 						mMousePress = false;

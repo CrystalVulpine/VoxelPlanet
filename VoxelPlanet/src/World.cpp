@@ -111,6 +111,8 @@ void World::startWorld(const int length, const int width, const int height) {
 		free(data);
 	}
 
+	player.createPlayer((float)mainWorld.worldLength / 2.0f, 17.6f, (float)mainWorld.worldWidth / 2.0f, 0.0f, 0.0f);
+
 	mods_onWorldLoad();
 }
 

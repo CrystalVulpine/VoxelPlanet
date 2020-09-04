@@ -1,7 +1,5 @@
 #pragma once
 
-#include "Camera.hpp"
-
 #if defined(_WIN32)
 #include <windef.h>
 #endif
@@ -18,8 +16,6 @@ extern float worldBrightness;
 extern float skyColorRed;
 extern float skyColorGreen;
 extern float skyColorBlue;
-
-extern Camera camera;
 
 extern bool worldIsDirty;
 
