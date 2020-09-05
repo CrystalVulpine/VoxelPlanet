@@ -30,6 +30,17 @@ void World::startWorld(const int length, const int width, const int height) {
 		worldWidth = width;
 		worldHeight = height;
 
+		player.inventory[0] = 0xff0000ff;
+		player.inventory[1] = 0xff8000ff;
+		player.inventory[2] = 0xffff00ff;
+		player.inventory[3] = 0x80ff00ff;
+		player.inventory[4] = 0x00ff00ff;
+		player.inventory[5] = 0x00ff80ff;
+		player.inventory[6] = 0x00ffffff;
+		player.inventory[7] = 0x0000ffff;
+		player.inventory[8] = 0x8000ffff;
+		player.inventory[9] = 0xff00ffff;
+
 		// yes I know, malloc in C++ is non-conventional. But it gets the job done.
 		cubes = (unsigned int*)malloc(worldLength * worldWidth * worldHeight * sizeof(unsigned int));
 
@@ -64,7 +75,6 @@ void World::startWorld(const int length, const int width, const int height) {
 	} else {
 
 		if (stat(levelDatPath, &st) != 0) {
-
 			printf("Could not load level information. You must move the current world so that a new one can be created.\n");
 			exit(1);
 		}
@@ -73,7 +83,6 @@ void World::startWorld(const int length, const int width, const int height) {
 		std::streamsize size = level.tellg();
 
 		if (size < 6) {
-
 			printf("Could not load world size. You must move the current world so that a new one can be created.\n");
 			exit(1);
 		}
@@ -81,17 +90,35 @@ void World::startWorld(const int length, const int width, const int height) {
 		isNewWorld = false;
 
 		level.seekg(0, std::ios::beg);
-		unsigned char info[6];
+		unsigned char info[size];
 		level.read((char*)info, size);
 		worldLength = (unsigned short)info[0] << 8 | (unsigned short)info[1];
 		worldWidth = (unsigned short)info[2] << 8 | (unsigned short)info[3];
 		worldHeight = (unsigned short)info[4] << 8 | (unsigned short)info[5];
+
+		if (size >= 46) {
+			for (unsigned int i = 0; i < 10; ++i) {
+				player.inventory[i] = (unsigned int)info[6 + (i * 4) + 0] << 24 | (unsigned int)info[6 + (i * 4) + 1] << 16 | (unsigned int)info[6 + (i * 4) + 2] << 8 | (unsigned int)info[6 + (i * 4) + 3];
+			}
+		} else {
+			player.inventory[0] = 0xff0000ff;
+			player.inventory[1] = 0xff8000ff;
+			player.inventory[2] = 0xffff00ff;
+			player.inventory[3] = 0x80ff00ff;
+			player.inventory[4] = 0x00ff00ff;
+			player.inventory[5] = 0x00ff80ff;
+			player.inventory[6] = 0x00ffffff;
+			player.inventory[7] = 0x0000ffff;
+			player.inventory[8] = 0x8000ffff;
+			player.inventory[9] = 0xff00ffff;
+		}
+
 		cubes = (unsigned int*)malloc(worldLength * worldWidth * worldHeight * sizeof(unsigned int));
 
 		std::ifstream save(cubesDatPath, std::ios::binary | std::ios::ate);
 		size = save.tellg();
 		save.seekg(0, std::ios::beg);
-		unsigned char* __restrict data = (unsigned char*)malloc(size);
+		unsigned char * const __restrict data = (unsigned char*)malloc(size);
 		save.read((char*)data, size);
 
 		unsigned int worldIndex = 0;
@@ -111,7 +138,7 @@ void World::startWorld(const int length, const int width, const int height) {
 		free(data);
 	}
 
-	player.createPlayer((float)mainWorld.worldLength / 2.0f, 17.6f, (float)mainWorld.worldWidth / 2.0f, 0.0f, 0.0f);
+	player.createPlayer();
 
 	mods_onWorldLoad();
 }
@@ -169,15 +196,22 @@ void World::saveWorld() {
 
 		std::ofstream level(levelDatPath);
 
-		unsigned char worldSizeInfo[6];
-		worldSizeInfo[0] = (worldLength >> 8) & 0xff;
-		worldSizeInfo[1] = worldLength & 0xff;
-		worldSizeInfo[2] = (worldWidth >> 8) & 0xff;
-		worldSizeInfo[3] = worldWidth & 0xff;
-		worldSizeInfo[4] = (worldHeight >> 8) & 0xff;
-		worldSizeInfo[5] = worldHeight & 0xff;
+		unsigned char levelInfo[46];
+		levelInfo[0] = (unsigned char)((worldLength >> 8) & 0xff);
+		levelInfo[1] = (unsigned char)(worldLength & 0xff);
+		levelInfo[2] = (unsigned char)((worldWidth >> 8) & 0xff);
+		levelInfo[3] = (unsigned char)(worldWidth & 0xff);
+		levelInfo[4] = (unsigned char)((worldHeight >> 8) & 0xff);
+		levelInfo[5] = (unsigned char)(worldHeight & 0xff);
 
-		level.write((char*)worldSizeInfo, 6);
+		for (unsigned int i = 0; i < 10; ++i) {
+			levelInfo[6 + (i * 4) + 0] = (unsigned char)((player.inventory[i] >> 24) & 0xff);
+			levelInfo[6 + (i * 4) + 1] = (unsigned char)((player.inventory[i] >> 16) & 0xff);
+			levelInfo[6 + (i * 4) + 2] = (unsigned char)((player.inventory[i] >> 8) & 0xff);
+			levelInfo[6 + (i * 4) + 3] = (unsigned char)(player.inventory[i] & 0xff);
+		}
+
+		level.write((char*)levelInfo, 46);
 
 
 		std::ofstream save(cubesDatPath);

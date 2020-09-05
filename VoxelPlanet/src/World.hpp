@@ -10,15 +10,15 @@ struct RayTraceInfo {
 
 class World {
 public:
-	char* __restrict worldDir;
-	char* __restrict cubesDatPath;
-	char* __restrict levelDatPath;
+	char * __restrict worldDir;
+	char * __restrict cubesDatPath;
+	char * __restrict levelDatPath;
 
-	int worldLength;
-	int worldWidth;
-	int worldHeight;
+	unsigned short worldLength;
+	unsigned short worldWidth;
+	unsigned short worldHeight;
 
-	unsigned int* __restrict cubes;
+	unsigned int * __restrict cubes;
 
 	bool isNewWorld;
 	bool isSaving;

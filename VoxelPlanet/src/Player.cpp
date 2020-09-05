@@ -1,5 +1,6 @@
 #include "Player.hpp"
 #include "global.hpp"
+#include "World.hpp"
 
 #include <glm/gtc/matrix_transform.hpp>
 
@@ -8,15 +9,15 @@ void Player::move(const float forward, const float vertical, const float sideway
 	zPos -= forward * glm::cos(rotationYaw) + sideways * glm::sin(-rotationYaw);
 	yPos += vertical;
 
-	if (xPos < minX) {
-		xPos = minX;
-	} else if (xPos > maxX) {
-		xPos = maxX;
+	if (xPos < 0.0f) {
+		xPos = 0.0f;
+	} else if (xPos > mainWorld.worldLength) {
+		xPos = mainWorld.worldLength;
 	}
-	if (zPos < minZ) {
-		zPos = minZ;
-	} else if (zPos > maxZ) {
-		zPos = maxZ;
+	if (zPos < 0.0f) {
+		zPos = 0.0f;
+	} else if (zPos > mainWorld.worldWidth) {
+		zPos = mainWorld.worldWidth;
 	}
 }
 
@@ -32,13 +33,6 @@ void Player::rotate(const float yaw, const float pitch) {
 	}
 }
 
-void Player::setBounds(const float lx, const float hx, const float lz, const float hz) {
-	minX = lx;
-	maxX = hx;
-	minZ = lz;
-	maxZ = hz;
-}
-
 glm::mat4 Player::getMatrix(const float windowSizeRatio, const unsigned int renderDistance) {
 	glm::mat4 model = glm::mat4(1.0f);
 	glm::mat4 projection = glm::perspective(glm::radians(70.0f), windowSizeRatio, 0.01f, (float)(renderDistance * 16));
@@ -46,14 +40,12 @@ glm::mat4 Player::getMatrix(const float windowSizeRatio, const unsigned int rend
 	return model * projection * view;
 }
 
-void Player::createPlayer(const float x, const float y, const float z, const float yaw, const float pitch) {
-	xPos = x;
-	yPos = y;
-	zPos = z;
-	rotationYaw = yaw;
-	rotationPitch = pitch;
-	minX = minZ = 0.0f;
-	maxX = maxZ = 256.0f;
+void Player::createPlayer() {
+	xPos = (float)mainWorld.worldLength / 2.0f;
+	yPos = 17.6f;
+	zPos = (float)mainWorld.worldWidth / 2.0f;
+	rotationYaw = 0.0f;
+	rotationPitch = 0.0f;
 
-	usingCube = 0x808080ff;
+	selectedSlot = 0;
 }

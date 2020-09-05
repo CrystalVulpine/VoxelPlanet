@@ -22,6 +22,8 @@ extern unsigned int openedScreen;
 /** the cube the screen/crosshair is pointing at **/
 extern bool isCubeSelected;
 
+extern bool changeCubeColor;
+
 /** marks the world dirty and in need of being rendered again. **/
 extern bool worldIsDirty;
 

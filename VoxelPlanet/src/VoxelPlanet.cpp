@@ -19,6 +19,8 @@ bool gameRunning = false;
 /** the cube the screen/crosshair is pointing at **/
 bool isCubeSelected = false;
 
+bool changeCubeColor = false;
+
 // don't let GLFW capture the pointer in case the application suspends.
 bool debugMode = false;
 
@@ -101,7 +103,6 @@ int main(int argc, char *argv[]) {
 	if (glErrorCode != 0) return glErrorCode;
 
 	gameRunning = true;
-	player.setBounds(0.0f, (float)mainWorld.worldLength, 0.0f, (float)mainWorld.worldWidth);
 
 	double mouseX;
 	double mouseY;
@@ -135,6 +136,7 @@ int main(int argc, char *argv[]) {
 				gamePaused = !gamePaused;
 			} else {
 				openedScreen = 0;
+				changeCubeColor = false;
 			}
 
 			if (!gamePaused) {
@@ -194,6 +196,28 @@ int main(int argc, char *argv[]) {
 					cPressed = false;
 				}
 
+				if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS) {
+					player.selectedSlot = 0;
+				} else if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS) {
+					player.selectedSlot = 1;
+				} else if (glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS) {
+					player.selectedSlot = 2;
+				} else if (glfwGetKey(window, GLFW_KEY_4) == GLFW_PRESS) {
+					player.selectedSlot = 3;
+				} else if (glfwGetKey(window, GLFW_KEY_5) == GLFW_PRESS) {
+					player.selectedSlot = 4;
+				} else if (glfwGetKey(window, GLFW_KEY_6) == GLFW_PRESS) {
+					player.selectedSlot = 5;
+				} else if (glfwGetKey(window, GLFW_KEY_7) == GLFW_PRESS) {
+					player.selectedSlot = 6;
+				} else if (glfwGetKey(window, GLFW_KEY_8) == GLFW_PRESS) {
+					player.selectedSlot = 7;
+				} else if (glfwGetKey(window, GLFW_KEY_9) == GLFW_PRESS) {
+					player.selectedSlot = 8;
+				} else if (glfwGetKey(window, GLFW_KEY_0) == GLFW_PRESS) {
+					player.selectedSlot = 9;
+				}
+
 
 				float forward = 0.0f;
 				float sideways = 0.0f;
@@ -248,12 +272,12 @@ int main(int argc, char *argv[]) {
 						glfwGetKey(window, GLFW_KEY_LEFT_CONTROL);
 						glfwGetKey(window, GLFW_KEY_RIGHT_CONTROL);
 						if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_CONTROL) == GLFW_PRESS) {
-							mainWorld.fillCubes(player.usingCube, x, y, z);
+							mainWorld.fillCubes(player.inventory[player.selectedSlot], x, y, z);
 							worldIsDirty = true;
 						} else {
 							unsigned int * __restrict cube = mainWorld.getCubePointer((int)std::floor(raySelection.lastPos.x), (int)std::floor(raySelection.lastPos.y), (int)std::floor(raySelection.lastPos.z));
 							if (cube != NULL && *cube == 0) {
-								*cube = player.usingCube;
+								*cube = player.inventory[player.selectedSlot];
 								worldIsDirty = true;
 							}
 						}
@@ -272,7 +296,7 @@ int main(int argc, char *argv[]) {
 						mMousePress = true;
 						unsigned int b = mainWorld.getCube(x, y, z);
 						if (b > 0) {
-							player.usingCube = b;
+							player.inventory[player.selectedSlot] = b;
 						}
 					} else if (mMousePress && glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_MIDDLE) != GLFW_PRESS) {
 						mMousePress = false;
@@ -295,6 +319,8 @@ int main(int argc, char *argv[]) {
 			} else if (openedScreen == SCREEN_COLOR) {
 
 				if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) {
+
+					changeCubeColor = true;
 
 					glfwGetCursorPos(window, &mouseX, &mouseY);
 
@@ -326,6 +352,8 @@ int main(int argc, char *argv[]) {
 
 					} else if (colorBarActive || ((!colorTriangleActive && !colorAlphaBarActive) && mouseY2 >= -0.35 && mouseY2 <= -0.15 && std::abs(mouseX2) < 0.6)) {
 
+						changeCubeColor = true;
+
 						colorBarActive = true;
 
 						if (mouseX2 < -0.6) {
@@ -337,6 +365,8 @@ int main(int argc, char *argv[]) {
 						colorBarPos = mouseX2;
 
 					} else if (colorAlphaBarActive || ((!colorTriangleActive && !colorBarActive) && mouseY2 <= 0.8 && mouseY2 >= -0.1 && mouseX2 >= -0.8 && mouseX2 <= -0.7)) {
+
+						changeCubeColor = true;
 
 						colorAlphaBarActive = true;
 
