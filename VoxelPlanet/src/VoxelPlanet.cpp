@@ -164,9 +164,9 @@ int main(int argc, char * argv[]) {
 			f2Pressed = true;
 
 			char timeString[96] = "screenshots/";
-			time_t * const __restrict rawtime = (time_t*)malloc(sizeof(time_t));
-			time(rawtime);
-			strftime(&timeString[12], sizeof(char[80]),"%d-%m-%Y %H-%M-%S", localtime(rawtime));
+			time_t rawtime;
+			time(&rawtime);
+			strftime(&timeString[12], sizeof(char[80]),"%d-%m-%Y %H-%M-%S", localtime(&rawtime));
 			strcat(timeString, ".png");
 			takeScreenshot(timeString, "screenshots/");
 		} else if (f2Pressed && glfwGetKey(window, GLFW_KEY_F2) != GLFW_PRESS) {
