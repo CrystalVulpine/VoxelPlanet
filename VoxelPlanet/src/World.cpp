@@ -89,6 +89,8 @@ void World::startWorld(const int length, const int width, const int height) __re
 		worldHeight = (unsigned short)info[4] << 8 | (unsigned short)info[5];
 		cubes = (unsigned int*)malloc(worldLength * worldWidth * worldHeight * sizeof(unsigned int));
 
+		free(info);
+
 		std::ifstream save(cubesDatPath, std::ios::binary | std::ios::ate);
 		size = save.tellg();
 		save.seekg(0, std::ios::beg);
@@ -179,6 +181,7 @@ void World::saveWorld() __restrict {
 
 		level.write((char*)worldSizeInfo, 6);
 		level.close();
+		free(worldSizeInfo);
 
 
 		std::ofstream save(cubesDatPath);
