@@ -152,8 +152,6 @@ void World::closeWorld() __restrict {
 
 	free(cubes);
 	free(worldDir);
-	free(cubesDatPath);
-	free(levelDatPath);
 }
 
 
