@@ -26,10 +26,10 @@ void Player::rotate(const float yaw, const float pitch) __restrict {
 	rotationPitch += pitch;
 
 	// this prevents the Player from rotating too far up or down
-	if (rotationPitch > M_PI / 2.0f) {
-		rotationPitch = M_PI / 2.0f;
-	} else if (rotationPitch < -M_PI / 2.0f) {
-		rotationPitch = -M_PI / 2.0f;
+	if (rotationPitch > _PI / 2.0f) {
+		rotationPitch = _PI / 2.0f;
+	} else if (rotationPitch < -_PI / 2.0f) {
+		rotationPitch = -_PI / 2.0f;
 	}
 }
 

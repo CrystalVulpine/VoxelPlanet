@@ -3,9 +3,7 @@
 #include "World.hpp"
 #include "Player.hpp"
 
-#ifndef M_PI
-    #define M_PI 3.14159265358979323846
-#endif
+#define _PI 3.14159265358979323846
 
 extern World mainWorld;
 extern Player player;

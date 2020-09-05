@@ -274,9 +274,9 @@ RayTraceInfo World::rayTraceCubes(const glm::vec3 start, const float rotationYaw
 	    pos.z -= changeZ;
 
 	    // tan can be undefined, so still move y when that happens
-	    if (rotationPitch <= -M_PI / 2.0f) {
+	    if (rotationPitch <= -_PI / 2.0f) {
 	    	pos.y += 1.0f;
-	    } else if (rotationPitch >= M_PI / 2.0f) {
+	    } else if (rotationPitch >= _PI / 2.0f) {
 	    	pos.y -= 1.0f;
 	    } else {
 	    	pos.y -= changeY;
