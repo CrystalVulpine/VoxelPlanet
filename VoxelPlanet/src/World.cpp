@@ -81,7 +81,7 @@ void World::startWorld(const int length, const int width, const int height) __re
 		isNewWorld = false;
 
 		level.seekg(0, std::ios::beg);
-		unsigned char info[6];
+		unsigned char * const __restrict info = (unsigned char*)malloc(sizeof(char[size]));
 		level.read((char*)info, size);
 		level.close();
 		worldLength = (unsigned short)info[0] << 8 | (unsigned short)info[1];
@@ -169,7 +169,7 @@ void World::saveWorld() __restrict {
 
 		std::ofstream level(levelDatPath);
 
-		unsigned char worldSizeInfo[6];
+		unsigned char * const __restrict worldSizeInfo = (unsigned char*)malloc(sizeof(char[6]));
 		worldSizeInfo[0] = (worldLength >> 8) & 0xff;
 		worldSizeInfo[1] = worldLength & 0xff;
 		worldSizeInfo[2] = (worldWidth >> 8) & 0xff;
