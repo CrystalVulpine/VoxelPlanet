@@ -89,7 +89,7 @@ void World::startWorld(const int length, const int width, const int height) __re
 		isNewWorld = false;
 
 		level.seekg(0, std::ios::beg);
-		unsigned char * const __restrict info = (unsigned char*)malloc(sizeof(char[size]));
+		unsigned char info[size];
 		level.read((char*)info, size);
 		level.close();
 		worldLength = (unsigned short)info[0] << 8 | (unsigned short)info[1];
@@ -114,8 +114,6 @@ void World::startWorld(const int length, const int width, const int height) __re
 		}
 
 		cubes = (unsigned int*)malloc(worldLength * worldWidth * worldHeight * sizeof(unsigned int));
-
-		free(info);
 
 		std::ifstream save(cubesDatPath, std::ios::binary | std::ios::ate);
 		size = save.tellg();
@@ -199,7 +197,7 @@ void World::saveWorld() __restrict {
 
 		std::ofstream level(levelDatPath);
 
-		unsigned char * const __restrict levelInfo = (unsigned char*)malloc(sizeof(char[46]));
+		unsigned char levelInfo[46];
 		levelInfo[0] = (unsigned char)((worldLength >> 8) & 0xff);
 		levelInfo[1] = (unsigned char)(worldLength & 0xff);
 		levelInfo[2] = (unsigned char)((worldWidth >> 8) & 0xff);
@@ -216,7 +214,6 @@ void World::saveWorld() __restrict {
 
 		level.write((char*)levelInfo, 46);
 		level.close();
-		free(levelInfo);
 
 		std::ofstream save(cubesDatPath);
 
@@ -322,22 +319,15 @@ void World::setSaveDir(const char * const __restrict dir) __restrict {
 		free(worldDir);
 	}
 
-	worldDir = (char*)malloc(strlen(dir) + 1);
+	const unsigned int dirLength = strlen(dir);
+	worldDir = (char*)malloc(dirLength + 1 + dirLength + sizeof("/cubes.dat") + 1 + dirLength + sizeof("/level.dat") + 1);
 	strcpy(worldDir, dir);
 
-	if (cubesDatPath != NULL) {
-		free(cubesDatPath);
-	}
-
-	cubesDatPath = (char*)malloc(strlen(dir) + sizeof("/cubes.dat") + 1);
+	cubesDatPath = &worldDir[dirLength + 1];
 	strcpy(cubesDatPath, dir);
 	strcat(cubesDatPath, "/cubes.dat");
 
-	if (levelDatPath != NULL) {
-		free(levelDatPath);
-	}
-
-	levelDatPath = (char*)malloc(strlen(dir) + sizeof("/level.dat") + 1);
+	levelDatPath = &worldDir[dirLength + 1 + dirLength + sizeof("/cubes.dat") + 1];
 	strcpy(levelDatPath, dir);
 	strcat(levelDatPath, "/level.dat");
 }

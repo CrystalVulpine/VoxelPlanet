@@ -115,33 +115,32 @@ static GLuint loadShaders(const GLchar * const __restrict vertexShaderPath, cons
 		exit(-1);
 	}
 
-	std::ifstream shaderStream;
-	shaderStream.open(vertexShaderPath);
-	shaderStream.seekg(0, std::ios::end);
-	unsigned int shaderLength = shaderStream.tellg();
-	shaderStream.seekg(0, std::ios::beg);
-	GLchar * const vertexShaderCode = (GLchar*)malloc(sizeof(GLchar[shaderLength + 1]));
-	vertexShaderCode[shaderLength] = '\0';
-	shaderStream.read(vertexShaderCode, shaderLength);
-	shaderStream.close();
-	shaderStream.clear();
-
-	shaderStream.open(fragmentShaderPath);
-	shaderStream.seekg(0, std::ios::end);
-	shaderLength = shaderStream.tellg();
-	shaderStream.seekg(0, std::ios::beg);
-	GLchar * const fragmentShaderCode = (GLchar*)malloc(sizeof(GLchar[shaderLength + 1]));
-	fragmentShaderCode[shaderLength] = '\0';
-	shaderStream.read(fragmentShaderCode, shaderLength);
-	shaderStream.close();
+	std::ifstream vertexStream;
+	vertexStream.open(vertexShaderPath);
+	vertexStream.seekg(0, std::ios::end);
+	unsigned int vertexLength = vertexStream.tellg();
+	std::ifstream fragmentStream;
+	fragmentStream.open(fragmentShaderPath);
+	fragmentStream.seekg(0, std::ios::end);
+	unsigned int fragmentLength = fragmentStream.tellg();
+	unsigned char * const __restrict vertexShaderCode = (unsigned char*)malloc(sizeof(char[vertexLength + 1 + fragmentLength + 1]));
+	vertexStream.seekg(0, std::ios::beg);
+	vertexStream.read((char*)vertexShaderCode, vertexLength);
+	vertexShaderCode[vertexLength] = '\0';
+	vertexStream.close();
+	unsigned char * const __restrict fragmentShaderCode = &vertexShaderCode[vertexLength + 1];
+	fragmentStream.seekg(0, std::ios::beg);
+	fragmentStream.read((char*)fragmentShaderCode, fragmentLength);
+	fragmentShaderCode[fragmentLength] = '\0';
+	fragmentStream.close();
 
 	GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
 	GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
 
-	glShaderSource(vertexShader, 1, &vertexShaderCode, NULL);
+	glShaderSource(vertexShader, 1, (const GLchar * const *)&vertexShaderCode, NULL);
 	glCompileShader(vertexShader);
 
-	glShaderSource(fragmentShader, 1, &fragmentShaderCode, NULL);
+	glShaderSource(fragmentShader, 1, (const GLchar * const *)&fragmentShaderCode, NULL);
 	glCompileShader(fragmentShader);
 
 	GLint isCompiled = 0;
@@ -937,7 +936,7 @@ void doDrawTick() {
 
 
 void takeScreenshot(const char * const __restrict filename, const char * const __restrict folder) {
-    unsigned char pixels[windowWidth * windowHeight * 3];
+    unsigned char * const __restrict pixels = (unsigned char*)malloc(sizeof(char[windowWidth * windowHeight * 3]));
     glPixelStorei(GL_PACK_ALIGNMENT, 1);
     glReadBuffer(GL_FRONT);
     glReadPixels(0, 0, windowWidth, windowHeight, GL_RGB, GL_UNSIGNED_BYTE, pixels);
@@ -952,7 +951,7 @@ void takeScreenshot(const char * const __restrict filename, const char * const _
     }
     png_structp png = png_create_write_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
     png_infop info = png_create_info_struct(png);
-    FILE* file = fopen(filename, "wb");
+    FILE * const __restrict file = fopen(filename, "wb");
     png_init_io(png, file);
     png_set_IHDR(png, info, windowWidth, windowHeight, 8, PNG_COLOR_TYPE_RGB, PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_BASE, PNG_FILTER_TYPE_BASE);
     png_colorp palette = (png_colorp)png_malloc(png, sizeof(png_color[PNG_MAX_PALETTE_LENGTH]));
@@ -961,15 +960,16 @@ void takeScreenshot(const char * const __restrict filename, const char * const _
     png_set_packing(png);
     png_bytepp rows = (png_bytepp)png_malloc(png, sizeof(png_bytep[windowHeight]));
     for (int i = 0; i < windowHeight; ++i) {
-        rows[i] = (png_bytep)(pixels + (windowHeight - i - 1) * windowWidth * 3);
+        rows[i] = (png_bytep)(&pixels[(windowHeight - i - 1) * windowWidth * 3]);
     }
     png_write_image(png, rows);
     png_write_end(png, info);
     png_free(png, palette);
+    png_free(png, rows);
+	free(pixels);
     png_destroy_write_struct(&png, &info);
     fclose(file);
 	std::cout << "Saved screenshot '" << filename << "'\n";
-    delete[] rows;
 }
 
 
