@@ -28,7 +28,7 @@ bool gamePaused = false;
 unsigned int openedScreen = 0;
 
 
-int main(int argc, char *argv[]) {
+int main(int argc, char * argv[]) {
 
 	srand(time(NULL));
 
@@ -99,7 +99,6 @@ int main(int argc, char *argv[]) {
 
 
 	int glErrorCode = setupOpenGL();
-
 	if (glErrorCode != 0) return glErrorCode;
 
 	gameRunning = true;
@@ -116,11 +115,10 @@ int main(int argc, char *argv[]) {
 	Clock loopTime;
 	Clock lastLoopTime = currentTimeMs();
 
-	Clock clickClock = currentTimeMs();
-
 	Clock lastTickTime = currentTimeMs();
 	Clock tickTime;
 
+	Clock clickClock = currentTimeMs();
 
 	bool cPressed = false;
 
@@ -167,9 +165,9 @@ int main(int argc, char *argv[]) {
 			f2Pressed = true;
 
 			char timeString[96] = "screenshots/";
-			time_t* __restrict rawtime = (time_t*)malloc(sizeof(time_t));
-			time(rawtime);
-			strftime(&timeString[12], sizeof(char[80]),"%d-%m-%Y %H-%M-%S", localtime(rawtime));
+			time_t rawtime;
+			time(&rawtime);
+			strftime(&timeString[12], sizeof(char[80]),"%d-%m-%Y %H-%M-%S", localtime(&rawtime));
 			strcat(timeString, ".png");
 			takeScreenshot(timeString, "screenshots/");
 		} else if (f2Pressed && glfwGetKey(window, GLFW_KEY_F2) != GLFW_PRESS) {
@@ -275,7 +273,7 @@ int main(int argc, char *argv[]) {
 							mainWorld.fillCubes(player.inventory[player.selectedSlot], x, y, z);
 							worldIsDirty = true;
 						} else {
-							unsigned int * __restrict cube = mainWorld.getCubePointer((int)std::floor(raySelection.lastPos.x), (int)std::floor(raySelection.lastPos.y), (int)std::floor(raySelection.lastPos.z));
+							unsigned int * const __restrict cube = mainWorld.getCubePointer((int)std::floor(raySelection.lastPos.x), (int)std::floor(raySelection.lastPos.y), (int)std::floor(raySelection.lastPos.z));
 							if (cube != NULL && *cube == 0) {
 								*cube = player.inventory[player.selectedSlot];
 								worldIsDirty = true;
@@ -285,7 +283,7 @@ int main(int argc, char *argv[]) {
 					if (currentTimeMs() - clickClock > 200 && glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) {
 						clickClock = currentTimeMs();
 
-						unsigned int * __restrict cube = mainWorld.getCubePointer(x, y, z);
+						unsigned int * const __restrict cube = mainWorld.getCubePointer(x, y, z);
 						if (cube != NULL && *cube > 0) {
 							*cube = 0;
 							worldIsDirty = true;
@@ -294,7 +292,7 @@ int main(int argc, char *argv[]) {
 
 					if (!mMousePress && glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_MIDDLE) == GLFW_PRESS) {
 						mMousePress = true;
-						unsigned int b = mainWorld.getCube(x, y, z);
+						const unsigned int b = mainWorld.getCube(x, y, z);
 						if (b > 0) {
 							player.inventory[player.selectedSlot] = b;
 						}

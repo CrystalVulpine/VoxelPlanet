@@ -15,6 +15,7 @@ extern bool debugMode;
 extern bool hideGUI;
 extern bool gamePaused;
 extern bool fancyGraphics;
+extern unsigned int renderDistance;
 
 /** id of the screen that is currently open. 0 if none. **/
 extern unsigned int openedScreen;

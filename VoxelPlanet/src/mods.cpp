@@ -7,6 +7,22 @@
 #include <functional>
 #include <cstring>
 
+#if defined(_WIN32) || defined(__MINGW32__)
+
+#include <windows.h>
+#define dllExt ".dll"
+static inline void * loadMod(const char * const __restrict path) { return LoadLibrary(path); }
+static inline void * loadModFunc(void * __restrict handle, const char * const __restrict name) { return GetProcAddress(handle, name); }
+
+#else
+
+#include <dlfcn.h>
+#define dllExt ".so"
+static inline void * loadMod(const char * const __restrict path) { return dlopen(path, RTLD_LAZY); }
+static inline void * loadModFunc(void * __restrict handle, const char * const __restrict name) { return dlsym(handle, name); }
+
+#endif
+
 namespace fs = std::filesystem;
 
 std::vector<void (*)()> mod_testFunc;
@@ -67,16 +83,12 @@ void mods_onGameLoop(Clock loopTime, Clock lastLoopTime) {
 	}
 }
 
-void mods_processGameArgs(int argc, char *argv[]) {
+void mods_processGameArgs(int argc, char * argv[]) {
 	for (unsigned int i = 0; i < mod_processGameArgs.size(); ++i) {
 		mod_processGameArgs.at(i)(argc, argv);
 	}
 }
 
-#if !defined(_WIN32) && !defined(__MINGW32__)
-
-#include <dlfcn.h>
-
 void loadMods()
 {
 	std::string path("mods/");
@@ -94,174 +106,70 @@ void loadMods()
 	mod_processGameArgs.reserve(5);
 	mod_onGameLoop.reserve(5);
 
-    for(auto& p: fs::recursive_directory_iterator(path))
+    for(auto & p: fs::recursive_directory_iterator(path))
     {
-        if(strcmp(p.path().extension().c_str(), ".so") == 0) {
+        if(strcmp(p.path().extension().c_str(), dllExt) == 0) {
 
-			void* handle;
+			void * __restrict handle;
 
-			if ((handle = dlopen(p.path().string().c_str(), RTLD_LAZY)) != NULL) {
+			if ((handle = loadMod(p.path().string().c_str())) != NULL) {
 
-				const char* (*versionGetter)() = (const char* (*)())dlsym(handle, "getApiVersion");
+				const char * (*versionGetter)() = (const char * (*)())loadModFunc(handle, "getApiVersion");
 
-				auto error = dlerror();
-				if (error != NULL) {
-					std::cout << error << '\n';
+				if (!versionGetter) {
+					std::cout << "No mod API version found for mod "  << ((const char * (*)())loadModFunc(handle, "getModName"))() << ", cannot load.\n";
 					continue;
 				} else {
-					const char* modApiVersion = versionGetter();
+					const char * const __restrict modApiVersion = versionGetter();
 					if (strcmp(modApiVersion, API_VERSION) != 0) {
-						std::cout << "Could not load " << ((const char* (*)())dlsym(handle, "getModName"))() << ". Mod uses API version " << modApiVersion << " but this is " << API_VERSION << ".\n";
+						std::cout << "Could not load " << ((const char * (*)())loadModFunc(handle, "getModName"))() << ". Mod uses API version " << modApiVersion << " but this is " << API_VERSION << ".\n";
 						continue;
 					}
 				}
 
-				std::cout << "Loaded mod " << ((const char* (*)())dlsym(handle, "getModName"))() << ": " << ((const char* (*)())dlsym(handle, "getModDescription"))() << "\n";
+				std::cout << "Loaded mod " << ((const char * (*)())loadModFunc(handle, "getModName"))() << ": " << ((const char * (*)())loadModFunc(handle, "getModDescription"))() << "\n";
 
-				void (*testFunc)() = (void (*)())dlsym(handle, "testFunc");
-				if (dlerror() == NULL) {
-					mod_testFunc.push_back(testFunc);
-				}
-
-				void (*onRenderTick)() = (void (*)())dlsym(handle, "onRenderTick");
-				if (dlerror() == NULL) {
-					mod_onRenderTick.push_back(onRenderTick);
-				}
-
-				void (*onWorldTick)() = (void (*)())dlsym(handle, "onWorldTick");
-				if (dlerror() == NULL) {
-					mod_onWorldTick.push_back(onWorldTick);
-				}
-
-				void (*onGameStart)() = (void (*)())dlsym(handle, "onGameStart");
-				if (dlerror() == NULL) {
-					mod_onGameStart.push_back(onGameStart);
-				}
-
-				void (*onGameExit)() = (void (*)())dlsym(handle, "onGameExit");
-				if (dlerror() == NULL) {
-					mod_onGameExit.push_back(onGameExit);
-				}
-
-				void (*onWorldLoad)() = (void (*)())dlsym(handle, "onWorldLoad");
-				if (dlerror() == NULL) {
-					mod_onWorldLoad.push_back(onWorldLoad);
-				}
-
-				void (*onWorldClose)() = (void (*)())dlsym(handle, "onWorldClose");
-				if (dlerror() == NULL) {
-					mod_onWorldClose.push_back(onWorldClose);
-				}
-
-				void (*onGameLoop)(Clock, Clock) = (void (*)(Clock, Clock))dlsym(handle, "onGameLoop");
-				if (dlerror() == NULL) {
-					mod_onGameLoop.push_back(onGameLoop);
-				}
-
-				void (*processGameArgs)(int, char*[]) = (void (*)(int, char*[]))dlsym(handle, "processGameArgs");
-				if (dlerror() == NULL) {
-					mod_processGameArgs.push_back(processGameArgs);
-				}
-
-			} else {
-
-				std::cout << "Unable to load mod \"" << p.path().filename().string() << "\"\n";
-			}
-        }
-    }
-}
-
-#endif
-
-/*
- * This is the experimental code for loading mods on Windows. It is NOT YET TESTED and probably doesn't work.
- */
-#if defined(_WIN32) || defined(__MINGW32__)
-
-#include <windows.h>
-
-void loadMods()
-{
-	std::string path("mods/");
-
-    // there are no mods, so don't try to load any
-    if (!fs::is_directory(path)) return;
-
-	mod_testFunc.reserve(5);
-	mod_onRenderTick.reserve(5);
-	mod_onWorldTick.reserve(5);
-	mod_onGameStart.reserve(5);
-	mod_onGameExit.reserve(5);
-	mod_onWorldLoad.reserve(5);
-	mod_onWorldClose.reserve(5);
-	mod_processGameArgs.reserve(5);
-	mod_onGameLoop.reserve(5);
-
-    for(auto& p: fs::recursive_directory_iterator(path))
-    {
-        if(strcmp(p.path().extension().c_str(), ".so") == 0) {
-
-			HINSTANCE handle;
-
-			if ((handle = LoadLibrary(p.path().string().c_str(), RTLD_LAZY)) != NULL) {
-
-				const char* (*versionGetter)() = (const char* (*)())GetProcAddress(handle, "getApiVersion");
-
-				auto error = dlerror();
-				if (error != NULL) {
-					std::cout << error << '\n';
-					continue;
-				} else {
-					const char* modApiVersion = versionGetter();
-					if (strcmp(modApiVersion, API_VERSION) != 0) {
-						std::cout << "Could not load " << ((const char* (*)())GetProcAddress(handle, "getModName"))() << ". Mod uses API version " << modApiVersion << " but this is " << API_VERSION << ".\n";
-						continue;
-					}
-				}
-
-				std::cout << "Loaded mod " << ((const char* (*)())GetProcAddress(handle, "getModName"))() << ": " << ((const char* (*)())GetProcAddress(handle, "getModDescription"))() << "\n";
-
-				void (*testFunc)() = (void (*)())GetProcAddress(handle, "testFunc");
+				void (*testFunc)() = (void (*)())loadModFunc(handle, "testFunc");
 				if (testFunc) {
 					mod_testFunc.push_back(testFunc);
 				}
 
-				void (*onRenderTick)() = (void (*)())GetProcAddress(handle, "onRenderTick");
+				void (*onRenderTick)() = (void (*)())loadModFunc(handle, "onRenderTick");
 				if (onRenderTick) {
 					mod_onRenderTick.push_back(onRenderTick);
 				}
 
-				void (*onWorldTick)() = (void (*)())GetProcAddress(handle, "onWorldTick");
+				void (*onWorldTick)() = (void (*)())loadModFunc(handle, "onWorldTick");
 				if (onWorldTick) {
 					mod_onWorldTick.push_back(onWorldTick);
 				}
 
-				void (*onGameStart)() = (void (*)())GetProcAddress(handle, "onGameStart");
+				void (*onGameStart)() = (void (*)())loadModFunc(handle, "onGameStart");
 				if (onGameStart) {
 					mod_onGameStart.push_back(onGameStart);
 				}
 
-				void (*onGameExit)() = (void (*)())GetProcAddress(handle, "onGameExit");
+				void (*onGameExit)() = (void (*)())loadModFunc(handle, "onGameExit");
 				if (onGameExit) {
 					mod_onGameExit.push_back(onGameExit);
 				}
 
-				void (*onWorldLoad)() = (void (*)())GetProcAddress(handle, "onWorldLoad");
+				void (*onWorldLoad)() = (void (*)())loadModFunc(handle, "onWorldLoad");
 				if (onWorldLoad) {
 					mod_onWorldLoad.push_back(onWorldLoad);
 				}
 
-				void (*onWorldClose)() = (void (*)())GetProcAddress(handle, "onWorldClose");
+				void (*onWorldClose)() = (void (*)())loadModFunc(handle, "onWorldClose");
 				if (onWorldClose) {
 					mod_onWorldClose.push_back(onWorldClose);
 				}
 
-				void (*onGameLoop)(Clock, Clock) = (void (*)(Clock, Clock))GetProcAddress(handle, "onGameLoop");
+				void (*onGameLoop)(Clock, Clock) = (void (*)(Clock, Clock))loadModFunc(handle, "onGameLoop");
 				if (onGameLoop) {
 					mod_onGameLoop.push_back(onGameLoop);
 				}
 
-				void (*processGameArgs)(int, char*[]) = (void (*)(int, char*[]))GetProcAddress(handle, "processGameArgs");
+				void (*processGameArgs)(int, char * []) = (void (*)(int, char * []))loadModFunc(handle, "processGameArgs");
 				if (processGameArgs) {
 					mod_processGameArgs.push_back(processGameArgs);
 				}
@@ -273,5 +181,3 @@ void loadMods()
         }
     }
 }
-
-#endif

@@ -9,15 +9,14 @@
 #include <cstring>
 #include <sys/stat.h>
 
-World::World() {
-
+World::World() __restrict {
 	worldDir = NULL;
 	cubesDatPath = NULL;
 	levelDatPath = NULL;
 	isSaving = false;
 }
 
-void World::startWorld(const int length, const int width, const int height) {
+void World::startWorld(const int length, const int width, const int height) __restrict {
 
 	struct stat st;
 
@@ -75,7 +74,7 @@ void World::startWorld(const int length, const int width, const int height) {
 	} else {
 
 		if (stat(levelDatPath, &st) != 0) {
-			printf("Could not load level information. You must move the current world so that a new one can be created.\n");
+			std::cout << "Could not load level information. You must move the current world so that a new one can be created.\n";
 			exit(1);
 		}
 
@@ -83,15 +82,16 @@ void World::startWorld(const int length, const int width, const int height) {
 		std::streamsize size = level.tellg();
 
 		if (size < 6) {
-			printf("Could not load world size. You must move the current world so that a new one can be created.\n");
+			std::cout << "Could not load world size. You must move the current world so that a new one can be created.\n";
 			exit(1);
 		}
 
 		isNewWorld = false;
 
 		level.seekg(0, std::ios::beg);
-		unsigned char info[size];
+		unsigned char * const __restrict info = (unsigned char*)malloc(sizeof(char[size]));
 		level.read((char*)info, size);
+		level.close();
 		worldLength = (unsigned short)info[0] << 8 | (unsigned short)info[1];
 		worldWidth = (unsigned short)info[2] << 8 | (unsigned short)info[3];
 		worldHeight = (unsigned short)info[4] << 8 | (unsigned short)info[5];
@@ -115,11 +115,14 @@ void World::startWorld(const int length, const int width, const int height) {
 
 		cubes = (unsigned int*)malloc(worldLength * worldWidth * worldHeight * sizeof(unsigned int));
 
+		free(info);
+
 		std::ifstream save(cubesDatPath, std::ios::binary | std::ios::ate);
 		size = save.tellg();
 		save.seekg(0, std::ios::beg);
 		unsigned char * const __restrict data = (unsigned char*)malloc(size);
 		save.read((char*)data, size);
+		save.close();
 
 		unsigned int worldIndex = 0;
 
@@ -143,7 +146,7 @@ void World::startWorld(const int length, const int width, const int height) {
 	mods_onWorldLoad();
 }
 
-void World::closeWorld() {
+void World::closeWorld() __restrict {
 
 	mods_onWorldClose();
 
@@ -156,7 +159,7 @@ void World::closeWorld() {
 }
 
 
-void World::setCube(const int x, const int y, const int z, const unsigned int cube) {
+void World::setCube(const int x, const int y, const int z, const unsigned int cube) __restrict {
 
 	if (x >= worldLength || x < 0 || z >= worldWidth || z < 0 || y >= worldHeight || y < 0) return;
 
@@ -164,7 +167,7 @@ void World::setCube(const int x, const int y, const int z, const unsigned int cu
 }
 
 
-unsigned int World::getCube(const int x, const int y, const int z) {
+unsigned int World::getCube(const int x, const int y, const int z) __restrict {
 
 	if (x >= worldLength || x < 0 || z >= worldWidth || z < 0 || y >= worldHeight || y < 0) return 0;
 
@@ -172,7 +175,7 @@ unsigned int World::getCube(const int x, const int y, const int z) {
 }
 
 
-unsigned int* World::getCubePointer(const int x, const int y, const int z) {
+unsigned int* World::getCubePointer(const int x, const int y, const int z) __restrict {
 
 	if (x >= worldLength || x < 0 || z >= worldWidth || z < 0 || y >= worldHeight || y < 0) return NULL;
 
@@ -180,7 +183,7 @@ unsigned int* World::getCubePointer(const int x, const int y, const int z) {
 }
 
 
-void World::saveWorld() {
+void World::saveWorld() __restrict {
 
 	if (!isSaving) {
 
@@ -190,13 +193,13 @@ void World::saveWorld() {
 
 		if (stat(worldDir, &st) != 0 && mkdir(worldDir, 0777) != 0) {
 
-			printf("Could not save world: directory 'world' cannot be created.\n");
+			std::cout << "Could not save world: directory 'world' cannot be created.\n";
 			return;
 		}
 
 		std::ofstream level(levelDatPath);
 
-		unsigned char levelInfo[46];
+		unsigned char * const __restrict levelInfo = (unsigned char*)malloc(sizeof(char[46]));
 		levelInfo[0] = (unsigned char)((worldLength >> 8) & 0xff);
 		levelInfo[1] = (unsigned char)(worldLength & 0xff);
 		levelInfo[2] = (unsigned char)((worldWidth >> 8) & 0xff);
@@ -212,12 +215,13 @@ void World::saveWorld() {
 		}
 
 		level.write((char*)levelInfo, 46);
-
+		level.close();
+		free(levelInfo);
 
 		std::ofstream save(cubesDatPath);
 
 		// one byte for cube color count, 4 for block/cube id
-		unsigned char * __restrict data = (unsigned char*)malloc(worldLength * worldWidth * worldHeight * 5);
+		unsigned char * const __restrict data = (unsigned char*)malloc(worldLength * worldWidth * worldHeight * 5);
 		unsigned int index = 0;
 
 		for (int i = 0; i < worldLength * worldWidth * worldHeight;) {
@@ -248,6 +252,7 @@ void World::saveWorld() {
 		}
 
 		save.write((char*)data, index);
+		save.close();
 
 		free(data);
 
@@ -256,7 +261,7 @@ void World::saveWorld() {
 }
 
 
-RayTraceInfo World::rayTraceCubes(glm::vec3 start, float rotationYaw, float rotationPitch, float reach) {
+RayTraceInfo World::rayTraceCubes(const glm::vec3 start, const float rotationYaw, const float rotationPitch, const float reach) __restrict {
 
 	bool couldFindCube = false;
 
@@ -264,11 +269,14 @@ RayTraceInfo World::rayTraceCubes(glm::vec3 start, float rotationYaw, float rota
 	glm::vec3 lastPos = start;
 	unsigned int cube = 0;
 
+	const float changeX = glm::cos(rotationYaw + 1.5708f) * 0.05f;
+	const float changeZ = glm::sin(rotationYaw + 1.5708f) * 0.05f;
+	const float changeY = glm::tan(rotationPitch) * 0.05f;
 	while (!cube) {
 
 		lastPos = pos;
-	    pos.x -= glm::cos(rotationYaw + 1.5708f) * 0.05f;
-	    pos.z -= glm::sin(rotationYaw + 1.5708f) * 0.05f;
+	    pos.x -= changeX;
+	    pos.z -= changeZ;
 
 	    // tan can be undefined, so still move y when that happens
 	    if (rotationPitch <= -M_PI / 2.0f) {
@@ -276,13 +284,13 @@ RayTraceInfo World::rayTraceCubes(glm::vec3 start, float rotationYaw, float rota
 	    } else if (rotationPitch >= M_PI / 2.0f) {
 	    	pos.y -= 1.0f;
 	    } else {
-	    	pos.y -= glm::tan(rotationPitch) * 0.05f;
+	    	pos.y -= changeY;
 	    }
 
 	    cube = getCube(pos.x, pos.y, pos.z);
 
 	    if (glm::distance(start, pos) > reach) {
-	    	RayTraceInfo info = {couldFindCube, pos, lastPos};
+	    	const RayTraceInfo info = {couldFindCube, pos, lastPos};
 	    	return info;
 	    }
 	}
@@ -303,12 +311,12 @@ RayTraceInfo World::rayTraceCubes(glm::vec3 start, float rotationYaw, float rota
     	couldFindCube = true;
     }
 
-	RayTraceInfo info = {couldFindCube, pos, lastPos};
+	const RayTraceInfo info = {couldFindCube, pos, lastPos};
 	return info;
 }
 
 
-void World::setSaveDir(const char* __restrict dir) {
+void World::setSaveDir(const char * const __restrict dir) __restrict {
 
 	if (worldDir != NULL) {
 		free(worldDir);
@@ -334,7 +342,7 @@ void World::setSaveDir(const char* __restrict dir) {
 	strcat(levelDatPath, "/level.dat");
 }
 
-void World::fillCubes(const unsigned int color, int x, int y, int z) {
+void World::fillCubes(const unsigned int color, const int x, const int y, const int z) __restrict {
 	unsigned int* __restrict cubePointer = getCubePointer(x, y, z);
 	if (cubePointer == NULL) return;
 

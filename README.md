@@ -4,9 +4,13 @@
 
 VoxelPlanet is a sandbox made out of colored cubes. It is made using basic shaders in OpenGL 3.3. The intent is to provide an open world to create things, much in the same way you would draw a picture out of pixels, but in a 3-dimensional space. It also supports mods and has a simple mod/plugin API.
 
-![GitHub prerelease](https://img.shields.io/github/v/release/CrystalVulpine/VoxelPlanet?include_prereleases) ![GitHub Download Count](https://img.shields.io/github/downloads/CrystalVulpine/VoxelPlanet/total) ![License](https://img.shields.io/github/license/CrystalVulpine/VoxelPlanet) ![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/CrystalVulpine/VoxelPlanet)
+[![GitHub prerelease](https://img.shields.io/github/v/release/CrystalVulpine/VoxelPlanet?include_prereleases)](https://github.com/CrystalVulpine/VoxelPlanet/releases) [![GitHub Download Count](https://img.shields.io/github/downloads/CrystalVulpine/VoxelPlanet/total)](https://github.com/CrystalVulpine/VoxelPlanet/releases) ![License](https://img.shields.io/github/license/CrystalVulpine/VoxelPlanet) ![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/CrystalVulpine/VoxelPlanet)
 
 ![](https://i.imgur.com/fGVsUsE.png)
+
+## Installation
+
+VoxelPlanet does not require any installation. For Linux, just [download a release from here](https://github.com/CrystalVulpine/VoxelPlanet/releases), extract the files and run the executable. You might need to install some dependencies such as glfw3 and glew, because I'm not sure if it's legal for me to distribute them in an MIT-licensed project. For Windows and Mac, you'll need to either download the source code and build the program, or find a way to run the Linux executable. This is because I don't have a Mac, and my Windows VM has a tendency to freeze my entire computer if I run it longer than about 5 minutes. However, if anyone can provide builds for those platforms I'll be happy to release them.
 
 ## Controls:
 

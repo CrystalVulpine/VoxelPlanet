@@ -1,6 +1,8 @@
 #include <png.h>
 #include <sys/stat.h>
 #include <iostream>
+#include <fstream>
+#include <string>
 #include "rendering.hpp"
 
 #include "global.hpp"
@@ -10,38 +12,36 @@
 
 #include <cstdio>
 
-GLFWwindow* window;
+
+GLFWwindow * __restrict window;
 int windowWidth = 1024;
 int windowHeight = 768;
 
+bool hideGUI = false;
+bool fancyGraphics = true;
+unsigned int renderDistance = 16;
 unsigned char antialiasingLevel = 4;
 float worldBrightness = 1.0f;
 float skyColorRed = 0.5f;
 float skyColorGreen = 0.5f;
 float skyColorBlue = 1.0f;
 
-bool hideGUI = false;
-bool fancyGraphics = true;
-
 bool worldIsDirty = false;
-
-GLuint vertexbuffer;
-GLuint colorbuffer;
-GLuint guiVertexBuffer;
-GLuint guiColorBuffer;
-
-unsigned int vertexIndex = 0;
-
 
 double colorTriangleX = 0.0;
 double colorTriangleY = 0.8;
 double colorBarPos = 0.0;
 double colorAlphaPos = 0.8;
 
-unsigned int guiVertexCount;
+static GLuint vertexbuffer;
+static GLuint colorbuffer;
+static GLuint guiVertexBuffer;
+static GLuint guiColorBuffer;
 
+static unsigned int vertexIndex = 0;
+static unsigned int guiVertexCount;
 
-double crosshairs[] = {
+static double crosshairs[] = {
 		-0.006, -0.051, 0.0,
 		0.006, -0.051, 0.0,
 		0.006, 0.051, 0.0,
@@ -71,7 +71,7 @@ double crosshairs[] = {
 		0.049, -0.004, 0.0,
 };
 
-float crosshairColor[] = {
+static float crosshairColor[] = {
 		1.0f, 1.0f, 1.0f, 1.0f,
 		1.0f, 1.0f, 1.0f, 1.0f,
 		1.0f, 1.0f, 1.0f, 1.0f,
@@ -101,11 +101,40 @@ float crosshairColor[] = {
 		0.0f, 0.0f, 0.0f, 1.0f,
 };
 
-GLuint program;
-GLuint matrix;
-GLuint vao;
+static GLuint program;
+static GLuint matrix;
+static GLuint vao;
 
-GLuint loadShaders(GLchar const * vertexShaderCode, GLchar const * fragmentShaderCode) {
+static GLuint loadShaders(const GLchar * const __restrict vertexShaderPath, const GLchar * const __restrict fragmentShaderPath) {
+	struct stat st;
+	if (stat(vertexShaderPath, &st) != 0) {
+		std::cout << "Could not load shader " << vertexShaderPath << ", exiting\n";
+		exit(-1);
+	} else if (stat(fragmentShaderPath, &st) != 0) {
+		std::cout << "Could not load shader " << fragmentShaderPath << ", exiting\n";
+		exit(-1);
+	}
+
+	std::ifstream shaderStream;
+	shaderStream.open(vertexShaderPath);
+	shaderStream.seekg(0, std::ios::end);
+	unsigned int shaderLength = shaderStream.tellg();
+	shaderStream.seekg(0, std::ios::beg);
+	GLchar * const vertexShaderCode = (GLchar*)malloc(sizeof(GLchar[shaderLength + 1]));
+	vertexShaderCode[shaderLength] = '\0';
+	shaderStream.read(vertexShaderCode, shaderLength);
+	shaderStream.close();
+	shaderStream.clear();
+
+	shaderStream.open(fragmentShaderPath);
+	shaderStream.seekg(0, std::ios::end);
+	shaderLength = shaderStream.tellg();
+	shaderStream.seekg(0, std::ios::beg);
+	GLchar * const fragmentShaderCode = (GLchar*)malloc(sizeof(GLchar[shaderLength + 1]));
+	fragmentShaderCode[shaderLength] = '\0';
+	shaderStream.read(fragmentShaderCode, shaderLength);
+	shaderStream.close();
+
 	GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
 	GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
 
@@ -114,6 +143,24 @@ GLuint loadShaders(GLchar const * vertexShaderCode, GLchar const * fragmentShade
 
 	glShaderSource(fragmentShader, 1, &fragmentShaderCode, NULL);
 	glCompileShader(fragmentShader);
+
+	GLint isCompiled = 0;
+	glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &isCompiled);
+	if (!isCompiled) {
+		GLint errorLength = 0;
+		glGetShaderiv(vertexShader, GL_INFO_LOG_LENGTH, &errorLength);
+		char error[errorLength];
+		glGetShaderInfoLog(vertexShader, errorLength, &errorLength, error);
+		std::cout << vertexShaderPath << ": " << error;
+	}
+	glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &isCompiled);
+	if (!isCompiled) {
+		GLint errorLength = 0;
+		glGetShaderiv(fragmentShader, GL_INFO_LOG_LENGTH, &errorLength);
+		char error[errorLength];
+		glGetShaderInfoLog(fragmentShader, errorLength, &errorLength, error);
+		std::cout << fragmentShaderPath << ": " << error;
+	}
 
 	GLuint program = glCreateProgram();
 	glAttachShader(program, vertexShader);
@@ -128,13 +175,13 @@ GLuint loadShaders(GLchar const * vertexShaderCode, GLchar const * fragmentShade
 	return program;
 }
 
-void renderCube(int x, int y, int z, unsigned int cube) {
+static void renderCube(int x, int y, int z, unsigned int cube) {
 	double vertices[6 * 2 * 3 * 3];
 
 	unsigned int vertexCount = 0;
 
 	// attempts to speed through the surrounding cube check by going through memory as contiguously as possible. cubePointer is the cube's memory location.
-	unsigned int* __restrict cubePointer = mainWorld.getCubePointer(x, y, z);
+	const unsigned int * const __restrict cubePointer = mainWorld.getCubePointer(x, y, z);
 	bool renderFrontFace = z > 0 && (cubePointer[-(mainWorld.worldLength * mainWorld.worldHeight)] & 0xff) != (cube & 0xff);
 	bool renderLeftFace = x > 0 && (cubePointer[-mainWorld.worldHeight] & 0xff) != (cube & 0xff);
 	bool renderBottomFace = y <= 0 || (cubePointer[-1] & 0xff) != (cube & 0xff);
@@ -315,7 +362,7 @@ void reRenderWorld() {
 	renderWorld();
 }
 
-void renderCubeSelect(double x, double y, double z) {
+void renderCubeSelect(const double x, const double y, const double z) {
 	double lines[] = {
 			x - 0.001, y + 1.001, z - 0.001,
 			x + 1.001, y + 1.001, z - 0.001,
@@ -350,8 +397,7 @@ void renderCubeSelect(double x, double y, double z) {
 
 int setupOpenGL() {
 	if (!glfwInit()) {
-		fprintf(stderr, "Failed to initialize GLFW");
-		getchar();
+		std::cout << "Failed to initialize GLFW\n";
 		return -1;
 	}
 	glfwWindowHint(GLFW_SAMPLES, antialiasingLevel);
@@ -365,8 +411,7 @@ int setupOpenGL() {
 #endif
 	window = glfwCreateWindow(windowWidth, windowHeight, "VoxelPlanet v0.2", NULL, NULL);
 	if (window == NULL) {
-		fprintf(stderr, "Failed to open GLFW window. Your GPU or CPU may not be compatible with OpenGL 3.3.");
-		getchar();
+		std::cout << "Failed to open GLFW window. Your GPU or CPU may not be compatible with OpenGL 3.3.\n";
 		glfwTerminate();
 		return -1;
 	}
@@ -377,8 +422,7 @@ int setupOpenGL() {
 	}
 
 	if (glewInit() != GLEW_OK) {
-		fprintf(stderr, "Failed to initialize GLEW");
-		getchar();
+		std::cout << "Failed to initialize GLEW\n";
 		glfwTerminate();
 		return -1;
 	}
@@ -386,28 +430,7 @@ int setupOpenGL() {
 	glGenVertexArrays(1, &vao);
 	glBindVertexArray(vao);
 
-	const GLchar *vertexShader = R"(
-	#version 330 core
-	layout(location = 0) in vec3 vertexPosition_modelspace;
-    layout(location = 1) in vec4 vertexColor;
-    out vec4 fragmentColor;
-  
-    uniform mat4 MVP;
-  
-    void main() {
-        gl_Position =  MVP * vec4(vertexPosition_modelspace,1);
-        fragmentColor = vertexColor;
-    })";
-
-	const GLchar *fragmentShader = R"(
-	#version 330 core
-    out vec4 color;
-    in vec4 fragmentColor;
-    void main() {
-        color = fragmentColor;
-    })";
-
-	program = loadShaders(vertexShader, fragmentShader);
+	program = loadShaders("assets/shaders/world/vertex.glsl", "assets/shaders/world/fragment.glsl");
 
 	glGenBuffers(1, &vertexbuffer);
 	glGenBuffers(1, &colorbuffer);
@@ -433,7 +456,7 @@ int setupOpenGL() {
 }
 
 /** adds and draws a list to the gui vbo. `count` refers to the number of vertices. **/
-void renderToGUI(unsigned int count, double vertices[], float colors[]) {
+static void renderToGUI(unsigned int count, double vertices[], float colors[]) {
 	glBindBuffer(GL_ARRAY_BUFFER, guiVertexBuffer);
 	glBufferSubData(GL_ARRAY_BUFFER, guiVertexCount * 3 * sizeof(double), count * 3 * sizeof(double), vertices);
 	glVertexAttribPointer(0, 3, GL_DOUBLE, GL_FALSE, 0, NULL);
@@ -913,7 +936,7 @@ void doDrawTick() {
 }
 
 
-void takeScreenshot(const char filename[], const char folder[]) {
+void takeScreenshot(const char * const __restrict filename, const char * const __restrict folder) {
     unsigned char pixels[windowWidth * windowHeight * 3];
     glPixelStorei(GL_PACK_ALIGNMENT, 1);
     glReadBuffer(GL_FRONT);
@@ -921,10 +944,10 @@ void takeScreenshot(const char filename[], const char folder[]) {
 
 	struct stat st;
     if (stat(folder, &st) != 0 && mkdir(folder, 0777) != 0) {
-    	printf("Could not create screenshot directory\n");
+    	std::cout << "Could not create screenshot directory\n";
     	return;
     } else if (stat(filename, &st) == 0) {
-    	printf("Could not take screenshot, file already exists!\n");
+    	std::cout << "Could not take screenshot, file already exists!\n";
     	return;
     }
     png_structp png = png_create_write_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
