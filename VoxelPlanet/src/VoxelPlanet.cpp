@@ -16,12 +16,10 @@ Player player;
 
 bool gameRunning = false;
 
-/** the cube the screen/crosshair is pointing at **/
 bool isCubeSelected = false;
 
 bool changeCubeColor = false;
 
-// don't let GLFW capture the pointer in case the application suspends.
 bool debugMode = false;
 
 bool gamePaused = false;

@@ -10,7 +10,11 @@ public:
 	float rotationYaw;
 	float rotationPitch;
 
+
+	/** An array of cubes in the inventory/hotbar. */
 	unsigned int inventory[10];
+
+	/** The current inventory slot. */
 	unsigned int selectedSlot;
 
 
@@ -23,5 +27,6 @@ public:
 	/** calculates a matrix for the camera for OpenGL **/
 	glm::mat4 getMatrix(const float windowSizeRatio, const unsigned int renderDistance);
 
+	/** Initializes the player. **/
 	void createPlayer();
 };

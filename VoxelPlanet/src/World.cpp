@@ -13,7 +13,6 @@ World::World() __restrict {
 	worldDir = NULL;
 	cubesDatPath = NULL;
 	levelDatPath = NULL;
-	isSaving = false;
 }
 
 void World::startWorld(const int length, const int width, const int height) __restrict {
@@ -181,78 +180,71 @@ unsigned int* World::getCubePointer(const int x, const int y, const int z) __res
 
 void World::saveWorld() __restrict {
 
-	if (!isSaving) {
+	struct stat st;
 
-		isSaving = true;
+	if (stat(worldDir, &st) != 0 && mkdir(worldDir, 0777) != 0) {
 
-		struct stat st;
-
-		if (stat(worldDir, &st) != 0 && mkdir(worldDir, 0777) != 0) {
-
-			std::cout << "Could not save world: directory 'world' cannot be created.\n";
-			return;
-		}
-
-		std::ofstream level(levelDatPath);
-
-		unsigned char levelInfo[46];
-		levelInfo[0] = (unsigned char)((worldLength >> 8) & 0xff);
-		levelInfo[1] = (unsigned char)(worldLength & 0xff);
-		levelInfo[2] = (unsigned char)((worldWidth >> 8) & 0xff);
-		levelInfo[3] = (unsigned char)(worldWidth & 0xff);
-		levelInfo[4] = (unsigned char)((worldHeight >> 8) & 0xff);
-		levelInfo[5] = (unsigned char)(worldHeight & 0xff);
-
-		for (unsigned int i = 0; i < 10; ++i) {
-			levelInfo[6 + (i * 4) + 0] = (unsigned char)((player.inventory[i] >> 24) & 0xff);
-			levelInfo[6 + (i * 4) + 1] = (unsigned char)((player.inventory[i] >> 16) & 0xff);
-			levelInfo[6 + (i * 4) + 2] = (unsigned char)((player.inventory[i] >> 8) & 0xff);
-			levelInfo[6 + (i * 4) + 3] = (unsigned char)(player.inventory[i] & 0xff);
-		}
-
-		level.write((char*)levelInfo, 46);
-		level.close();
-
-		std::ofstream save(cubesDatPath);
-
-		// one byte for cube color count, 4 for block/cube id
-		unsigned char * const __restrict data = (unsigned char*)malloc(worldLength * worldWidth * worldHeight * 5);
-		unsigned int index = 0;
-
-		for (int i = 0; i < worldLength * worldWidth * worldHeight;) {
-
-			// this does some (very basic) compression; not particularly effective
-			unsigned int prevCube = cubes[i];
-			unsigned int cube = cubes[i];
-			unsigned char count = 0;
-
-			while (prevCube == cube) {
-
-				++count;
-				if (count >= 255 || i + count >= worldLength * worldWidth * worldHeight) break;
-
-				cube = cubes[i + count];
-			}
-
-			data[index] = count;
-
-			// ensure big endian so save files don't get corrupted between platforms
-			data[index + 1] = (unsigned char)((prevCube >> 24) & 0xff);
-			data[index + 2] = (unsigned char)((prevCube >> 16) & 0xff);
-			data[index + 3] = (unsigned char)((prevCube >> 8) & 0xff);
-			data[index + 4] = (unsigned char)(prevCube & 0xff);
-
-			i += count;
-			index += 5;
-		}
-
-		save.write((char*)data, index);
-		save.close();
-
-		free(data);
-
-		isSaving = false;
+		std::cout << "Could not save world: directory 'world' cannot be created.\n";
+		return;
 	}
+
+	std::ofstream level(levelDatPath);
+
+	unsigned char levelInfo[46];
+	levelInfo[0] = (unsigned char)((worldLength >> 8) & 0xff);
+	levelInfo[1] = (unsigned char)(worldLength & 0xff);
+	levelInfo[2] = (unsigned char)((worldWidth >> 8) & 0xff);
+	levelInfo[3] = (unsigned char)(worldWidth & 0xff);
+	levelInfo[4] = (unsigned char)((worldHeight >> 8) & 0xff);
+	levelInfo[5] = (unsigned char)(worldHeight & 0xff);
+
+	for (unsigned int i = 0; i < 10; ++i) {
+		levelInfo[6 + (i * 4) + 0] = (unsigned char)((player.inventory[i] >> 24) & 0xff);
+		levelInfo[6 + (i * 4) + 1] = (unsigned char)((player.inventory[i] >> 16) & 0xff);
+		levelInfo[6 + (i * 4) + 2] = (unsigned char)((player.inventory[i] >> 8) & 0xff);
+		levelInfo[6 + (i * 4) + 3] = (unsigned char)(player.inventory[i] & 0xff);
+	}
+
+	level.write((char*)levelInfo, 46);
+	level.close();
+
+	std::ofstream save(cubesDatPath);
+
+	// one byte for cube color count, 4 for block/cube id
+	unsigned char * const __restrict data = (unsigned char*)malloc(worldLength * worldWidth * worldHeight * 5);
+	unsigned int index = 0;
+
+	for (int i = 0; i < worldLength * worldWidth * worldHeight;) {
+
+		// this does some (very basic) compression; not particularly effective
+		unsigned int prevCube = cubes[i];
+		unsigned int cube = cubes[i];
+		unsigned char count = 0;
+
+		while (prevCube == cube) {
+
+			++count;
+			if (count >= 255 || i + count >= worldLength * worldWidth * worldHeight) break;
+
+			cube = cubes[i + count];
+		}
+
+		data[index] = count;
+
+		// ensure big endian so save files don't get corrupted between platforms
+		data[index + 1] = (unsigned char)((prevCube >> 24) & 0xff);
+		data[index + 2] = (unsigned char)((prevCube >> 16) & 0xff);
+		data[index + 3] = (unsigned char)((prevCube >> 8) & 0xff);
+		data[index + 4] = (unsigned char)(prevCube & 0xff);
+
+		i += count;
+		index += 5;
+	}
+
+	save.write((char*)data, index);
+	save.close();
+
+	free(data);
 }
 
 
