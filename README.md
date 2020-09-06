@@ -30,7 +30,7 @@ VoxelPlanet does not require any installation. For Linux, just [download a relea
 
 ## Documentation
 
-VoxelPlanet is modular and has various programmatic functions, such as a mod/plugin API and commands. Documentation and specification for those is available, and can be found hosted on [the documentation website](https://crystalvulpine.github.io/VoxelPlanet/).
+VoxelPlanet is modular and has various programmatic functions, such as a mod/plugin API and commands. Documentation and specification for those is available, and can be found hosted on [the documentation website](https://crystalvulpine.github.io/VoxelPlanet/). Additionally, there is also documentation of internal functions, classes, variables, etc. which can be found [here](https://crystalvulpine.github.io/VoxelPlanet/program).
 
 ## To-Do List:
 
