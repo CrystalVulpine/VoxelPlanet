@@ -252,6 +252,8 @@ RayTraceInfo World::rayTraceCubes(const glm::vec3 start, const float rotationYaw
 	glm::vec3 pos = start;
 	unsigned int cube = 0;
 
+	// This implementation is based on https://github.com/swr06/Minecraft/blob/6dfd1b5e07639225b1d4af9caf72ba25946bea03/Source/Core/World/World.cpp
+
 	glm::vec3 direction;
 	direction.x = -cosf(rotationPitch) * cosf(rotationYaw + glm::radians(90.0f));
 	direction.y = sinf(-rotationPitch);
@@ -259,7 +261,6 @@ RayTraceInfo World::rayTraceCubes(const glm::vec3 start, const float rotationYaw
 	glm::vec3 sign(direction[0] > 0, direction[1] > 0, direction[2] > 0);
 
 	while (true) {
-		//glm::vec3 tvec((floorf(pos.x + sign.x) - pos.x) / direction.x, (floorf(pos.y + sign.y) - pos.y) / direction.y, (floorf(pos.z + sign.z) - pos.z) / direction.z);
 		const glm::vec3 tvec = (glm::floor(pos + sign) - pos) / direction;
 		const float t = std::min(tvec.x, std::min(tvec.y, tvec.z));
 		pos += direction * (t + 0.001f);
