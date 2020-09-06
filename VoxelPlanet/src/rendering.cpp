@@ -14,24 +14,8 @@
 
 
 GLFWwindow * __restrict window;
-int windowWidth = 1024;
-int windowHeight = 768;
-
-bool hideGUI = false;
-bool fancyGraphics = true;
-unsigned int renderDistance = 16;
-unsigned char antialiasingLevel = 4;
-float worldBrightness = 1.0f;
-float skyColorRed = 0.5f;
-float skyColorGreen = 0.5f;
-float skyColorBlue = 1.0f;
 
 bool worldIsDirty = false;
-
-double colorTriangleX = 0.0;
-double colorTriangleY = 0.8;
-double colorBarPos = 0.0;
-double colorAlphaPos = 0.8;
 
 static GLuint vertexbuffer;
 static GLuint colorbuffer;
@@ -101,11 +85,11 @@ static float crosshairColor[] = {
 		0.0f, 0.0f, 0.0f, 1.0f,
 };
 
-static GLuint program;
-static GLuint matrix;
 static GLuint vao;
+GLuint GLprogram;
+GLuint GLmatrix;
 
-static GLuint loadShaders(const GLchar * const __restrict vertexShaderPath, const GLchar * const __restrict fragmentShaderPath) {
+GLuint loadShaders(const GLchar * const __restrict vertexShaderPath, const GLchar * const __restrict fragmentShaderPath) {
 	struct stat st;
 	if (stat(vertexShaderPath, &st) != 0) {
 		std::cout << "Could not load shader " << vertexShaderPath << ", exiting\n";
@@ -310,9 +294,9 @@ static void renderCube(int x, int y, int z, unsigned int cube) {
 	float alpha = (float)(cube & 255) / 255.0f;
 
 	for (unsigned int i = 0; i < sizeof(colors) / sizeof(colors[0]); i += 4) {
-		colors[i + 0] *= red * worldBrightness;
-		colors[i + 1] *= green * worldBrightness;
-		colors[i + 2] *= blue * worldBrightness;
+		colors[i + 0] *= red * settings.worldBrightness;
+		colors[i + 1] *= green * settings.worldBrightness;
+		colors[i + 2] *= blue * settings.worldBrightness;
 		colors[i + 3] *= alpha;
 	}
 
@@ -399,7 +383,7 @@ int setupOpenGL() {
 		std::cout << "Failed to initialize GLFW\n";
 		return -1;
 	}
-	glfwWindowHint(GLFW_SAMPLES, antialiasingLevel);
+	glfwWindowHint(GLFW_SAMPLES, settings.antialiasingLevel);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
@@ -408,7 +392,7 @@ int setupOpenGL() {
 #else
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 #endif
-	window = glfwCreateWindow(windowWidth, windowHeight, "VoxelPlanet v0.2", NULL, NULL);
+	window = glfwCreateWindow(settings.windowWidth, settings.windowHeight, "VoxelPlanet v0.2", NULL, NULL);
 	if (window == NULL) {
 		std::cout << "Failed to open GLFW window. Your GPU or CPU may not be compatible with OpenGL 3.3.\n";
 		glfwTerminate();
@@ -416,7 +400,7 @@ int setupOpenGL() {
 	}
 	glfwMakeContextCurrent(window);
 	glfwSetInputMode(window, GLFW_STICKY_KEYS, GL_TRUE);
-	if (!debugMode) {
+	if (!settings.debugMode) {
 		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	}
 
@@ -429,7 +413,7 @@ int setupOpenGL() {
 	glGenVertexArrays(1, &vao);
 	glBindVertexArray(vao);
 
-	program = loadShaders("assets/shaders/world/vertex.glsl", "assets/shaders/world/fragment.glsl");
+	GLprogram = loadShaders("assets/shaders/world/vertex.glsl", "assets/shaders/world/fragment.glsl");
 
 	glGenBuffers(1, &vertexbuffer);
 	glGenBuffers(1, &colorbuffer);
@@ -441,21 +425,20 @@ int setupOpenGL() {
 	glBindBuffer(GL_ARRAY_BUFFER, colorbuffer);
 	glBufferData(GL_ARRAY_BUFFER, ((mainWorld.worldLength * mainWorld.worldWidth * mainWorld.worldHeight) * 6 * 2 * 3 * 4) * sizeof(float), NULL, GL_STATIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, guiVertexBuffer);
-	glBufferData(GL_ARRAY_BUFFER, 1000 * sizeof(double), NULL, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, 2000 * sizeof(double), NULL, GL_STATIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, guiColorBuffer);
-	glBufferData(GL_ARRAY_BUFFER, 1000 * sizeof(float), NULL, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, 2000 * sizeof(float), NULL, GL_STATIC_DRAW);
 
-	matrix = glGetUniformLocation(program, "MVP");
+	GLmatrix = glGetUniformLocation(GLprogram, "MVP");
 
-	glClearColor(skyColorRed, skyColorGreen, skyColorBlue, 1.0f);
+	glClearColor(settings.skyColorRed, settings.skyColorGreen, settings.skyColorBlue, 1.0f);
 
 	renderWorld();
 
 	return 0;
 }
 
-/** adds and draws a list to the gui vbo. `count` refers to the number of vertices. **/
-static void renderToGUI(unsigned int count, double vertices[], float colors[]) {
+void renderToGUI(unsigned int count, const double * const __restrict vertices, const float * const __restrict colors) {
 	glBindBuffer(GL_ARRAY_BUFFER, guiVertexBuffer);
 	glBufferSubData(GL_ARRAY_BUFFER, guiVertexCount * 3 * sizeof(double), count * 3 * sizeof(double), vertices);
 	glVertexAttribPointer(0, 3, GL_DOUBLE, GL_FALSE, 0, NULL);
@@ -468,7 +451,7 @@ static void renderToGUI(unsigned int count, double vertices[], float colors[]) {
 }
 
 void doDrawTick() {
-	glViewport(0, 0, windowWidth, windowHeight);
+	glViewport(0, 0, settings.windowWidth, settings.windowHeight);
 
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LEQUAL);
@@ -477,10 +460,10 @@ void doDrawTick() {
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	glUseProgram(program);
+	glUseProgram(GLprogram);
 
-	glm::mat4 mvp = player.getMatrix((float)windowWidth / (float)windowHeight, 16);
-	glUniformMatrix4fv(matrix, 1, GL_FALSE, &mvp[0][0]);
+	glm::mat4 mvp = player.getMatrix((float)settings.windowWidth / (float)settings.windowHeight, 16);
+	glUniformMatrix4fv(GLmatrix, 1, GL_FALSE, &mvp[0][0]);
 
 	glDisable(GL_BLEND);
 
@@ -500,7 +483,7 @@ void doDrawTick() {
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-	if (fancyGraphics) {
+	if (settings.fancyGraphics) {
 		glDisable(GL_CULL_FACE);
 		glDepthMask(true);
 		glColorMask(false, false, false, false);
@@ -516,8 +499,7 @@ void doDrawTick() {
 	glEnable(GL_CULL_FACE);
 	glDepthMask(false);
 
-	if (!hideGUI || openedScreen) {
-
+	if (!settings.hideGUI || openedScreen != NULL) {
 		guiVertexCount = 0;
 
 		glDisableVertexAttribArray(1);
@@ -532,347 +514,14 @@ void doDrawTick() {
 
 		glEnableVertexAttribArray(1);
 
-		glm::mat4 model;
+		glm::mat4 model = glm::mat4(1.0f);
+		glm::mat4 mvpb = glm::ortho<float>(-((float)settings.windowWidth / (float)settings.windowHeight), (float)settings.windowWidth / (float)settings.windowHeight, -1.0f, 1.0f, -1.0f, 1.0f);
 
-		if (openedScreen != SCREEN_COLOR) {
+		for (unsigned int i = 0; i < 10; ++i) {
+			mvp = mvpb * glm::translate(model, glm::vec3((float)i / 5.0f - 0.9f, -0.8f, 0.0)) * glm::rotate(model, 0.5f, glm::vec3(1.0, 0.0, 0.0)) * glm::rotate(model, 0.785398f, glm::vec3(0.0, 1.0, 0.0));
+			glUniformMatrix4fv(GLmatrix, 1, GL_FALSE, &mvp[0][0]);
 
-			glm::mat4 model = glm::mat4(1.0f);
-			glm::mat4 mvpb = glm::ortho<float>(-((float)windowWidth / (float)windowHeight), (float)windowWidth / (float)windowHeight, -1.0f, 1.0f, -1.0f, 1.0f);
-
-			for (unsigned int i = 0; i < 10; ++i) {
-				mvp = mvpb * glm::translate(model, glm::vec3((float)i / 5.0f - 0.9f, -0.8f, 0.0)) * glm::rotate(model, 0.5f, glm::vec3(1.0, 0.0, 0.0)) * glm::rotate(model, 0.785398f, glm::vec3(0.0, 1.0, 0.0));
-				glUniformMatrix4fv(matrix, 1, GL_FALSE, &mvp[0][0]);
-
-				const unsigned int usingCube = player.inventory[i];
-				float red = (float)(usingCube >> 24) / 255.0f;
-				float green = (float)((usingCube >> 16) & 255) / 255.0f;
-				float blue = (float)((usingCube >> 8) & 255) / 255.0f;
-				float alpha = (float)(usingCube & 255) / 255.0f;
-				float usingCubeColor[] = {
-						red * 0.8f, green * 0.8f, blue * 0.8f, alpha,
-						red * 0.8f, green * 0.8f, blue * 0.8f, alpha,
-						red * 0.8f, green * 0.8f, blue * 0.8f, alpha,
-						red * 0.8f, green * 0.8f, blue * 0.8f, alpha,
-						red * 0.8f, green * 0.8f, blue * 0.8f, alpha,
-						red * 0.8f, green * 0.8f, blue * 0.8f, alpha,
-
-						red * 0.6f, green * 0.6f, blue * 0.6f, alpha,
-						red * 0.6f, green * 0.6f, blue * 0.6f, alpha,
-						red * 0.6f, green * 0.6f, blue * 0.6f, alpha,
-						red * 0.6f, green * 0.6f, blue * 0.6f, alpha,
-						red * 0.6f, green * 0.6f, blue * 0.6f, alpha,
-						red * 0.6f, green * 0.6f, blue * 0.6f, alpha,
-
-						red, green, blue, alpha,
-						red, green, blue, alpha,
-						red, green, blue, alpha,
-						red, green, blue, alpha,
-						red, green, blue, alpha,
-						red, green, blue, alpha,
-				};
-				const double size = i == player.selectedSlot ? 0.06 : 0.05;
-				double usingCubeVertices[] = {
-						-size, size, size,
-						-size, -size, size,
-						size, -size, size,
-						-size, size, size,
-						size, -size, size,
-						size, size, size,
-
-						-size, -size, size,
-						-size, size, size,
-						-size, size, -size,
-						-size, -size, size,
-						-size, size, -size,
-						-size, -size, -size,
-
-						size, size, size,
-						size, size, -size,
-						-size, size, -size,
-						-size, size, -size,
-						-size, size, size,
-						size, size, size,
-				};
-				renderToGUI(18, usingCubeVertices, usingCubeColor);
-			}
-		}
-
-
-		model = glm::mat4(1.0f);
-		mvp = glm::ortho<float>(-((float)windowWidth / (float)windowHeight), (float)windowWidth / (float)windowHeight, -1.0f, 1.0f, -1.0f, 1.0f);
-		glUniformMatrix4fv(matrix, 1, GL_FALSE, &mvp[0][0]);
-
-		glDisable(GL_DEPTH_TEST);
-
-		renderToGUI(sizeof(crosshairs) / sizeof(crosshairs[0]) / 3, crosshairs, crosshairColor);
-
-		if (gamePaused || openedScreen) {
-
-			// render darkened background
-			double background[] = {
-					-(double)windowWidth / (double)windowHeight, -1.0, 0.0,
-					(double)windowWidth / (double)windowHeight, -1.0, 0.0,
-					(double)windowWidth / (double)windowHeight, 1.0, 0.0,
-					(double)windowWidth / (double)windowHeight, 1.0, 0.0,
-					-(double)windowWidth / (double)windowHeight, 1.0, 0.0,
-					-(double)windowWidth / (double)windowHeight, -1.0, 0.0
-			};
-			float backgroundColor[] = {
-					0.5f, 0.5f, 0.5f, 0.5f,
-					0.5f, 0.5f, 0.5f, 0.5f,
-					0.5f, 0.5f, 0.5f, 0.5f,
-					0.5f, 0.5f, 0.5f, 0.5f,
-					0.5f, 0.5f, 0.5f, 0.5f,
-					0.5f, 0.5f, 0.5f, 0.5f,
-			};
-			renderToGUI(6, background, backgroundColor);
-		}
-
-		if (openedScreen == SCREEN_COLOR) {
-
-			double triangle[] = {
-					0.6, -0.1, 0.0,
-					0.0, 0.8, 0.0,
-					-0.6, -0.1, 0.0,
-
-					-0.4, -0.2, 0.0,
-					-0.6, -0.2, 0.0,
-					-0.6, -0.3, 0.0,
-
-					-0.6, -0.3, 0.0,
-					-0.4, -0.3, 0.0,
-					-0.4, -0.2, 0.0,
-
-					-0.2, -0.2, 0.0,
-					-0.4, -0.2, 0.0,
-					-0.4, -0.3, 0.0,
-					-0.4, -0.3, 0.0,
-					-0.2, -0.3, 0.0,
-					-0.2, -0.2, 0.0,
-
-					0.0, -0.2, 0.0,
-					-0.2, -0.2, 0.0,
-					-0.2, -0.3, 0.0,
-					-0.2, -0.3, 0.0,
-					0.0, -0.3, 0.0,
-					0.0, -0.2, 0.0,
-
-					0.2, -0.2, 0.0,
-					0.0, -0.2, 0.0,
-					0.0, -0.3, 0.0,
-					0.0, -0.3, 0.0,
-					0.2, -0.3, 0.0,
-					0.2, -0.2, 0.0,
-
-					0.4, -0.2, 0.0,
-					0.2, -0.2, 0.0,
-					0.2, -0.3, 0.0,
-					0.2, -0.3, 0.0,
-					0.4, -0.3, 0.0,
-					0.4, -0.2, 0.0,
-
-					0.6, -0.2, 0.0,
-					0.4, -0.2, 0.0,
-					0.4, -0.3, 0.0,
-					0.4, -0.3, 0.0,
-					0.6, -0.3, 0.0,
-					0.6, -0.2, 0.0,
-
-					colorTriangleX - 0.015, colorTriangleY + 0.015, 0.0,
-					colorTriangleX - 0.015, colorTriangleY - 0.015, 0.0,
-					colorTriangleX + 0.015, colorTriangleY - 0.015, 0.0,
-					colorTriangleX + 0.015, colorTriangleY - 0.015, 0.0,
-					colorTriangleX + 0.015, colorTriangleY + 0.015, 0.0,
-					colorTriangleX - 0.015, colorTriangleY + 0.015, 0.0,
-
-					colorTriangleX - 0.01, colorTriangleY + 0.01, 0.0,
-					colorTriangleX - 0.01, colorTriangleY - 0.01, 0.0,
-					colorTriangleX + 0.01, colorTriangleY - 0.01, 0.0,
-					colorTriangleX + 0.01, colorTriangleY - 0.01, 0.0,
-					colorTriangleX + 0.01, colorTriangleY + 0.01, 0.0,
-					colorTriangleX - 0.01, colorTriangleY + 0.01, 0.0,
-
-					colorBarPos - 0.01, -0.15, 0.0,
-					colorBarPos - 0.01, -0.35, 0.0,
-					colorBarPos + 0.01, -0.35, 0.0,
-					colorBarPos + 0.01, -0.35, 0.0,
-					colorBarPos + 0.01, -0.15, 0.0,
-					colorBarPos - 0.01, -0.15, 0.0,
-
-					-0.7, 0.8, 0.0,
-					-0.8, 0.8, 0.0,
-					-0.8, -0.1, 0.0,
-					-0.8, -0.1, 0.0,
-					-0.7, -0.1, 0.0,
-					-0.7, 0.8, 0.0,
-
-					-0.85, colorAlphaPos + 0.01, 0.0,
-					-0.85, colorAlphaPos - 0.01, 0.0,
-					-0.65, colorAlphaPos - 0.01, 0.0,
-					-0.65, colorAlphaPos - 0.01, 0.0,
-					-0.65, colorAlphaPos + 0.01, 0.0,
-					-0.85, colorAlphaPos + 0.01, 0.0,
-			};
-
-			float colorBarRed;
-			float colorBarGreen;
-			float colorBarBlue;
-
-			if (colorBarPos > 0.0) {
-				colorBarRed = (colorBarPos - 0.2f) / 0.2f;
-			} else {
-				colorBarRed = (-colorBarPos - 0.2f) / 0.2f;
-			}
-			if (colorBarPos > -0.2) {
-				colorBarGreen = -(colorBarPos - 0.2f) / 0.2f;
-			} else {
-				colorBarGreen = 1.0f + (colorBarPos + 0.4f) / 0.2f;
-			}
-			if (colorBarPos > 0.2) {
-				colorBarBlue = -(colorBarPos - 0.6f) / 0.2f;
-			} else {
-				colorBarBlue = 1.0f + (colorBarPos + 0.0) / 0.2f;
-			}
-
-			if (colorBarRed < 0.0f) {
-				colorBarRed = 0.0f;
-			} else if (colorBarRed > 1.0f) {
-				colorBarRed = 1.0f;
-			}
-			if (colorBarGreen < 0.0f) {
-				colorBarGreen = 0.0f;
-			} else if (colorBarGreen > 1.0f) {
-				colorBarGreen = 1.0f;
-			}
-			if (colorBarBlue < 0.0f) {
-				colorBarBlue = 0.0f;
-			} else if (colorBarBlue > 1.0f) {
-				colorBarBlue = 1.0f;
-			}
-
-			float multiplierRed = ((colorTriangleY + 0.1) / 0.9) * colorBarRed;
-			multiplierRed += 0.5f * (1.0f - ((colorTriangleY + 0.1) / 0.9));
-			multiplierRed += (colorTriangleX / 1.2);
-			if (multiplierRed > 1.0f) {
-				multiplierRed = 1.0f;
-			} else if (multiplierRed < 0.0f) {
-				multiplierRed = 0.0f;
-			}
-
-			float multiplierGreen = ((colorTriangleY + 0.1) / 0.9) * colorBarGreen;
-			multiplierGreen += 0.5f * (1.0f - ((colorTriangleY + 0.1) / 0.9));
-			multiplierGreen += (colorTriangleX / 1.2);
-			if (multiplierGreen > 1.0f) {
-				multiplierGreen = 1.0f;
-			} else if (multiplierGreen < 0.0f) {
-				multiplierGreen = 0.0f;
-			}
-
-			float multiplierBlue = ((colorTriangleY + 0.1) / 0.9) * colorBarBlue;
-			multiplierBlue += 0.5f * (1.0f - ((colorTriangleY + 0.1) / 0.9));
-			multiplierBlue += (colorTriangleX / 1.2);
-			if (multiplierBlue > 1.0f) {
-				multiplierBlue = 1.0f;
-			} else if (multiplierBlue < 0.0f) {
-				multiplierBlue = 0.0f;
-			}
-
-			float triangleColor[] = {
-					1.0f, 1.0f, 1.0f, 1.0f,
-					colorBarRed, colorBarGreen, colorBarBlue, 1.0f,
-					0.0f, 0.0f, 0.0f, 1.0f,
-
-					1.0f, 1.0f, 0.0f, 1.0f,
-					1.0f, 0.0f, 0.0f, 1.0f,
-					1.0f, 0.0f, 0.0f, 1.0f,
-					1.0f, 0.0f, 0.0f, 1.0f,
-					1.0f, 1.0f, 0.0f, 1.0f,
-					1.0f, 1.0f, 0.0f, 1.0f,
-
-					0.0f, 1.0f, 0.0f, 1.0f,
-					1.0f, 1.0f, 0.0f, 1.0f,
-					1.0f, 1.0f, 0.0f, 1.0f,
-					1.0f, 1.0f, 0.0f, 1.0f,
-					0.0f, 1.0f, 0.0f, 1.0f,
-					0.0f, 1.0f, 0.0f, 1.0f,
-
-					0.0f, 1.0f, 1.0f, 1.0f,
-					0.0f, 1.0f, 0.0f, 1.0f,
-					0.0f, 1.0f, 0.0f, 1.0f,
-					0.0f, 1.0f, 0.0f, 1.0f,
-					0.0f, 1.0f, 1.0f, 1.0f,
-					0.0f, 1.0f, 1.0f, 1.0f,
-
-					0.0f, 0.0f, 1.0f, 1.0f,
-					0.0f, 1.0f, 1.0f, 1.0f,
-					0.0f, 1.0f, 1.0f, 1.0f,
-					0.0f, 1.0f, 1.0f, 1.0f,
-					0.0f, 0.0f, 1.0f, 1.0f,
-					0.0f, 0.0f, 1.0f, 1.0f,
-
-					1.0f, 0.0f, 1.0f, 1.0f,
-					0.0f, 0.0f, 1.0f, 1.0f,
-					0.0f, 0.0f, 1.0f, 1.0f,
-					0.0f, 0.0f, 1.0f, 1.0f,
-					1.0f, 0.0f, 1.0f, 1.0f,
-					1.0f, 0.0f, 1.0f, 1.0f,
-
-					1.0f, 0.0f, 0.0f, 1.0f,
-					1.0f, 0.0f, 1.0f, 1.0f,
-					1.0f, 0.0f, 1.0f, 1.0f,
-					1.0f, 0.0f, 1.0f, 1.0f,
-					1.0f, 0.0f, 0.0f, 1.0f,
-					1.0f, 0.0f, 0.0f, 1.0f,
-
-					0.0f, 0.0f, 0.0f, 1.0f,
-					0.0f, 0.0f, 0.0f, 1.0f,
-					0.0f, 0.0f, 0.0f, 1.0f,
-					0.0f, 0.0f, 0.0f, 1.0f,
-					0.0f, 0.0f, 0.0f, 1.0f,
-					0.0f, 0.0f, 0.0f, 1.0f,
-
-					1.0f, 1.0f, 1.0f, 1.0f,
-					1.0f, 1.0f, 1.0f, 1.0f,
-					1.0f, 1.0f, 1.0f, 1.0f,
-					1.0f, 1.0f, 1.0f, 1.0f,
-					1.0f, 1.0f, 1.0f, 1.0f,
-					1.0f, 1.0f, 1.0f, 1.0f,
-
-					0.0f, 0.0f, 0.0f, 1.0f,
-					0.0f, 0.0f, 0.0f, 1.0f,
-					0.0f, 0.0f, 0.0f, 1.0f,
-					0.0f, 0.0f, 0.0f, 1.0f,
-					0.0f, 0.0f, 0.0f, 1.0f,
-					0.0f, 0.0f, 0.0f, 1.0f,
-
-					multiplierRed, multiplierGreen, multiplierBlue, 1.0f,
-					multiplierRed, multiplierGreen, multiplierBlue, 1.0f,
-					multiplierRed, multiplierGreen, multiplierBlue, 0.0f,
-					multiplierRed, multiplierGreen, multiplierBlue, 0.0f,
-					multiplierRed, multiplierGreen, multiplierBlue, 0.0f,
-					multiplierRed, multiplierGreen, multiplierBlue, 1.0f,
-
-					0.0f, 0.0f, 0.0f, 1.0f,
-					0.0f, 0.0f, 0.0f, 1.0f,
-					0.0f, 0.0f, 0.0f, 1.0f,
-					0.0f, 0.0f, 0.0f, 1.0f,
-					0.0f, 0.0f, 0.0f, 1.0f,
-					0.0f, 0.0f, 0.0f, 1.0f,
-			};
-			renderToGUI(sizeof(triangle) / sizeof(triangle[0]) / 3, triangle, triangleColor);
-
-			unsigned int usingCube;
-			if (changeCubeColor) {
-				usingCube = (unsigned char)(multiplierRed * 255.0f) << 24 | (unsigned char)(multiplierGreen * 255.0f) << 16 | (unsigned char)(multiplierBlue * 255.0f) << 8 | (unsigned char)(((colorAlphaPos + 0.1f) / 0.9f) * 255.0f);
-				player.inventory[player.selectedSlot] = usingCube;
-			} else {
-				usingCube = player.inventory[player.selectedSlot];
-			}
-
-			glm::mat4 model = glm::mat4(1.0f);
-			mvp = glm::ortho<float>(-((float)windowWidth / (float)windowHeight), (float)windowWidth / (float)windowHeight, -1.0f, 1.0f, -1.0f, 1.0f) * glm::rotate(model, 0.5f, glm::vec3(1.0, 0.0, 0.0)) * glm::translate(model, glm::vec3(((double)windowWidth / (double)windowHeight) - 0.2, 0.9, 0.0)) * glm::rotate(model, 0.785398f, glm::vec3(0.0, 1.0, 0.0));
-			glUniformMatrix4fv(matrix, 1, GL_FALSE, &mvp[0][0]);
-
+			const unsigned int usingCube = player.inventory[i];
 			float red = (float)(usingCube >> 24) / 255.0f;
 			float green = (float)((usingCube >> 16) & 255) / 255.0f;
 			float blue = (float)((usingCube >> 8) & 255) / 255.0f;
@@ -899,29 +548,65 @@ void doDrawTick() {
 					red, green, blue, alpha,
 					red, green, blue, alpha,
 			};
+			const double size = i == player.selectedSlot ? 0.06 : 0.05;
 			double usingCubeVertices[] = {
-					-0.1, 0.1, 0.1,
-					-0.1, -0.1, 0.1,
-					0.1, -0.1, 0.1,
-					-0.1, 0.1, 0.1,
-					0.1, -0.1, 0.1,
-					0.1, 0.1, 0.1,
+					-size, size, size,
+					-size, -size, size,
+					size, -size, size,
+					-size, size, size,
+					size, -size, size,
+					size, size, size,
 
-					-0.1, -0.1, 0.1,
-					-0.1, 0.1, 0.1,
-					-0.1, 0.1, -0.1,
-					-0.1, -0.1, 0.1,
-					-0.1, 0.1, -0.1,
-					-0.1, -0.1, -0.1,
+					-size, -size, size,
+					-size, size, size,
+					-size, size, -size,
+					-size, -size, size,
+					-size, size, -size,
+					-size, -size, -size,
 
-					0.1, 0.1, 0.1,
-					0.1, 0.1, -0.1,
-					-0.1, 0.1, -0.1,
-					-0.1, 0.1, -0.1,
-					-0.1, 0.1, 0.1,
-					0.1, 0.1, 0.1,
+					size, size, size,
+					size, size, -size,
+					-size, size, -size,
+					-size, size, -size,
+					-size, size, size,
+					size, size, size,
 			};
 			renderToGUI(18, usingCubeVertices, usingCubeColor);
+		}
+
+
+		model = glm::mat4(1.0f);
+		mvp = glm::ortho<float>(-((float)settings.windowWidth / (float)settings.windowHeight), (float)settings.windowWidth / (float)settings.windowHeight, -1.0f, 1.0f, -1.0f, 1.0f);
+		glUniformMatrix4fv(GLmatrix, 1, GL_FALSE, &mvp[0][0]);
+
+		glDisable(GL_DEPTH_TEST);
+
+		renderToGUI(sizeof(crosshairs) / sizeof(crosshairs[0]) / 3, crosshairs, crosshairColor);
+
+		if (gamePaused || openedScreen != NULL) {
+
+			// render darkened background
+			double background[] = {
+					-(double)settings.windowWidth / (double)settings.windowHeight, -1.0, 0.0,
+					(double)settings.windowWidth / (double)settings.windowHeight, -1.0, 0.0,
+					(double)settings.windowWidth / (double)settings.windowHeight, 1.0, 0.0,
+					(double)settings.windowWidth / (double)settings.windowHeight, 1.0, 0.0,
+					-(double)settings.windowWidth / (double)settings.windowHeight, 1.0, 0.0,
+					-(double)settings.windowWidth / (double)settings.windowHeight, -1.0, 0.0
+			};
+			float backgroundColor[] = {
+					0.5f, 0.5f, 0.5f, 0.5f,
+					0.5f, 0.5f, 0.5f, 0.5f,
+					0.5f, 0.5f, 0.5f, 0.5f,
+					0.5f, 0.5f, 0.5f, 0.5f,
+					0.5f, 0.5f, 0.5f, 0.5f,
+					0.5f, 0.5f, 0.5f, 0.5f,
+			};
+			renderToGUI(6, background, backgroundColor);
+		}
+
+		if (openedScreen != NULL) {
+			openedScreen->renderScreen();
 		}
 
 		mods_onRenderTick();
@@ -936,10 +621,10 @@ void doDrawTick() {
 
 
 void takeScreenshot(const char * const __restrict filename, const char * const __restrict folder) {
-    unsigned char * const __restrict pixels = (unsigned char*)malloc(sizeof(char[windowWidth * windowHeight * 3]));
+    unsigned char * const __restrict pixels = (unsigned char*)malloc(sizeof(char[settings.windowWidth * settings.windowHeight * 3]));
     glPixelStorei(GL_PACK_ALIGNMENT, 1);
     glReadBuffer(GL_FRONT);
-    glReadPixels(0, 0, windowWidth, windowHeight, GL_RGB, GL_UNSIGNED_BYTE, pixels);
+    glReadPixels(0, 0, settings.windowWidth, settings.windowHeight, GL_RGB, GL_UNSIGNED_BYTE, pixels);
 
 	struct stat st;
     if (stat(folder, &st) != 0 && mkdir(folder, 0777) != 0) {
@@ -953,14 +638,14 @@ void takeScreenshot(const char * const __restrict filename, const char * const _
     png_infop info = png_create_info_struct(png);
     FILE * const __restrict file = fopen(filename, "wb");
     png_init_io(png, file);
-    png_set_IHDR(png, info, windowWidth, windowHeight, 8, PNG_COLOR_TYPE_RGB, PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_BASE, PNG_FILTER_TYPE_BASE);
+    png_set_IHDR(png, info, settings.windowWidth, settings.windowHeight, 8, PNG_COLOR_TYPE_RGB, PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_BASE, PNG_FILTER_TYPE_BASE);
     png_colorp palette = (png_colorp)png_malloc(png, sizeof(png_color[PNG_MAX_PALETTE_LENGTH]));
     png_set_PLTE(png, info, palette, PNG_MAX_PALETTE_LENGTH);
     png_write_info(png, info);
     png_set_packing(png);
-    png_bytepp rows = (png_bytepp)png_malloc(png, sizeof(png_bytep[windowHeight]));
-    for (int i = 0; i < windowHeight; ++i) {
-        rows[i] = (png_bytep)(&pixels[(windowHeight - i - 1) * windowWidth * 3]);
+    png_bytepp rows = (png_bytepp)png_malloc(png, sizeof(png_bytep[settings.windowHeight]));
+    for (int i = 0; i < settings.windowHeight; ++i) {
+        rows[i] = (png_bytep)(&pixels[(settings.windowHeight - i - 1) * settings.windowWidth * 3]);
     }
     png_write_image(png, rows);
     png_write_end(png, info);

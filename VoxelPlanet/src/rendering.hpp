@@ -16,21 +16,8 @@
 /** The main OpenGL window of the game. */
 extern GLFWwindow * __restrict window;
 
-/** Width of the game window in pixels. */
-extern int windowWidth;
-
-/** Height of the game window in pixels. */
-extern int windowHeight;
-
-/** The level of antialiasing/MSAA sampling. */
-extern unsigned char antialiasingLevel;
-
-/** The brightness of cubes and objects in the world. */
-extern float worldBrightness;
-
-extern float skyColorRed;
-extern float skyColorGreen;
-extern float skyColorBlue;
+extern GLuint GLprogram;
+extern GLuint GLmatrix;
 
 /** Whether or not the world has been altered and needs re-rendered. This should be set to true when placing, deleting, or editing cubes. */
 extern bool worldIsDirty;
@@ -54,3 +41,9 @@ extern void doDrawTick();
 
 /** Shuts down OpenGL and any graphical libraries. */
 extern void cleanupOpenGL();
+
+/** Loads the shaders from the specified (relative) file paths. */
+extern GLuint loadShaders(const GLchar * const __restrict vertexShaderPath, const GLchar * const __restrict fragmentShaderPath);
+
+/** Adds and draws a list to the gui vbo. `count` refers to the number of vertices. **/
+extern void renderToGUI(unsigned int count, const double * const __restrict vertices, const float * const __restrict colors);
