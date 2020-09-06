@@ -248,7 +248,7 @@ void World::saveWorld() __restrict {
 }
 
 
-RayTraceInfo World::rayTraceCubes(const glm::vec3 start, const float rotationYaw, const float rotationPitch, const float reach) {
+RayTraceInfo World::rayTraceCubes(const glm::vec3 start, const float rotationYaw, const float rotationPitch, const float reach) __restrict {
 	glm::vec3 pos = start;
 	unsigned int cube = 0;
 
