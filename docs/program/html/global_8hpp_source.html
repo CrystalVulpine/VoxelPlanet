@@ -75,55 +75,37 @@ $(function() {
 <div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160; </div>
 <div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;<span class="preprocessor">#include &quot;World.hpp&quot;</span></div>
 <div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;<span class="preprocessor">#include &quot;Player.hpp&quot;</span></div>
-<div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160; </div>
-<div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;<span class="preprocessor">#define _PI 3.14159265358979323846</span></div>
-<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160; </div>
-<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;<span class="keyword">extern</span> <a class="code" href="classWorld.html">World</a> mainWorld;</div>
-<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;<span class="keyword">extern</span> <a class="code" href="classPlayer.html">Player</a> player;</div>
+<div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;<span class="preprocessor">#include &quot;Settings.hpp&quot;</span></div>
+<div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;<span class="preprocessor">#include &quot;Screen.hpp&quot;</span></div>
+<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;<span class="preprocessor">#include &quot;ColorScreen.hpp&quot;</span></div>
+<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160; </div>
+<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;<span class="preprocessor">#define _PI 3.14159265358979323846</span></div>
 <div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160; </div>
-<div class="line"><a name="l00018"></a><span class="lineno"><a class="line" href="global_8hpp.html#a6a53f521f7eac5d92191b6fe6e055a24">   18</a></span>&#160;<span class="preprocessor">#define SCREEN_COLOR 1</span></div>
-<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160; </div>
-<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;<span class="keyword">extern</span> <span class="keywordtype">bool</span> <a class="code" href="global_8hpp.html#aa3cee5bb562891fe08f778861a9a3b8d">debugMode</a>;</div>
-<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160; </div>
-<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;<span class="keyword">extern</span> <span class="keywordtype">bool</span> hideGUI;</div>
-<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;<span class="keyword">extern</span> <span class="keywordtype">bool</span> gamePaused;</div>
-<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;<span class="keyword">extern</span> <span class="keywordtype">bool</span> fancyGraphics;</div>
+<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;<span class="keyword">extern</span> <a class="code" href="classWorld.html">World</a> mainWorld;</div>
+<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;<span class="keyword">extern</span> <a class="code" href="classPlayer.html">Player</a> player;</div>
+<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;<span class="keyword">extern</span> <a class="code" href="classSettings.html">Settings</a> settings;</div>
+<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160; </div>
+<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;<span class="keyword">extern</span> <a class="code" href="classScreen.html">Screen</a> * <a class="code" href="global_8hpp.html#aee3813d0dbe1e35186d8bc6517486f41">openedScreen</a>;</div>
+<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160; </div>
+<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;<span class="keyword">extern</span> <a class="code" href="classColorScreen.html">ColorScreen</a> <a class="code" href="global_8hpp.html#afcf862d8693de9c2739b0312ee007797">colorScreen</a>;</div>
 <div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160; </div>
-<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;<span class="keyword">extern</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> <a class="code" href="global_8hpp.html#a3b98ae71d29e55d398730ac308c9adbc">renderDistance</a>;</div>
-<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160; </div>
-<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;<span class="keyword">extern</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> <a class="code" href="global_8hpp.html#a5c5925519b5e7db2476ccfcadd95940e">openedScreen</a>;</div>
-<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160; </div>
-<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;<span class="keyword">extern</span> <span class="keywordtype">bool</span> <a class="code" href="global_8hpp.html#a20510d34f994a0c10e87b9cf36462b4d">isCubeSelected</a>;</div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160; </div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;<span class="keyword">extern</span> <span class="keywordtype">bool</span> <a class="code" href="global_8hpp.html#aa6df46a970f6bd536780c34682fd51e9">worldIsDirty</a>;</div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160; </div>
-<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;<span class="keyword">extern</span> <span class="keywordtype">double</span> <a class="code" href="global_8hpp.html#aa4795405a2aba565940c846188cd281d">colorTriangleX</a>;</div>
-<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160; </div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;<span class="keyword">extern</span> <span class="keywordtype">double</span> <a class="code" href="global_8hpp.html#a029b8b1baf894b5603965233a08c7c43">colorTriangleY</a>;</div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160; </div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;<span class="keyword">extern</span> <span class="keywordtype">double</span> <a class="code" href="global_8hpp.html#a8fd2ecefeb82e6f5a68ba7bd3075b30b">colorBarPos</a>;</div>
-<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160; </div>
-<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;<span class="keyword">extern</span> <span class="keywordtype">double</span> <a class="code" href="global_8hpp.html#acb38fe36ff0e7d2294e8e5b202f70fec">colorAlphaPos</a>;</div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160; </div>
-<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;<span class="keyword">extern</span> <span class="keywordtype">bool</span> <a class="code" href="global_8hpp.html#a8e76bc059b77cb9b64e6891f9e482ada">changeCubeColor</a>;</div>
-<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160; </div>
-<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;<span class="keyword">typedef</span> <span class="keywordtype">long</span> Clock;</div>
-<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160; </div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;<span class="keyword">extern</span> Clock <a class="code" href="global_8hpp.html#a0f297d8a9ef44ed520ff3bba16f94b93">currentTimeMs</a>();</div>
+<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;<span class="keyword">extern</span> <span class="keywordtype">bool</span> gamePaused;</div>
+<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160; </div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;<span class="keyword">extern</span> <span class="keywordtype">bool</span> <a class="code" href="global_8hpp.html#a20510d34f994a0c10e87b9cf36462b4d">isCubeSelected</a>;</div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160; </div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;<span class="keyword">typedef</span> <span class="keywordtype">long</span> Clock;</div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160; </div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;<span class="keyword">extern</span> Clock <a class="code" href="global_8hpp.html#a0f297d8a9ef44ed520ff3bba16f94b93">currentTimeMs</a>();</div>
 </div><!-- fragment --></div><!-- contents -->
-<div class="ttc" id="aglobal_8hpp_html_a8e76bc059b77cb9b64e6891f9e482ada"><div class="ttname"><a href="global_8hpp.html#a8e76bc059b77cb9b64e6891f9e482ada">changeCubeColor</a></div><div class="ttdeci">bool changeCubeColor</div><div class="ttdef"><b>Definition:</b> VoxelPlanet.cpp:28</div></div>
-<div class="ttc" id="aglobal_8hpp_html_acb38fe36ff0e7d2294e8e5b202f70fec"><div class="ttname"><a href="global_8hpp.html#acb38fe36ff0e7d2294e8e5b202f70fec">colorAlphaPos</a></div><div class="ttdeci">double colorAlphaPos</div><div class="ttdef"><b>Definition:</b> rendering.cpp:34</div></div>
-<div class="ttc" id="aglobal_8hpp_html_a8fd2ecefeb82e6f5a68ba7bd3075b30b"><div class="ttname"><a href="global_8hpp.html#a8fd2ecefeb82e6f5a68ba7bd3075b30b">colorBarPos</a></div><div class="ttdeci">double colorBarPos</div><div class="ttdef"><b>Definition:</b> rendering.cpp:33</div></div>
-<div class="ttc" id="aglobal_8hpp_html_a3b98ae71d29e55d398730ac308c9adbc"><div class="ttname"><a href="global_8hpp.html#a3b98ae71d29e55d398730ac308c9adbc">renderDistance</a></div><div class="ttdeci">unsigned int renderDistance</div><div class="ttdef"><b>Definition:</b> rendering.cpp:22</div></div>
-<div class="ttc" id="aglobal_8hpp_html_a5c5925519b5e7db2476ccfcadd95940e"><div class="ttname"><a href="global_8hpp.html#a5c5925519b5e7db2476ccfcadd95940e">openedScreen</a></div><div class="ttdeci">unsigned int openedScreen</div><div class="ttdef"><b>Definition:</b> VoxelPlanet.cpp:33</div></div>
+<div class="ttc" id="aglobal_8hpp_html_aee3813d0dbe1e35186d8bc6517486f41"><div class="ttname"><a href="global_8hpp.html#aee3813d0dbe1e35186d8bc6517486f41">openedScreen</a></div><div class="ttdeci">Screen * openedScreen</div><div class="ttdef"><b>Definition:</b> VoxelPlanet.cpp:31</div></div>
+<div class="ttc" id="aclassSettings_html"><div class="ttname"><a href="classSettings.html">Settings</a></div><div class="ttdef"><b>Definition:</b> Settings.hpp:3</div></div>
+<div class="ttc" id="aclassScreen_html"><div class="ttname"><a href="classScreen.html">Screen</a></div><div class="ttdef"><b>Definition:</b> Screen.hpp:3</div></div>
 <div class="ttc" id="aglobal_8hpp_html_a0f297d8a9ef44ed520ff3bba16f94b93"><div class="ttname"><a href="global_8hpp.html#a0f297d8a9ef44ed520ff3bba16f94b93">currentTimeMs</a></div><div class="ttdeci">Clock currentTimeMs()</div><div class="ttdef"><b>Definition:</b> global.cpp:4</div></div>
 <div class="ttc" id="aclassWorld_html"><div class="ttname"><a href="classWorld.html">World</a></div><div class="ttdef"><b>Definition:</b> World.hpp:20</div></div>
-<div class="ttc" id="aglobal_8hpp_html_aa4795405a2aba565940c846188cd281d"><div class="ttname"><a href="global_8hpp.html#aa4795405a2aba565940c846188cd281d">colorTriangleX</a></div><div class="ttdeci">double colorTriangleX</div><div class="ttdef"><b>Definition:</b> rendering.cpp:31</div></div>
 <div class="ttc" id="aglobal_8hpp_html_a20510d34f994a0c10e87b9cf36462b4d"><div class="ttname"><a href="global_8hpp.html#a20510d34f994a0c10e87b9cf36462b4d">isCubeSelected</a></div><div class="ttdeci">bool isCubeSelected</div><div class="ttdef"><b>Definition:</b> VoxelPlanet.cpp:26</div></div>
-<div class="ttc" id="aglobal_8hpp_html_aa6df46a970f6bd536780c34682fd51e9"><div class="ttname"><a href="global_8hpp.html#aa6df46a970f6bd536780c34682fd51e9">worldIsDirty</a></div><div class="ttdeci">bool worldIsDirty</div><div class="ttdef"><b>Definition:</b> rendering.cpp:29</div></div>
-<div class="ttc" id="aglobal_8hpp_html_aa3cee5bb562891fe08f778861a9a3b8d"><div class="ttname"><a href="global_8hpp.html#aa3cee5bb562891fe08f778861a9a3b8d">debugMode</a></div><div class="ttdeci">bool debugMode</div><div class="ttdef"><b>Definition:</b> VoxelPlanet.cpp:30</div></div>
 <div class="ttc" id="aclassPlayer_html"><div class="ttname"><a href="classPlayer.html">Player</a></div><div class="ttdef"><b>Definition:</b> Player.hpp:5</div></div>
-<div class="ttc" id="aglobal_8hpp_html_a029b8b1baf894b5603965233a08c7c43"><div class="ttname"><a href="global_8hpp.html#a029b8b1baf894b5603965233a08c7c43">colorTriangleY</a></div><div class="ttdeci">double colorTriangleY</div><div class="ttdef"><b>Definition:</b> rendering.cpp:32</div></div>
+<div class="ttc" id="aclassColorScreen_html"><div class="ttname"><a href="classColorScreen.html">ColorScreen</a></div><div class="ttdef"><b>Definition:</b> ColorScreen.hpp:5</div></div>
+<div class="ttc" id="aglobal_8hpp_html_afcf862d8693de9c2739b0312ee007797"><div class="ttname"><a href="global_8hpp.html#afcf862d8693de9c2739b0312ee007797">colorScreen</a></div><div class="ttdeci">ColorScreen colorScreen</div><div class="ttdef"><b>Definition:</b> VoxelPlanet.cpp:32</div></div>
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
 Generated by&#160;<a href="http://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.0

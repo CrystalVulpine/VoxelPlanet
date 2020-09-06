@@ -77,6 +77,9 @@ $(function() {
 <div class="contents">
 <div class="textblock"><code>#include &quot;World.hpp&quot;</code><br />
 <code>#include &quot;Player.hpp&quot;</code><br />
+<code>#include &quot;Settings.hpp&quot;</code><br />
+<code>#include &quot;Screen.hpp&quot;</code><br />
+<code>#include &quot;ColorScreen.hpp&quot;</code><br />
 </div>
 <p><a href="global_8hpp_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
@@ -85,8 +88,6 @@ Macros</h2></td></tr>
 <tr class="memitem:a583ed7652f3528c16157897a96203bfd"><td class="memItemLeft" align="right" valign="top"><a id="a583ed7652f3528c16157897a96203bfd"></a>
 #define&#160;</td><td class="memItemRight" valign="bottom"><b>_PI</b>&#160;&#160;&#160;3.14159265358979323846</td></tr>
 <tr class="separator:a583ed7652f3528c16157897a96203bfd"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6a53f521f7eac5d92191b6fe6e055a24"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="global_8hpp.html#a6a53f521f7eac5d92191b6fe6e055a24">SCREEN_COLOR</a>&#160;&#160;&#160;1</td></tr>
-<tr class="separator:a6a53f521f7eac5d92191b6fe6e055a24"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="typedef-members"></a>
 Typedefs</h2></td></tr>
@@ -107,55 +108,22 @@ Variables</h2></td></tr>
 <tr class="memitem:af61d6983a9396a11078805087518af88"><td class="memItemLeft" align="right" valign="top"><a id="af61d6983a9396a11078805087518af88"></a>
 <a class="el" href="classPlayer.html">Player</a>&#160;</td><td class="memItemRight" valign="bottom"><b>player</b></td></tr>
 <tr class="separator:af61d6983a9396a11078805087518af88"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa3cee5bb562891fe08f778861a9a3b8d"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="global_8hpp.html#aa3cee5bb562891fe08f778861a9a3b8d">debugMode</a></td></tr>
-<tr class="separator:aa3cee5bb562891fe08f778861a9a3b8d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6df93b4f337bc3e65ec1f75a7ed2fed8"><td class="memItemLeft" align="right" valign="top"><a id="a6df93b4f337bc3e65ec1f75a7ed2fed8"></a>
-bool&#160;</td><td class="memItemRight" valign="bottom"><b>hideGUI</b></td></tr>
-<tr class="separator:a6df93b4f337bc3e65ec1f75a7ed2fed8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a19276c778f3034b94881cf1f8614dbb2"><td class="memItemLeft" align="right" valign="top"><a id="a19276c778f3034b94881cf1f8614dbb2"></a>
+<a class="el" href="classSettings.html">Settings</a>&#160;</td><td class="memItemRight" valign="bottom"><b>settings</b></td></tr>
+<tr class="separator:a19276c778f3034b94881cf1f8614dbb2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aee3813d0dbe1e35186d8bc6517486f41"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classScreen.html">Screen</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="global_8hpp.html#aee3813d0dbe1e35186d8bc6517486f41">openedScreen</a></td></tr>
+<tr class="separator:aee3813d0dbe1e35186d8bc6517486f41"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afcf862d8693de9c2739b0312ee007797"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classColorScreen.html">ColorScreen</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="global_8hpp.html#afcf862d8693de9c2739b0312ee007797">colorScreen</a></td></tr>
+<tr class="separator:afcf862d8693de9c2739b0312ee007797"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aff6395859aa708856938d6944faa5097"><td class="memItemLeft" align="right" valign="top"><a id="aff6395859aa708856938d6944faa5097"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><b>gamePaused</b></td></tr>
 <tr class="separator:aff6395859aa708856938d6944faa5097"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa91c0dd51ba082c586ca5a122fd95a5e"><td class="memItemLeft" align="right" valign="top"><a id="aa91c0dd51ba082c586ca5a122fd95a5e"></a>
-bool&#160;</td><td class="memItemRight" valign="bottom"><b>fancyGraphics</b></td></tr>
-<tr class="separator:aa91c0dd51ba082c586ca5a122fd95a5e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3b98ae71d29e55d398730ac308c9adbc"><td class="memItemLeft" align="right" valign="top">unsigned int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="global_8hpp.html#a3b98ae71d29e55d398730ac308c9adbc">renderDistance</a></td></tr>
-<tr class="separator:a3b98ae71d29e55d398730ac308c9adbc"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5c5925519b5e7db2476ccfcadd95940e"><td class="memItemLeft" align="right" valign="top">unsigned int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="global_8hpp.html#a5c5925519b5e7db2476ccfcadd95940e">openedScreen</a></td></tr>
-<tr class="separator:a5c5925519b5e7db2476ccfcadd95940e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a20510d34f994a0c10e87b9cf36462b4d"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="global_8hpp.html#a20510d34f994a0c10e87b9cf36462b4d">isCubeSelected</a></td></tr>
 <tr class="separator:a20510d34f994a0c10e87b9cf36462b4d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa6df46a970f6bd536780c34682fd51e9"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="global_8hpp.html#aa6df46a970f6bd536780c34682fd51e9">worldIsDirty</a></td></tr>
-<tr class="separator:aa6df46a970f6bd536780c34682fd51e9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa4795405a2aba565940c846188cd281d"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="global_8hpp.html#aa4795405a2aba565940c846188cd281d">colorTriangleX</a></td></tr>
-<tr class="separator:aa4795405a2aba565940c846188cd281d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a029b8b1baf894b5603965233a08c7c43"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="global_8hpp.html#a029b8b1baf894b5603965233a08c7c43">colorTriangleY</a></td></tr>
-<tr class="separator:a029b8b1baf894b5603965233a08c7c43"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8fd2ecefeb82e6f5a68ba7bd3075b30b"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="global_8hpp.html#a8fd2ecefeb82e6f5a68ba7bd3075b30b">colorBarPos</a></td></tr>
-<tr class="separator:a8fd2ecefeb82e6f5a68ba7bd3075b30b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:acb38fe36ff0e7d2294e8e5b202f70fec"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="global_8hpp.html#acb38fe36ff0e7d2294e8e5b202f70fec">colorAlphaPos</a></td></tr>
-<tr class="separator:acb38fe36ff0e7d2294e8e5b202f70fec"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8e76bc059b77cb9b64e6891f9e482ada"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="global_8hpp.html#a8e76bc059b77cb9b64e6891f9e482ada">changeCubeColor</a></td></tr>
-<tr class="separator:a8e76bc059b77cb9b64e6891f9e482ada"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>This header contains global variables and definitions. </p>
-</div><h2 class="groupheader">Macro Definition Documentation</h2>
-<a id="a6a53f521f7eac5d92191b6fe6e055a24"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a6a53f521f7eac5d92191b6fe6e055a24">&#9670;&nbsp;</a></span>SCREEN_COLOR</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define SCREEN_COLOR&#160;&#160;&#160;1</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<p>Id of the color picker screen. </p>
-
-</div>
-</div>
-<h2 class="groupheader">Function Documentation</h2>
+</div><h2 class="groupheader">Function Documentation</h2>
 <a id="a0f297d8a9ef44ed520ff3bba16f94b93"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a0f297d8a9ef44ed520ff3bba16f94b93">&#9670;&nbsp;</a></span>currentTimeMs()</h2>
 
@@ -175,8 +143,8 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><b>fancyGraphics</b></td
 </div>
 </div>
 <h2 class="groupheader">Variable Documentation</h2>
-<a id="a8e76bc059b77cb9b64e6891f9e482ada"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a8e76bc059b77cb9b64e6891f9e482ada">&#9670;&nbsp;</a></span>changeCubeColor</h2>
+<a id="afcf862d8693de9c2739b0312ee007797"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afcf862d8693de9c2739b0312ee007797">&#9670;&nbsp;</a></span>colorScreen</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -185,7 +153,7 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><b>fancyGraphics</b></td
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">bool changeCubeColor</td>
+          <td class="memname"><a class="el" href="classColorScreen.html">ColorScreen</a> colorScreen</td>
         </tr>
       </table>
   </td>
@@ -194,122 +162,7 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><b>fancyGraphics</b></td
   </tr>
 </table>
 </div><div class="memdoc">
-<p>A flag that is set to true when the color picker is actually used. Initially set to false to prevent the cube color from changing just from opening the color picking screen. </p>
-
-</div>
-</div>
-<a id="acb38fe36ff0e7d2294e8e5b202f70fec"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#acb38fe36ff0e7d2294e8e5b202f70fec">&#9670;&nbsp;</a></span>colorAlphaPos</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">double colorAlphaPos</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">extern</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>Pos on the alpha bar of the color picker screen. This is a screen coord and not between 0.0 and 1.0. </p>
-
-</div>
-</div>
-<a id="a8fd2ecefeb82e6f5a68ba7bd3075b30b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a8fd2ecefeb82e6f5a68ba7bd3075b30b">&#9670;&nbsp;</a></span>colorBarPos</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">double colorBarPos</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">extern</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>Pos on the hue bar of the color picker screen. This is a screen coord and not between 0.0 and 1.0. </p>
-
-</div>
-</div>
-<a id="aa4795405a2aba565940c846188cd281d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa4795405a2aba565940c846188cd281d">&#9670;&nbsp;</a></span>colorTriangleX</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">double colorTriangleX</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">extern</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>X coord on the color picker triangle. This is a screen coord and not between 0.0 and 1.0. </p>
-
-</div>
-</div>
-<a id="a029b8b1baf894b5603965233a08c7c43"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a029b8b1baf894b5603965233a08c7c43">&#9670;&nbsp;</a></span>colorTriangleY</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">double colorTriangleY</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">extern</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>Y coord on the color picker triangle. This is a screen coord and not between 0.0 and 1.0. </p>
-
-</div>
-</div>
-<a id="aa3cee5bb562891fe08f778861a9a3b8d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa3cee5bb562891fe08f778861a9a3b8d">&#9670;&nbsp;</a></span>debugMode</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">bool debugMode</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">extern</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>This enables debugging stuff, such as not capturing the pointer (in case the program freezes). </p>
+<p>Color picker GUI screen. </p>
 
 </div>
 </div>
@@ -332,35 +185,12 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><b>fancyGraphics</b></td
   </tr>
 </table>
 </div><div class="memdoc">
-<p>the cube the screen/crosshair is pointing at </p>
+<p>Is the screen/crosshair pointing at a cube? </p>
 
 </div>
 </div>
-<a id="a5c5925519b5e7db2476ccfcadd95940e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a5c5925519b5e7db2476ccfcadd95940e">&#9670;&nbsp;</a></span>openedScreen</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">unsigned int openedScreen</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">extern</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>id of the screen that is currently open. 0 if none. </p>
-
-</div>
-</div>
-<a id="a3b98ae71d29e55d398730ac308c9adbc"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a3b98ae71d29e55d398730ac308c9adbc">&#9670;&nbsp;</a></span>renderDistance</h2>
+<a id="aee3813d0dbe1e35186d8bc6517486f41"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aee3813d0dbe1e35186d8bc6517486f41">&#9670;&nbsp;</a></span>openedScreen</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -369,7 +199,7 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><b>fancyGraphics</b></td
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">unsigned int renderDistance</td>
+          <td class="memname"><a class="el" href="classScreen.html">Screen</a>* openedScreen</td>
         </tr>
       </table>
   </td>
@@ -378,30 +208,7 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><b>fancyGraphics</b></td
   </tr>
 </table>
 </div><div class="memdoc">
-<p>How many 16-cube areas are visible in any given direction. </p>
-
-</div>
-</div>
-<a id="aa6df46a970f6bd536780c34682fd51e9"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa6df46a970f6bd536780c34682fd51e9">&#9670;&nbsp;</a></span>worldIsDirty</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">bool worldIsDirty</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">extern</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>marks the world dirty and in need of being rendered again. </p>
+<p>The screen that is currently open. 0 if none. </p>
 
 </div>
 </div>
