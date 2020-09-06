@@ -248,58 +248,41 @@ void World::saveWorld() __restrict {
 }
 
 
-RayTraceInfo World::rayTraceCubes(const glm::vec3 start, const float rotationYaw, const float rotationPitch, const float reach) __restrict {
-
-	bool couldFindCube = false;
-
+RayTraceInfo World::rayTraceCubes(const glm::vec3 start, const float rotationYaw, const float rotationPitch, const float reach) {
 	glm::vec3 pos = start;
-	glm::vec3 lastPos = start;
 	unsigned int cube = 0;
 
-	const float changeX = glm::cos(rotationYaw + 1.5708f) * 0.05f;
-	const float changeZ = glm::sin(rotationYaw + 1.5708f) * 0.05f;
-	const float changeY = glm::tan(rotationPitch) * 0.05f;
-	while (!cube) {
+	glm::vec3 direction;
+	direction.x = -cosf(rotationPitch) * cosf(rotationYaw + glm::radians(90.0f));
+	direction.y = sinf(-rotationPitch);
+	direction.z = -cosf(rotationPitch) * sinf(rotationYaw + glm::radians(90.0f));
+	glm::vec3 sign(direction[0] > 0, direction[1] > 0, direction[2] > 0);
 
-		lastPos = pos;
-	    pos.x -= changeX;
-	    pos.z -= changeZ;
+	while (true) {
+		//glm::vec3 tvec((floorf(pos.x + sign.x) - pos.x) / direction.x, (floorf(pos.y + sign.y) - pos.y) / direction.y, (floorf(pos.z + sign.z) - pos.z) / direction.z);
+		const glm::vec3 tvec = (glm::floor(pos + sign) - pos) / direction;
+		const float t = std::min(tvec.x, std::min(tvec.y, tvec.z));
+		pos += direction * (t + 0.001f);
 
-	    // tan can be undefined, so still move y when that happens
-	    if (rotationPitch <= -_PI / 2.0f) {
-	    	pos.y += 1.0f;
-	    } else if (rotationPitch >= _PI / 2.0f) {
-	    	pos.y -= 1.0f;
-	    } else {
-	    	pos.y -= changeY;
-	    }
+		glm::vec3 normal;
+		for (unsigned int i = 0; i < 3; ++i) {
+			normal[i] = (t == tvec[i]);
 
-	    cube = getCube(pos.x, pos.y, pos.z);
+			if (sign[i]) {
+				normal[i] = -normal[i];
+			}
+		}
 
-	    if (glm::distance(start, pos) > reach) {
-	    	const RayTraceInfo info = {couldFindCube, pos, lastPos};
+	    cube = getCube((int)floorf(pos.x), (int)floorf(pos.y), (int)floorf(pos.z));
+
+	    if (cube) {
+	    	const RayTraceInfo info = {true, pos, pos + normal};
+	    	return info;
+	    } else if (glm::distance(start, pos) > reach) {
+	    	const RayTraceInfo info = {false, pos, pos + normal};
 	    	return info;
 	    }
 	}
-
-	// this prevents the edge case of placing a cube on a corner
-    int posDiff = 0;
-
-    if (std::floor(pos.x) != std::floor(lastPos.x)) {
-    	posDiff += 1;
-    }
-    if (std::floor(pos.y) != std::floor(lastPos.y)) {
-    	posDiff += 1;
-    }
-    if (std::floor(pos.z) != std::floor(lastPos.z)) {
-    	posDiff += 1;
-    }
-    if (posDiff == 1) {
-    	couldFindCube = true;
-    }
-
-	const RayTraceInfo info = {couldFindCube, pos, lastPos};
-	return info;
 }
 
 

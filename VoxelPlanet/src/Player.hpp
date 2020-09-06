@@ -7,7 +7,11 @@ public:
 	float xPos;
 	float yPos;
 	float zPos;
+
+	/** Rotation yaw of the player in radians. */
 	float rotationYaw;
+
+	/** Rotation pitch of the player in radians. */
 	float rotationPitch;
 
 

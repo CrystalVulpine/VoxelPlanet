@@ -169,12 +169,12 @@ void runGameLoop() {
 				glfwSetCursorPos(window, (double)settings.windowWidth / 2.0, (double)settings.windowHeight / 2.0);
 
 				// here's where we trace a ray from the player to a cube in the world
-				RayTraceInfo raySelection = mainWorld.rayTraceCubes(glm::vec3(player.xPos, player.yPos, player.zPos), player.rotationYaw, player.rotationPitch, 6.0f);
+				RayTraceInfo raySelection = mainWorld.rayTraceCubes(glm::vec3(player.xPos, player.yPos, player.zPos), player.rotationYaw, player.rotationPitch, 10.0f);
 
 				if (raySelection.cubeFound) {
-					double xd = std::floor(raySelection.pos.x);
-					double yd = std::floor(raySelection.pos.y);
-					double zd = std::floor(raySelection.pos.z);
+					float xd = floorf(raySelection.pos.x);
+					float yd = floorf(raySelection.pos.y);
+					float zd = floorf(raySelection.pos.z);
 
 					renderCubeSelect(xd, yd, zd);
 
