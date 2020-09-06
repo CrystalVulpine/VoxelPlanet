@@ -8,14 +8,9 @@
 #include <GLFW/glfw3.h>
 
 extern GLFWwindow * __restrict window;
-extern int windowWidth;
-extern int windowHeight;
 
-extern unsigned char antialiasingLevel;
-extern float worldBrightness;
-extern float skyColorRed;
-extern float skyColorGreen;
-extern float skyColorBlue;
+extern GLuint GLprogram;
+extern GLuint GLmatrix;
 
 extern bool worldIsDirty;
 
@@ -26,3 +21,9 @@ extern void renderCubeSelect(const double x, const double y, const double z);
 extern int setupOpenGL();
 extern void doDrawTick();
 extern void cleanupOpenGL();
+
+/** Loads the shaders from the specified (relative) file paths. */
+extern GLuint loadShaders(const GLchar * const __restrict vertexShaderPath, const GLchar * const __restrict fragmentShaderPath);
+
+/** adds and draws a list to the gui vbo. `count` refers to the number of vertices. **/
+extern void renderToGUI(unsigned int count, const double * const __restrict vertices, const float * const __restrict colors);
