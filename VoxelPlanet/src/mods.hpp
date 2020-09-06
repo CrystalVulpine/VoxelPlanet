@@ -1,3 +1,9 @@
+/**
+ * @file mods.hpp
+ *
+ * This header contains functions for loading and running mods.
+ */
+
 #pragma once
 
 #include "global.hpp"

@@ -1,3 +1,9 @@
+/**
+ * @file global.hpp
+ *
+ * This header contains global variables and definitions.
+ */
+
 #pragma once
 
 #include "World.hpp"

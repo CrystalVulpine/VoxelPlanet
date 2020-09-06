@@ -1,3 +1,9 @@
+/**
+ * @file rendering.hpp
+ *
+ * This header contains most of the functions and variables for rendering and drawing the game with OpenGL.
+ */
+
 #pragma once
 
 #if defined(_WIN32)

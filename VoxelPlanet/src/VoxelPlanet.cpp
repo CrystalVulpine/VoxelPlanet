@@ -1,3 +1,10 @@
+/*! \mainpage VoxelPlanet documentation
+ *
+ * \section intro_sec Introduction
+ *
+ * This is the main documentation page for VoxelPlanet. Here you will find the documentation for all of the global functions, variables, and definitions available in the game.
+ */
+
 #include "global.hpp"
 #include "World.hpp"
 #include "rendering.hpp"
